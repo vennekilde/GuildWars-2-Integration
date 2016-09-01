@@ -1,1 +1,1 @@
-# GuildWars2-Integration
+# GuildWars-2-Integration

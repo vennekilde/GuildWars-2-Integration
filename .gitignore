@@ -1,0 +1,6 @@
+/nbproject/
+/vendor/
+/src/config.php
+/src/Modules/Verification/config.php
+/src/Modules/Verification/Modules/SMF/config.php
+/src/Modules/Verification/Modules/Teamspeak/config.php

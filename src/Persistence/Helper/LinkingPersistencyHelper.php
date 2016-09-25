@@ -149,13 +149,13 @@ class LinkingPersistencyHelper {
         }
        
         $preparedQueryString = '
-            INSERT INTO '.$gw2i_db_prefix.'user_service_links (link_id, service_user_id, service_id, is_primary' . (isset($displayName) ? ", service_display_name" : "") . (isset($attributes) ? ", attributes" : "") . ')
-                VALUES(?,?,?,?' . (isset($displayName) ? ",?" : "") . (isset($attributes) ? ",?" : "") . ')
+            INSERT INTO '.$gw2i_db_prefix.'user_service_links (link_id, service_user_id, service_id, is_primary' . (!empty($displayName) ? ", service_display_name" : "") . (isset($attributes) ? ", attributes" : "") . ')
+                VALUES(?,?,?,?' . (!empty($displayName) ? ",?" : "") . (isset($attributes) ? ",?" : "") . ')
             ON DUPLICATE KEY UPDATE 
                 link_id = VALUES(link_id),
                 service_user_id = VALUES(service_user_id),
                 is_primary = VALUES(is_primary)'
-                . (isset($displayName) ? ", service_display_name = VALUES(service_display_name)" : "")
+                . (!empty($displayName) ? ", service_display_name = VALUES(service_display_name)" : "")
                 . (isset($attributes) ? ", attributes = VALUES(attributes)" : "");
         
         $queryParams = array(
@@ -164,7 +164,7 @@ class LinkingPersistencyHelper {
             $serviceId,
             $isPrimary
         );
-        if(isset($displayName)){
+        if(!empty($displayName)){
             $queryParams[] = $displayName;
         }
         if(isset($attributes)){

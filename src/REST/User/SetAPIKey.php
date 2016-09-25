@@ -42,6 +42,7 @@ use GW2Integration\Exceptions\MissingRequiredAPIKeyPermissions;
 use GW2Integration\Exceptions\UnableToDetermineLinkId;
 use GW2Integration\Persistence\Helper\GW2DataPersistence;
 use GW2Integration\REST\RESTHelper;
+use GW2Treasures\GW2Api\V2\Authentication\Exception\AuthenticationException;
 use function GuzzleHttp\json_encode;
 
 $linkedUser = RESTHelper::getLinkedUserFromParams();
@@ -60,22 +61,29 @@ try {
     //Exception handling
     if ($e instanceof InvalidAPIKeyNameException || $e instanceof InvalidAPIKeyFormatException) {
         http_response_code(417); //invalid api keyname
-        $logger->info('SetAPIKey Exception: ' . get_class($e). ": ".$e->getMessage());
+        $logger->info($linkedUser->compactString().' - SetAPIKey Exception: ' . get_class($e). ": ".$e->getMessage());
         echo $e->getMessage();
         
     } else if ($e instanceof MissingRequiredAPIKeyPermissions) {
         http_response_code(401); //Unauthorized
         $permissions = $e->getPermissions();
-        $logger->info("SetAPIKey Exception: MissingRequiredAPIKeyPermissions",$permissions, $linkedUser);
+        $logger->info($linkedUser->compactString()." - SetAPIKey Exception: MissingRequiredAPIKeyPermissions",$permissions, $linkedUser);
         echo '["' . implode('","', $permissions) . '"]';
     } else if($e instanceof UnableToDetermineLinkId){
-        $logger->info('SetAPIKey Exception: UnableToDetermineLinkId: '.$linkedUser, $e->getTrace());
+        $logger->info($linkedUser->compactString().' - SetAPIKey Exception: UnableToDetermineLinkId: '.$linkedUser, $e->getTrace());
         echo "false";
     } else {
         http_response_code(406); //Not acceptable
-        //Could not add API key for what ever reason
-        $logger->info('SetAPIKey Exception: ' . get_class($e) . ": ".$e->getMessage(), $e->getTrace());
-        echo $e->getMessage();
+        $errorMsg = $e->getMessage();
+        if($e instanceof AuthenticationException){
+            //Could not add API key for what ever reason
+            $logger->info($linkedUser->compactString().' - SetAPIKey Exception: ' . get_class($e) . ": ".$e->getMessage());
+            $errorMsg = "API Key is invalid or the API is down";
+        } else {
+            //Could not add API key for what ever reason
+            $logger->info($linkedUser->compactString().' - SetAPIKey Exception: ' . get_class($e) . ": ".$e->getMessage(), $e->getTrace());
+        }
+        echo $errorMsg;
     }
     exit(0);
 }

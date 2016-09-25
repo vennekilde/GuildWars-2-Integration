@@ -1,0 +1,186 @@
+/*
+The MIT License
+
+Copyright 2016 Jeppe Boysen Vennekilde.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+/* 
+    Created on : 04-09-2016, 07:47:27
+    Author     : Jeppe Boysen Vennekilde
+*/
+
+.mdl-stepper {
+    max-width: none;
+    box-shadow: none;
+    background-color: transparent;
+    padding-top: 0px;
+    margin-top: 0px;
+}
+.mdl-step__transient-overlay {
+    background-color: transparent;
+}
+.mdl-step {
+    height: inherit;
+}
+.mdl-step__content {
+    overflow: inherit;
+}
+#api-key-name {
+    display: inline-block;
+    font-weight: bold;
+}
+.information-container {
+    display: inline-flex;
+    vertical-align: middle;
+}
+.information-container .material-icons {
+    color: #2196F3;
+    padding-right: 16px;
+}
+.mdl-step__label .mdl-step__title .mdl-step__title-message {
+    max-height: 55px;
+    white-space: inherit;
+    overflow: overlay;
+    position: inherit;
+}
+.step-done{
+    color: green !important;
+}
+.step-error{
+    color: #F44336 !important;
+}
+.inline-var {
+    display: inline-block;
+}
+.linkstatus-list-item{
+    width: 200px;
+}
+.mdl-tabs__panel{
+    margin-top: 10px;
+}
+.table-td-ta-left td {
+    text-align: left;
+}    
+.mdl-layout__header {
+    background-color: rgb(39, 39, 39);
+}
+.mdl-layout__header-row>* {
+    color: #aaa;
+}
+.linked-service-container {
+    padding-bottom: 10px;
+}
+.service_link_unavailable {
+    font-style: italic;
+    color: #cf0c0c;
+}
+.service-entry td:nth-child(3){
+    white-space: pre-wrap;
+}
+.secondaryheading {
+    background-color: #f2f2f2;
+}
+.secondaryheading {
+    padding: 24px;
+}
+.primaryheading {
+    padding: 0px 24px 24px 24px;
+}
+.vertical-mdl-tabs .mdl-tabs__panel > .primaryheading ~ .primaryheading{
+    padding-top: 24px;
+}
+.detailed-log{
+    height: 400px;
+}
+.detailed-log-container{
+    overflow: auto;
+    white-space: pre-wrap;
+    height: 100%;
+    background: white;
+    padding-left: 5px;
+}
+.response-div {
+    border-left: solid 3px #C0EbF1;
+    padding-left: 20px;
+    white-space: pre-wrap;
+    margin-top: 24px;
+    display: none;
+}
+.button-spinner {
+    vertical-align: top;
+}
+.spinner-button {
+    top: 4px;
+    margin-left: 6px;
+    display: none;
+}
+/*
+ * Vertical MDL Tabs
+ * Taken from http://rahul-sagore.github.io/#/blog/vertical-tabs-with-material-design-lite
+ * Has been modified to not use mdl grid
+*/
+/*
+.vertical-mdl-tabs {
+  padding: 30px 0;
+    display: table;
+}
+.vertical-mdl-tabs-bar {
+    display: table-cell;
+}
+.vertical-mdl-tabs-panels {
+    display: table-cell;
+    width: 100%;
+}
+
+.vertical-mdl-tabs .mdl-tabs__tab-bar {
+    -webkit-flex-direction: column;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    height: inherit;
+    border-bottom: none;
+    border-right: 1px solid rgba(10, 11, 49, 0.20);
+}
+
+.vertical-mdl-tabs .mdl-tabs__tab {
+    width: 100%;
+    height: 35px;
+    line-height: 35px;
+    box-sizing: border-box;
+    letter-spacing: 2px;
+}
+
+.vertical-mdl-tabs.mdl-tabs.is-upgraded a.mdl-tabs__tab.is-active {
+    border-right: 2px solid #ED462F;
+    color: #ED462F;
+}
+.vertical-mdl-tabs.mdl-tabs.is-upgraded .mdl-tabs__tab.is-active:after {
+    content: inherit;
+    height: 0;
+}
+
+.vertical-mdl-tabs.mdl-tabs .mdl-tabs__tab {
+    text-align: left;
+}
+
+/* I will handle padding manually
+.vertical-mdl-tabs.mdl-tabs.is-upgraded .mdl-tabs__panel.is-active, .mdl-tabs__panel {
+    padding: 0 30px;
+}
+*/

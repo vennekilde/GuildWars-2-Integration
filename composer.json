@@ -1,0 +1,21 @@
+{
+    "name": "vennekilde/gw2integration",
+    "description": "Description of project GW2 Website API Integration.",
+    "version": "4.0.0",
+    "authors": [
+        {
+            "name": "Jeppe Boysen Vennekilde",
+            "email": "jeppe@jeppes.info"
+        }
+    ],
+    "require": {
+        "gw2treasures/gw2api": "^2.4",
+        "katzgrau/klogger": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "GW2Integration\\": "src"
+        },
+        "classmap": ["src/"]
+    }
+}

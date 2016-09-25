@@ -35,6 +35,8 @@ use GW2Integration\Exceptions\LinkedUserIdConflictException;
 use GW2Integration\Exceptions\UnableToDetermineLinkId;
 use GW2Integration\Persistence\Persistence;
 use PDO;
+use function GuzzleHttp\json_decode;
+use function GuzzleHttp\json_encode;
 
 if (!defined('GW2Integration')) {
     die('Hacking attempt...');
@@ -133,13 +135,13 @@ class LinkingPersistencyHelper {
         }
     }
     
-    public static function persistServiceUserLink($linkedUser, $serviceUserId, $serviceId, $displayName = null, $isPrimary = true){
+    public static function persistServiceUserLink($linkedUser, $serviceUserId, $serviceId, $displayName = null, $isPrimary = true, $attributes = null){
         global $gw2i_db_prefix;
         //Determine the link id for the given linked user
         $linkId = LinkingPersistencyHelper::determineLinkedUserId($linkedUser);
         
         //Generate events that will be created by this new link
-        $linkEventsFromNewLink = static::getLinkEventsFromNewLink($linkId, $serviceUserId, $serviceId, $displayName, $isPrimary);
+        $linkEventsFromNewLink = static::getLinkEventsFromNewLink($linkId, $serviceUserId, $serviceId, $displayName, $isPrimary, $attributes);
         
         if($linkEventsFromNewLink == false){
             //No events means that the new link is either the same as the current link, or it simply isn't worth persisting
@@ -147,13 +149,14 @@ class LinkingPersistencyHelper {
         }
        
         $preparedQueryString = '
-            INSERT INTO '.$gw2i_db_prefix.'user_service_links (link_id, service_user_id, service_id, is_primary' . ($displayName != null ? ", service_display_name" : "") . ')
-                VALUES(?,?,?,?' . ($displayName != null ? ",?" : "") . ')
+            INSERT INTO '.$gw2i_db_prefix.'user_service_links (link_id, service_user_id, service_id, is_primary' . (isset($displayName) ? ", service_display_name" : "") . (isset($attributes) ? ", attributes" : "") . ')
+                VALUES(?,?,?,?' . (isset($displayName) ? ",?" : "") . (isset($attributes) ? ",?" : "") . ')
             ON DUPLICATE KEY UPDATE 
                 link_id = VALUES(link_id),
                 service_user_id = VALUES(service_user_id),
                 is_primary = VALUES(is_primary)'
-                . ($displayName != null ? ", service_display_name = VALUES(service_display_name)" : "");
+                . (isset($displayName) ? ", service_display_name = VALUES(service_display_name)" : "")
+                . (isset($attributes) ? ", attributes = VALUES(attributes)" : "");
         
         $queryParams = array(
             $linkId,
@@ -161,8 +164,11 @@ class LinkingPersistencyHelper {
             $serviceId,
             $isPrimary
         );
-        if($displayName != null){
+        if(isset($displayName)){
             $queryParams[] = $displayName;
+        }
+        if(isset($attributes)){
+            $queryParams[] = $attributes;
         }
         
         $preparedStatement = Persistence::getDBEngine()->prepare($preparedQueryString);
@@ -208,7 +214,7 @@ class LinkingPersistencyHelper {
         return $result;
     }
     
-    public static function getLinkEventsFromNewLink($linkId, $serviceUserId, $serviceId, $displayName, $isPrimary){
+    public static function getLinkEventsFromNewLink($linkId, $serviceUserId, $serviceId, $displayName, $isPrimary, $attributes){
         $affectedLinks = static::getAffectedLinksFromNewLink($linkId, $isPrimary, $serviceUserId, $serviceId);
         $events = array();
         $isLinkNew = true;
@@ -222,6 +228,7 @@ class LinkingPersistencyHelper {
                     && $affectedLink["service_user_id"] == $serviceUserId
                     && $affectedLink["is_primary"] == $isPrimary
                     && $affectedLink["link_id"] == $linkId
+                    && $affectedLink["attributes"] == $attributes
                 ){
                 //no need to update
                 return false;
@@ -236,9 +243,11 @@ class LinkingPersistencyHelper {
                         $serviceId, 
                         $serviceUserId, 
                         $displayName, 
-                        $isPrimary, 
+                        $isPrimary,
+                        $attributes,
                         $affectedLink["service_display_name"], 
-                        $affectedLink["is_primary"]);
+                        $affectedLink["is_primary"],
+                        $affectedLink["attributes"]);
             } else {
                 //If the link isn't the same link, then the affected link is removed
                 $events[] =  new UserServiceLinkRemoved(
@@ -246,7 +255,8 @@ class LinkingPersistencyHelper {
                         $affectedLink["service_id"], 
                         $affectedLink["service_user_id"], 
                         $affectedLink["service_display_name"], 
-                        $affectedLink["is_primary"]);
+                        $affectedLink["is_primary"],
+                        $affectedLink["attributes"]);
             }
         }
         if($isLinkNew){
@@ -255,7 +265,8 @@ class LinkingPersistencyHelper {
                     $serviceId, 
                     $serviceUserId, 
                     $displayName, 
-                    $isPrimary);
+                    $isPrimary,
+                    $attributes);
         }
         return $events;
     }
@@ -277,6 +288,8 @@ class LinkingPersistencyHelper {
             $serviceId,
             $serviceUserId,
         );
+        
+        //There can be multiple secondary links on the same service, so only run this check if the link is primary
         if($isPrimary){
             $preparedQueryString .= " OR (link_id = ? AND service_id = ? AND is_primary = 1)";
             $values[] = $linkId;
@@ -333,7 +346,7 @@ class LinkingPersistencyHelper {
         return $result;
     }
     
-    public static function updateDisplayName($serviceUserId, $serviceId, $displayName = null){
+    public static function setDisplayName($serviceUserId, $serviceId, $displayName = null){
         global $gw2i_db_prefix;
         $preparedQueryString = 'UPDATE '.$gw2i_db_prefix.'user_service_links SET service_display_name = ? WHERE service_user_id = ? AND service_id = ?';
         $queryParams = array(
@@ -343,6 +356,71 @@ class LinkingPersistencyHelper {
         );
         $preparedStatement = Persistence::getDBEngine()->prepare($preparedQueryString);
         $preparedStatement->execute($queryParams);
+    }
+    
+    public static function setAttributes($serviceUserId, $serviceId, $attributes = null){
+        global $gw2i_db_prefix;
+        $preparedQueryString = 'UPDATE '.$gw2i_db_prefix.'user_service_links SET attributes = ? WHERE service_user_id = ? AND service_id = ?';
+        $queryParams = array(
+            $attributes,
+            $serviceUserId,
+            $serviceId
+        );
+        $preparedStatement = Persistence::getDBEngine()->prepare($preparedQueryString);
+        $preparedStatement->execute($queryParams);
+    }
+    
+    public static function setAttribute($serviceUserId, $serviceId, $attributeName, $attributeValue){
+        global $gw2i_db_prefix;
+        
+        $preparedQueryString = 'SELECT service_id, service_user_id, attributes FROM '.$gw2i_db_prefix.'user_service_links WHERE service_user_id = ? AND service_id = ?';
+        $queryParams = array(
+            $serviceUserId,
+            $serviceId
+        );
+        $preparedStatement = Persistence::getDBEngine()->prepare($preparedQueryString);
+        $preparedStatement->execute($queryParams);
+        
+        $response = $preparedStatement->fetch(PDO::FETCH_ASSOC);
+        if(empty($response["attributes"])){
+            $json = array();
+        } else {
+            $json = json_decode($response["attributes"], true);
+        }
+        
+        if(empty($attributeValue)){
+            unset($json[$attributeName]);
+        } else {
+            $json[$attributeName] = $attributeValue;
+        }
+        static::setAttributes($serviceUserId, $serviceId, json_encode($json));
+    }
+    
+    /**
+     * 
+     * @param LinkedUser $linkedUser
+     * @param string $attributeName
+     */
+    public static function removeAttributeFromAllUserLinks($linkedUser, $attributeName){
+        global $gw2i_db_prefix;
+        $userId = LinkingPersistencyHelper::determineLinkedUserId($linkedUser);
+        
+        $preparedQueryString = 'SELECT service_id, service_user_id, attributes FROM '.$gw2i_db_prefix.'user_service_links WHERE link_id = ?';
+        $queryParams = array(
+            $userId
+        );
+        $preparedStatement = Persistence::getDBEngine()->prepare($preparedQueryString);
+        $preparedStatement->execute($queryParams);
+        
+        $response = $preparedStatement->fetchAll(PDO::FETCH_ASSOC);
+        
+        foreach($response AS $linkData){
+            $json = json_decode($linkData["attributes"], true);
+            if(isset($json[$attributeName])){
+                unset($json[$attributeName]);
+                static::setAttributes($linkData["service_user_id"], $linkData["service_id"], json_encode($json));
+            }
+        }
     }
     
     /**

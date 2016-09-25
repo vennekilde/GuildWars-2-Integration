@@ -113,6 +113,8 @@ class VerificationController {
                 true
             );
         
+        LinkingPersistencyHelper::removeAttributeFromAllUserLinks($linkedUser, "tempExpired");
+        
         $logger->info($linkedUser->compactString() . " Has been granted temporary access as world $world");
     }
 
@@ -150,7 +152,7 @@ class VerificationController {
             //Access expired
             } else if ($expired) {
                 $result = new VerificationStatus(VerificationStatus::ACCESS_DENIED_EXPIRED);
-
+                
             //Home world access
             } else if ($gw2i_home_world == $extensiveAccountData["a_world"]) {
                 if ($temporary) {
@@ -195,6 +197,24 @@ class VerificationController {
             }
         }
         $result->setLinkId($linkedUser->getLinkedId());
+        
+        //If a specific user service link is requested, attach the link attributes to the verification status
+        if(isset($linkedUser->fetchServiceId) && isset($linkedUser->fetchServiceUserId)) {
+            if(isset($linkedUser->primaryServiceIds[$linkedUser->fetchServiceId]) 
+                    && $linkedUser->primaryServiceIds[$linkedUser->fetchServiceId][0] == $linkedUser->fetchServiceUserId
+                    && isset($linkedUser->primaryServiceIds[$linkedUser->fetchServiceId][2])){
+                
+                $result->setAttributes($linkedUser->primaryServiceIds[$linkedUser->fetchServiceId][2]);
+                
+            } else if(isset($linkedUser->secondaryServiceIds[$linkedUser->fetchServiceId]) 
+                    && isset($linkedUser->secondaryServiceIds[$linkedUser->fetchServiceId][$linkedUser->fetchServiceUserId])
+                    && isset($linkedUser->secondaryServiceIds[$linkedUser->fetchServiceId][$linkedUser->fetchServiceUserId][1])){
+                
+                $result->setAttributes($linkedUser->secondaryServiceIds[$linkedUser->fetchServiceId][$linkedUser->fetchServiceUserId][1]);
+                
+            }
+        }
+            
         return $result;
     }
 }

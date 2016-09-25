@@ -74,15 +74,15 @@ class LinkedUser {
     }
     
     
-    public function setPrimaryarySeviceId($serviceUserId, $serviceId, $displayName = null){
-        $this->primaryServiceIds[$serviceId] = array($serviceUserId, $displayName);
+    public function setPrimaryarySeviceId($serviceUserId, $serviceId, $displayName = null, $attributes = null){
+        $this->primaryServiceIds[$serviceId] = array($serviceUserId, $displayName, $attributes);
     }
     
-    public function addSecondarySeviceId($serviceUserId, $serviceId, $displayName = null){
+    public function addSecondarySeviceId($serviceUserId, $serviceId, $displayName = null, $attributes = null){
         if(!isset($this->secondaryServiceIds[$serviceId])){
             $this->secondaryServiceIds[$serviceId] = array();
         }
-        $this->secondaryServiceIds[$serviceId][$serviceUserId] = $displayName;
+        $this->secondaryServiceIds[$serviceId][$serviceUserId] = array($displayName, $attributes);
     }
     
     public function addOnLinkedIdSetListener($listenerMethod){

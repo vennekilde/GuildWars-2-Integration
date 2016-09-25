@@ -3,7 +3,7 @@
 /*
  * The MIT License
  *
- * Copyright 2015 jeppe.
+ * Copyright 2016 Jeppe Boysen Vennekilde.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,38 +24,31 @@
  * THE SOFTWARE.
  */
 
-namespace GW2Integration\Events\Events;
+namespace GW2Integration\REST\User;
 
-/**
- * Description of GW2ResponseEvent
- *
- * @author jeppe
- */
-class UserServiceLinkRemoved extends UserServiceLinkEvent{
-    private $displayName;
-    private $isPrimary;
-    private $attributes;
-    
-    function __construct($linkId, $serviceId, $userId, $displayName, $isPrimary, $attributes) {
-        parent::__construct($linkId, $serviceId, $userId);
-        $this->displayName = $displayName;
-        $this->isPrimary = $isPrimary;
-    }
+require __DIR__.'/../../RestrictedRESTHelper.php';
 
-    public function getDisplayName() {
-        return $this->displayName;
-    }
+use GW2Integration\Persistence\Helper\LinkingPersistencyHelper;
+use function GuzzleHttp\json_encode;
 
-    public function getIsPrimary() {
-        return $this->isPrimary;
-    }
-    
-    public function getAttributes() {
-        return $this->attributes;
-    }
+global $gw2i_linkedServices;
 
-    public function __toString() {
-        return "Removed link [linkId: ".$this->getLinkId().", serviceId: ".$this->getServiceId().", userId: ".$this->getUserId().", displayName: $this->displayName, IsPrimary: $this->isPrimary, attributes: $this->attributes]";
-    }
+$attributeName = filter_input(INPUT_GET, 'name');
+$attributeValue = filter_input(INPUT_GET, 'value');
+$serviceUserId = filter_input(INPUT_GET, 'user-id');
+$serviceId = filter_input(INPUT_GET, 'service-id');
 
+$response = array();
+
+if(isset($attributeName) && isset($serviceUserId) && isset($serviceId)){
+    if(isset($attributeValue)){
+        //get null, false, etc to be the correct type
+        $attributeValue = json_encode(json_decode($attributeValue));
+    }
+    LinkingPersistencyHelper::setAttribute($serviceUserId, $serviceId, $attributeName, $attributeValue);
+    $response["result"] = "success";
+} else {
+    $response["error"] = "Missing params";
 }
+
+echo json_encode($response);

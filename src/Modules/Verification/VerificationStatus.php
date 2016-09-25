@@ -39,6 +39,7 @@ class VerificationStatus extends BetterEnum {
     private $banReason;
     private $linkId;
     private $mirrorOwnerServiceId;
+    private $attributes;
 
     const __default = self::ACCESS_DENIED_ACCOUNT_NOT_LINKED;
     const ACCESS_GRANTED_HOME_WORLD = 0;
@@ -83,6 +84,14 @@ class VerificationStatus extends BetterEnum {
         $this->mirrorOwnerServiceId = $mirrorOwnerServiceId;
     }
     
+    public function getAttributes() {
+        return $this->attributes;
+    }
+
+    public function setAttributes($attributes) {
+        $this->attributes = $attributes;
+    }
+        
     function toJSON($useEnumId){
         $accessStatus = null;
     
@@ -102,6 +111,10 @@ class VerificationStatus extends BetterEnum {
         //add ban data if banned
         if($this->getBanReason() != null){
             $result["ban-reason"] = $this->getBanReason();
+        }
+        //add ban data if banned
+        if($this->getAttributes() != null){
+            $result["attributes"] = $this->getAttributes();
         }
         //Add mirror owner data if given user is not the primary user
         if($this->getMirrorOwnerServiceId() != null){

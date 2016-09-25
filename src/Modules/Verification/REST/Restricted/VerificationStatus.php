@@ -41,7 +41,9 @@ $useEnumsIds = isset($_REQUEST["enum-ids"]);
 foreach($linkedUsers AS $id => $linkedUser){
     try{
         $response[$id] = processAccountData($linkedUser, GW2DataPersistence::getExtensiveAccountData($linkedUser), $useEnumsIds);
-        LinkingPersistencyHelper::updateDisplayName($linkedUser->fetchServiceUserId, $linkedUser->fetchServiceId, $linkedUser->fetchServiceDisplayName);
+        if(!empty($linkedUser->fetchServiceDisplayName)){
+            LinkingPersistencyHelper::setDisplayName($linkedUser->fetchServiceUserId, $linkedUser->fetchServiceId, $linkedUser->fetchServiceDisplayName);
+        }
     } catch(UnableToDetermineLinkId $ex){
         if($useEnumsIds){
             $accessStatus = VerificationStatus::ACCESS_DENIED_ACCOUNT_NOT_LINKED;

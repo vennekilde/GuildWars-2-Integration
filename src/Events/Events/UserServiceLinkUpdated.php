@@ -34,24 +34,28 @@ namespace GW2Integration\Events\Events;
 class UserServiceLinkUpdated extends UserServiceLinkEvent{
     private $oldDisplayName;
     private $oldIsPrimary;
+    private $oldAttributes;
     
     private $newDisplayName;
     private $newIsPrimary;
+    private $newAttributes;
     
     
     function __construct(
             $linkId,
             $serviceId, 
             $userId, 
-            $newDisplayName, $newIsPrimary, 
+            $newDisplayName, $newIsPrimary, $newAttributes,
             //If the new link is replacing an old link, fill in the old data
-            $oldDisplayName = null, $oldIsPrimary = null
+            $oldDisplayName = null, $oldIsPrimary = null, $oldAttributes
         ) {
             parent::__construct($linkId, $serviceId, $userId);
         $this->oldDisplayName = $oldDisplayName;
         $this->oldIsPrimary = $oldIsPrimary;
+        $this->oldAttributes = $oldAttributes;
         $this->newDisplayName = $newDisplayName;
         $this->newIsPrimary = $newIsPrimary;
+        $this->newAttributes = $newAttributes;
     }
     
 
@@ -62,6 +66,10 @@ class UserServiceLinkUpdated extends UserServiceLinkEvent{
     public function getOldIsPrimary() {
         return $this->oldIsPrimary;
     }
+    
+    public function getOldAttributes() {
+        return $this->oldAttributes;
+    }
 
     public function getNewDisplayName() {
         return $this->newDisplayName;
@@ -70,10 +78,13 @@ class UserServiceLinkUpdated extends UserServiceLinkEvent{
     public function getNewIsPrimary() {
         return $this->newIsPrimary;
     }
-        
-    public function __toString() {
-        $toString = "UserServiceLinkUpdated - linkId: ".$this->getLinkId().", serviceId: ".$this->getServiceId().", userId: ".$this->getUserId().", New link [displayName: $this->newDisplayName, IsPrimary: $this->newIsPrimary], Old Link [displayName: $this->oldDisplayName, IsPrimary: $this->oldIsPrimary]";
-        return $toString;
+
+    public function getNewAttributes() {
+        return $this->newAttributes;
     }
 
+    public function __toString() {
+        $toString = "UserServiceLinkUpdated - linkId: ".$this->getLinkId().", serviceId: ".$this->getServiceId().", userId: ".$this->getUserId().", New link [displayName: $this->newDisplayName, IsPrimary: $this->newIsPrimary, attributes: $this->newAttributes], Old Link [displayName: $this->oldDisplayName, IsPrimary: $this->oldIsPrimary, attributes: $this->oldAttributes]";
+        return $toString;
+    }
 }

@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS gw2integration_user_service_links (
     service_id INT(11) NOT NULL, 
     service_display_name VARCHAR(64) NOT NULL DEFAULT 'Unknown Display Name', 
     is_primary TINYINT(1) NOT NULL, 
+    attributes VARCHAR(128) NOT NULL, 
 	PRIMARY KEY (service_user_id, service_id)
 );
 

@@ -53,9 +53,9 @@ class LinkedUserController {
         foreach($serviceLinks AS $serviceLink){
             $linkedUser->setLinkedId($serviceLink["link_id"]);
             if($serviceLink["is_primary"] == 1){
-                $linkedUser->setPrimaryarySeviceId($serviceLink["service_user_id"], $serviceLink["service_id"], $serviceLink["service_display_name"]);
+                $linkedUser->setPrimaryarySeviceId($serviceLink["service_user_id"], $serviceLink["service_id"], $serviceLink["service_display_name"], $serviceLink["attributes"]);
             } else {
-                $linkedUser->addSecondarySeviceId($serviceLink["service_user_id"], $serviceLink["service_id"], $serviceLink["service_display_name"]);
+                $linkedUser->addSecondarySeviceId($serviceLink["service_user_id"], $serviceLink["service_id"], $serviceLink["service_display_name"], $serviceLink["attributes"]);
             }
         }
         return $linkedUser;

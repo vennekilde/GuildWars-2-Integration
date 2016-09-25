@@ -58,30 +58,32 @@ try {
     
 } catch (Exception $e) {
     global $logger;
+    
+    $baseErrorMsg = $linkedUser->compactString().' - API Key: '.$apiKey.' - SetAPIKey Exception: ' . get_class($e) . ": ";
     //Exception handling
     if ($e instanceof InvalidAPIKeyNameException || $e instanceof InvalidAPIKeyFormatException) {
         http_response_code(417); //invalid api keyname
-        $logger->info($linkedUser->compactString().' - SetAPIKey Exception: ' . get_class($e). ": ".$e->getMessage());
+        $logger->info($baseErrorMsg . $e->getMessage());
         echo $e->getMessage();
         
     } else if ($e instanceof MissingRequiredAPIKeyPermissions) {
         http_response_code(401); //Unauthorized
         $permissions = $e->getPermissions();
-        $logger->info($linkedUser->compactString()." - SetAPIKey Exception: MissingRequiredAPIKeyPermissions",$permissions, $linkedUser);
+        $logger->info($baseErrorMsg . $e->getMessage(),$permissions);
         echo '["' . implode('","', $permissions) . '"]';
     } else if($e instanceof UnableToDetermineLinkId){
-        $logger->info($linkedUser->compactString().' - SetAPIKey Exception: UnableToDetermineLinkId: '.$linkedUser, $e->getTrace());
+        $logger->info($baseErrorMsg . $e->getMessage(), $e->getTrace());
         echo "false";
     } else {
         http_response_code(406); //Not acceptable
         $errorMsg = $e->getMessage();
         if($e instanceof AuthenticationException){
             //Could not add API key for what ever reason
-            $logger->info($linkedUser->compactString().' - SetAPIKey Exception: ' . get_class($e) . ": ".$e->getMessage());
+            $logger->info($baseErrorMsg . $e->getMessage());
             $errorMsg = "API Key is invalid or the API is down";
         } else {
             //Could not add API key for what ever reason
-            $logger->info($linkedUser->compactString().' - SetAPIKey Exception: ' . get_class($e) . ": ".$e->getMessage(), $e->getTrace());
+            $logger->info($baseErrorMsg . $e->getMessage(), $e->getTrace());
         }
         echo $errorMsg;
     }

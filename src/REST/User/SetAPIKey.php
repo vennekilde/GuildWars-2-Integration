@@ -36,6 +36,7 @@ require __DIR__.'/../RESTHelper.php';
 
 use Exception;
 use GW2Integration\API\APIKeyManager;
+use GW2Integration\Exceptions\InvalidAPIKeyFormatException;
 use GW2Integration\Exceptions\InvalidAPIKeyNameException;
 use GW2Integration\Exceptions\MissingRequiredAPIKeyPermissions;
 use GW2Integration\Exceptions\UnableToDetermineLinkId;
@@ -57,9 +58,9 @@ try {
 } catch (Exception $e) {
     global $logger;
     //Exception handling
-    if ($e instanceof InvalidAPIKeyNameException) {
+    if ($e instanceof InvalidAPIKeyNameException || $e instanceof InvalidAPIKeyFormatException) {
         http_response_code(417); //invalid api keyname
-        $logger->info('SetAPIKey Exception: InvalidAPIKeyNameException: '.$e->getMessage());
+        $logger->info('SetAPIKey Exception: ' . get_class($e). ": ".$e->getMessage());
         echo $e->getMessage();
         
     } else if ($e instanceof MissingRequiredAPIKeyPermissions) {
@@ -73,7 +74,7 @@ try {
     } else {
         http_response_code(406); //Not acceptable
         //Could not add API key for what ever reason
-        $logger->info('SetAPIKey Exception: '.$e->getMessage(), $e->getTrace());
+        $logger->info('SetAPIKey Exception: ' . get_class($e) . ": ".$e->getMessage(), $e->getTrace());
         echo $e->getMessage();
     }
     exit(0);

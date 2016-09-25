@@ -72,47 +72,52 @@ class GW2APICommunicator {
      * @return GW2ResponseEvent
      */
     public static function makeRequest($endPoint, $apiKey, $timeout = 5) {
-        
-        //Prepare cURL request
-        $curl = curl_init();
-        //Set URL
-        curl_setopt($curl, CURLOPT_URL, static::baseURL . $endPoint);
-        //Return response as a String instead of outputting to a screen
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT ,0); 
-        curl_setopt($curl, CURLOPT_TIMEOUT, $timeout);
-        //Prepare Request Header
-        $headers = array();
-        $headers[] = 'Authorization: Bearer ' . $apiKey;
-        //Add Request Header
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        try{
+            //Prepare cURL request
+            $curl = curl_init();
+            //Set URL
+            curl_setopt($curl, CURLOPT_URL, static::baseURL . $endPoint);
+            //Return response as a String instead of outputting to a screen
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_CONNECTTIMEOUT ,0); 
+            curl_setopt($curl, CURLOPT_TIMEOUT, $timeout);
+            //Prepare Request Header
+            $headers = array();
+            $headers[] = 'Authorization: Bearer ' . $apiKey;
+            //Add Request Header
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 
-        //Perform request
-        $response = curl_exec($curl);
-        //\IPS\Session::i()->log(null,  'GW2 API Response: ' . $response );
-        //HTTP Status
-        $http_status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        //Close request connection
-        curl_close($curl);
-        //Check if request was successful
-        if($http_status == 200){
-            //Decode Json response
-            $json = json_decode($response, true);
+            //Perform request
+            $response = curl_exec($curl);
+            //\IPS\Session::i()->log(null,  'GW2 API Response: ' . $response );
+            //HTTP Status
+            $http_status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
             //Check if request was successful
-            if (isset($json["text"]) && $json["text"] == "endpoint requires authentication") {
-                throw new GW2APIKeyException('endpoint requires authentication', $apiKey, $http_status, $response, 1);
+            if($http_status == 200){
+                //Decode Json response
+                $json = json_decode($response, true);
 
-            //Known to be set if endpoint can't be found
-            } elseif(isset($json["error"])){
-                throw new GW2APIKeyException($json["error"], $apiKey, $response, $http_status, 2);
+                //Check if request was successful
+                if (isset($json["text"]) && $json["text"] == "endpoint requires authentication") {
+                    throw new GW2APIKeyException('endpoint requires authentication', $apiKey, $http_status, $response, 1);
+
+                //Known to be set if endpoint can't be found
+                } elseif(isset($json["error"])){
+                    throw new GW2APIKeyException($json["error"], $apiKey, $response, $http_status, 2);
+                }
+            } else if($response === false){
+                throw new GW2APIKeyException('CURL Error: ' . curl_error($curl) . '. HTTP Code: '.$http_status, $apiKey, $response, $http_status, -1);
+            } else {
+                throw new GW2APIKeyException('HTTP Code: '.$http_status, $apiKey, $response, $http_status, -1);
             }
-        } else {
-            throw new GW2APIKeyException('HTTP Code: '.$http_status, $apiKey, $response, $http_status, -1);
+
+            $gw2ResponseEvent = new GW2ResponseEvent(-1, $json, $response, $endPoint, $http_status);
+            return $gw2ResponseEvent;
+        } finally {
+            //Close request connection
+            curl_close($curl);
         }
-        
-        $gw2ResponseEvent = new GW2ResponseEvent(-1, $json, $response, $endPoint, $http_status);
-        return $gw2ResponseEvent;
     }
     
     /**

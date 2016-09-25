@@ -99,7 +99,7 @@ class GW2DataController {
                     GW2DataPersistence::persistGuildDetails($json);
                 } catch(GW2APIException $e){
                     global $logger;
-                    $logger->error($e->getMessage(), $e->getTrace());
+                    $logger->error("Exception ".get_class($e) . ": " . $e->getMessage());
                 }
             }
         }

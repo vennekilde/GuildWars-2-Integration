@@ -1,6 +1,11 @@
 <?php
 
+use GW2Integration\LinkedServices\SMF\SimpleMachinesForum;
+use GW2Integration\LinkedServices\Teamspeak\Teamspeak;
 use GW2Integration\Logger\EventLogger;
+use GW2Integration\Modules\Verification\ModuleLoader;
+use GW2Integration\Modules\Verification\SMF\SimpleMachinesForumVerification;
+use GW2Integration\Modules\Verification\Teamspeak\TeamspeakVerification;
 use GW2Integration\Persistence\Helper\SettingsPersistencyHelper;
 use GW2Integration\Processes\Cleanup;
 use Katzgrau\KLogger\Logger;
@@ -51,6 +56,29 @@ $logger = new Logger($loggingDir, $loggingLevel, array(
 ));
 
 require_once __DIR__.'/config.php';
+
+/*******************************************
+ * Modules
+ *******************************************/
+
+$gw2i_verification_module = new ModuleLoader();
+$gw2i_smf_verification_module = new SimpleMachinesForumVerification();
+$gw2i_ts_verification_module = new TeamspeakVerification();
+$gw2i_modules = array(
+    $gw2i_verification_module->getModuleName() => $gw2i_verification_module,
+    $gw2i_smf_verification_module->getModuleName() => $gw2i_smf_verification_module,
+    $gw2i_ts_verification_module->getModuleName() => $gw2i_ts_verification_module
+);
+/*******************************************
+ * Linked Services
+ *******************************************/
+
+$gw2i_smf = new SimpleMachinesForum();
+$gw2i_ts = new Teamspeak();
+$gw2i_linkedServices = array(
+    $gw2i_smf->getServiceId() => $gw2i_smf,
+    $gw2i_ts->getServiceId() => $gw2i_ts,
+);
 
 foreach($gw2i_modules as $module) {
     $module->init();

@@ -26,15 +26,15 @@
  * Created: 23-09-2016
  */
 
-TRUNCATE gw2_integration_live.gw2integration_accounts;
-TRUNCATE gw2_integration_live.gw2integration_api_keys;
-TRUNCATE gw2_integration_live.gw2integration_user_service_links;
+TRUNCATE gw2integration_accounts;
+TRUNCATE gw2integration_api_keys;
+TRUNCATE gw2integration_user_service_links;
 
-INSERT INTO gw2_integration_live.gw2integration_accounts (link_id,a_uuid,a_username,a_world,a_created,a_access,a_commander,a_fractal_level,a_daily_ap,a_monthly_ap,a_wvw_rank)
+INSERT INTO gw2integration_accounts (link_id,a_uuid,a_username,a_world,a_created,a_access,a_commander,a_fractal_level,a_daily_ap,a_monthly_ap,a_wvw_rank)
 SELECT 	link_id, uuid, username,world,created,access,commander,fractal_level,daily_ap,monthly_ap,wvw_rank  FROM gw2_integration.gw2_accounts;
 
-INSERT INTO gw2_integration_live.gw2integration_api_keys (link_id,api_key,api_key_name,api_key_permissions,last_success,last_attempted_fetch)
+INSERT INTO gw2integration_api_keys (link_id,api_key,api_key_name,api_key_permissions,last_success,last_attempted_fetch)
 SELECT link_id,api_key,api_key_name,api_key_permissions,last_success Ascending,last_attempted_fetch  FROM gw2_integration.gw2_api_keys;
 
-INSERT INTO gw2_integration_live.gw2integration_user_service_links (link_id, service_id, service_user_id, service_display_name, is_primary)
+INSERT INTO gw2integration_user_service_links (link_id, service_id, service_user_id, service_display_name, is_primary)
 SELECT link_id, service_id, service_user_id, service_display_name, service_link_rank = 1  FROM gw2_integration.gw2_linked_services;

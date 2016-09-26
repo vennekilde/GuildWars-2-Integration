@@ -74,3 +74,7 @@ function decodeEntities(encodedString) {
     textArea.innerHTML = encodedString;
     return textArea.value;
 }
+
+function scrollToBottom(container){
+    $(container).scrollTop($(container)[0].scrollHeight);
+}

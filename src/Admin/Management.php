@@ -22,73 +22,10 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
 <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
 <script src="https://malsup.github.io/jquery.form.js"></script> 
 <script src="<?php echo $webPath ?>/js/common.js"></script>
+<script src="<?php echo $webPath ?>/js/admin.js"></script>
 
 <script> 
     webPath = "<?php echo $webPath ?>";
-    
-    $( document ).ready(function(){
-        //initialize ajax forms
-        $('.ajax-form').submit(function (ev) {
-            form = $(this);
-            ev.preventDefault();
-            
-            var data = form.serialize();
-            var formName = form.attr("name");
-            if(data){
-                data += "&form="+formName;
-            } else {
-                data = "form="+formName;
-            }
-            console.log(data);
-            form.find(".spinner-button").css('display', 'inline-block');
-            form.find(".mdl-button").prop("disabled",true)
-            $.ajax({
-                type: form.attr('method'),
-                url: form.attr('action'),
-                data: data,
-                success: function (response) {
-                    form.find(".spinner-button").hide();
-                    form.find(".mdl-button").prop("disabled",false)
-                    console.log(response);
-                    console.log("success");
-                    var json = JSON.parse(response)
-                    var div = form.find(".response-div");
-                    var html = "";
-                    if(json["data"] !== false){
-                        var data = json["data"];
-                        for (var key in data) {
-                            html += "<h5 style='text-transform: uppercase'>"+key.replace(/\-/g," ")+"</h5>";
-                            if(typeof data[key] === 'object') {
-                                html += JSON.stringify(data[key], null, 4);
-                            } else {
-                                html += data[key];
-                            }
-                        }
-                    } else {
-                        html = "No results found";
-                    }
-                    div.html(html);
-                    div.show();
-                    adjustHeight();
-                },
-                error: function(response){
-                    console.log("error");
-                    console.log(response);
-                    form.find(".spinner-button").hide();
-                    form.find(".mdl-button").prop("disabled",false)
-                }
-            });
-        });
-        //Scroll log to bottom
-        $(".detailed-log-container").scrollTop($(".detailed-log-container")[0].scrollHeight);
-        //Auto resize if within an IFrame
-        $(".detailed-log").bind('resize', function(){
-            adjustHeight();
-         }); 
-         
-         
-    });
-    
 </script>
 
 <div id="gw2i-container">
@@ -113,7 +50,7 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                         <h5>Data Lookup</h5>
                         <p>Lookup data for a user using either of the user's id<br />
                         Output is currently dumped directly from the database, so it isn't as nice to read as it could be</p>
-                        <form action='ManagementController.php' method="POST" name='search' class="ajax-form">
+                        <form action='ManagementController.php' method="POST" name='search' class="default-admin-form">
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                                 <input class="mdl-textfield__input" type="text" name="search-user-id" id="search-user-id">
                                 <label class="mdl-textfield__label" for="search-user-id">User Identification</label>
@@ -138,7 +75,7 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                             </button> 
                             <div class="mdl-spinner mdl-js-spinner is-active spinner-button"></div>
 
-                            <div class="response-div"></div>
+                            <div class="response-div response-div-style"></div>
                             <br /><br />
                         </form>
                     </div>
@@ -148,7 +85,7 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                         <h5>Synchronize Selected Users</h5>
                         <p>Synchronize the provided users below based on their id's, sepereated by commas</p>
 
-                        <form action='ManagementController.php' method="POST" name='sync-users' class="ajax-form">
+                        <form action='ManagementController.php' method="POST" name='sync-users' class="default-admin-form">
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                                 <input class="mdl-textfield__input" type="text" id="sync-users" name="sync-users">
                                 <label class="mdl-textfield__label" for="sync-users">Synchronize users</label>
@@ -172,7 +109,7 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                             </button> 
                             <div class="mdl-spinner mdl-js-spinner is-active spinner-button"></div>
 
-                            <div class="response-div"></div>
+                            <div class="response-div response-div-style"></div>
                             <br /><br />
                         </form>
                     </div>
@@ -180,7 +117,7 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                     <div class='secondaryheading'>
                         <h5>Batch Syncronization</h5>
                         <p>Synchronize the next X amount of user's schedualed to be synchronized with the GuildWars 2 API</p>
-                        <form action='ManagementController.php' method="POST" name='batch-process' class="ajax-form">
+                        <form action='ManagementController.php' method="POST" name='batch-process' class="default-admin-form">
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                                 <input class="mdl-textfield__input" type="text" pattern="-?[0-9]*(\.[0-9]+)?" name="batch-process-count" id="batch-process-count" value="<?php echo $gw2i_proccess_keys_per_run ; ?>">
                                 <label class="mdl-textfield__label" for="batch-process-count">Synchronize amount</label>
@@ -192,7 +129,7 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                             </button> 
                             <div class="mdl-spinner mdl-js-spinner is-active spinner-button"></div>
 
-                            <div class="response-div"></div>
+                            <div class="response-div response-div-style"></div>
                             <br /><br />
                         </form>
                     </div>
@@ -201,7 +138,7 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                         <h5>Generate Session Link</h5>
                         <p>Generate a unique link for accessing/linking a user</p>
 
-                        <form action='ManagementController.php' method="POST" name='gen-user-session' class="ajax-form">
+                        <form action='ManagementController.php' method="POST" name='gen-user-session' class="default-admin-form">
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                                 <input class="mdl-textfield__input" type="text" name="gen-session-user-id">
                                 <label class="mdl-textfield__label" for="gen-session-user-id">User Identification</label>
@@ -234,7 +171,7 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                             </button> 
                             <div class="mdl-spinner mdl-js-spinner is-active spinner-button"></div>
 
-                            <div class="response-div"></div>
+                            <div class="response-div response-div-style"></div>
                             <br /><br />
                         </form>
                     </div>
@@ -243,7 +180,7 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                     <div class='primaryheading'>
                         <h5>Set API Key</h5>
                         <p>Set the API Key for a user</p>
-                        <form action='ManagementController.php' method="POST" name='set-api-key' class="ajax-form">
+                        <form action='ManagementController.php' method="POST" name='set-api-key' class="default-admin-form">
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                                 <input class="mdl-textfield__input" type="text" name="user-id" id="user-id">
                                 <label class="mdl-textfield__label" for="user-id">User Identification</label>
@@ -275,7 +212,7 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                             </button> 
                             <div class="mdl-spinner mdl-js-spinner is-active spinner-button"></div>
 
-                            <div class="response-div"></div>
+                            <div class="response-div response-div-style"></div>
                             <br /><br />
                         </form>
                     </div>
@@ -284,7 +221,7 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                         <h5>Generate Unique API Key Name</h5>
                         <p>Generate a Unique API Key name for a specific user given the service they attempt to verify themselves with</p>
 
-                        <form action='ManagementController.php' method="POST" name='get-api-key-name' class="ajax-form">
+                        <form action='ManagementController.php' method="POST" name='get-api-key-name' class="default-admin-form">
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                                 <input class="mdl-textfield__input" type="text" name="user-id" id="user-id">
                                 <label class="mdl-textfield__label" for="user-id">User Identification</label>
@@ -306,7 +243,7 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                             </button> 
                             <div class="mdl-spinner mdl-js-spinner is-active spinner-button"></div>
 
-                            <div class="response-div"></div>
+                            <div class="response-div response-div-style"></div>
                             <br /><br />
                         </form>
                     </div>
@@ -412,27 +349,27 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                     <div class='secondaryheading'>
                         <h5>Detailed Log</h5>
                         <p>Detailed log read directly from the log file <b><?php echo "log_".date("Y-m-d").".log"; ?></b></p>
-                        <p>
-                            Current Timestamp: <b style="text-transform: uppercase;"><?php echo date("Y-m-d H:i:s"); ?></b>
+                        
+                        <form action='ManagementController.php' method="POST" name='get-log' class="log-admin-form">
+                            <p>
+                                Current Timestamp: <b style="text-transform: uppercase;"><?php echo date("Y-m-d H:i:s"); ?></b>
+                                <br />
+                                Current logging level: <b style="text-transform: uppercase;"><?php echo $loggingLevel; ?></b>
+                            </p>
+                            <button id="fetch-latest-log-btn" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner">
+                                Fetch latest log
+                            </button> 
+                            <button onclick="scrollToBottom('#detailed-log-container'); return false;" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner" style="margin-left: 10px;">
+                                Scroll to bottom
+                            </button> 
+                            <div class="mdl-spinner mdl-js-spinner is-active spinner-button"></div>
                             <br />
-                            Current logging level: <b style="text-transform: uppercase;"><?php echo $loggingLevel; ?></b>
-                        </p>
-                        <div class="detailed-log resizeable">
-                            <div class="detailed-log-container mdl-shadow--2dp"><?php
-                                    $date = date("Y-m-d");
-                                    $filePath = $loggingDir . "/log_$date.log";
-                                    $logFile = fopen($filePath, "r");
-                                    $fileSize = filesize($filePath);
-                                    if($fileSize > 0) {
-                                        echo htmlentities(fread($logFile,$fileSize));
-                                    } else {
-                                        echo "No log file for today";
-                                    }
-
-                                    fclose($logFile);
-                                ?>
+                            <br />
+                            <div id="detailed-log" class="detailed-log resizeable">
+                                <div id="detailed-log-container" class="detailed-log-container mdl-shadow--2dp response-div">
+                                </div>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
                 <div class="mdl-tabs__panel" id="tab6">

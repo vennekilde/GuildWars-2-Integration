@@ -164,6 +164,27 @@ switch($form){
         break;
         
         
+    case "get-log":
+        if(isset($formData["filename"])){
+            $logName = $formData["filename"];
+        } else {
+            $date = date("Y-m-d");
+            $logName = "log_$date.log";
+        }
+        $filePath = "$loggingDir/$logName";
+        $logFile = fopen($filePath, "r");
+        $fileSize = filesize($filePath);
+        if($fileSize > 0) {
+            $result["log"] = htmlentities(fread($logFile,$fileSize));
+        } else {
+            $result["error"] = "Could not find log file $logName";
+        }
+
+        fclose($logFile);
+            
+        break;
+        
+        
     default:
         $result = $_POST;
         break;

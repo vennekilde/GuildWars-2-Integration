@@ -78,3 +78,7 @@ function decodeEntities(encodedString) {
 function scrollToBottom(container){
     $(container).scrollTop($(container)[0].scrollHeight);
 }
+
+function addNotitification(msg, type){
+    $("#gw2i-notification-container").append('<div class="alert-box '+type+'">'+msg+'</div>');
+}

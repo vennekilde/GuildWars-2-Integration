@@ -75,7 +75,7 @@ class Teamspeak extends LinkedService{
     public function getConfigPageHTML(){
         return '<h5>Soft Restart Teamspeak Bot</h5>
                 <p>Soft restart the teamspeak bot, this means the actual Java VM is not restarted, only the internal components</p>
-                <form action="../LinkedServices/Teamspeak/ManagementController.php" method="POST" name="soft-restart-ts" class="ajax-form">
+                <form action="../LinkedServices/Teamspeak/ManagementController.php" method="POST" name="soft-restart-ts" class="default-admin-form">
                     <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner">
                         Soft Restart
                     </button> 

@@ -252,5 +252,19 @@ class APIKeyManager {
     public static function calculateTimeLeftBeforeKeyExpires($lastSuccess) {
         return strtotime($lastSuccess) + SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_EXPIRATION_TIME) - time();
     }
+    
+    public static function analyzeAnetAPI(){
+        $apiKey = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::DEBUG_API_KEY);
+        try{
+            if(!empty($apiKey) && static::isAPIKeyFormatValid($apiKey)){
+                static::$api->tokeninfo($apiKey);
+                static::$api->account($apiKey);
+                static::$api->characters($apiKey);
+            }
+            SettingsPersistencyHelper::persistSetting(SettingsPersistencyHelper::IS_API_DOWN, 0);
+        } catch(Exception $e){
+            SettingsPersistencyHelper::persistSetting(SettingsPersistencyHelper::IS_API_DOWN, 1);
+        }
+    }
 }
 APIKeyManager::init();

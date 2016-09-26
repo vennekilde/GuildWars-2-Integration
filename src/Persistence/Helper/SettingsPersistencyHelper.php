@@ -40,11 +40,14 @@ if (!defined('GW2Integration')) {
 class SettingsPersistencyHelper {
     const SALT = "salt";
     const API_KEY_EXPIRATION_TIME = "api_key_expiration_time";
+    const DEBUG_API_KEY = "debug_api_key";
+    const IS_API_DOWN = "is_api_down";
     const TEAMSPEAK_BOT_ADDRESS = "teamspeak_bot_address";
     const TEMPORARY_ACCESS_EXPIRATION = "temporary_access_expiration";
     
     public static $visibleSettings = array(
         self::API_KEY_EXPIRATION_TIME,
+        self::DEBUG_API_KEY,
         self::TEAMSPEAK_BOT_ADDRESS,
         self::TEMPORARY_ACCESS_EXPIRATION
     );

@@ -131,6 +131,9 @@ THE SOFTWARE.
     margin-left: 6px;
     display: none;
 }
+.gw2i-notification {
+    background-color: green;
+}
 /*
  * Vertical MDL Tabs
  * Taken from http://rahul-sagore.github.io/#/blog/vertical-tabs-with-material-design-lite
@@ -184,3 +187,28 @@ THE SOFTWARE.
     padding: 0 30px;
 }
 */
+
+.alert-box {
+    color:#555;
+    border-radius:10px;
+    font-size: 14px;
+    padding:10px;
+    margin:10px;
+}
+
+.error {
+    background:#ffecec no-repeat 10px 50%;
+    border:1px solid #f5aca6;
+}
+.success {
+    background:#e9ffd9 no-repeat 10px 50%;
+    border:1px solid #a6ca8a;
+}
+.warning {
+    background:#fff8c4 no-repeat 10px 50%;
+    border:1px solid #f2c779;
+}
+.notice {
+    background:#e3f7fc no-repeat 10px 50%;
+    border:1px solid #8ed9f6;
+}

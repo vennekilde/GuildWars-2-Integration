@@ -30,6 +30,13 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
 </script>
 
 <div id="gw2i-container">
+    <div id="gw2i-notification-container">
+        <?php
+            if(SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::IS_API_DOWN)){
+                echo '<div class="alert-box warning">The Guild Wars 2 API is current experiencing issues</div>';
+            }
+        ?>
+    </div>
     <div class="mdl-tabs vertical-mdl-tabs mdl-js-tabs">
         <div style="display: table; width: 100%;">
             <div class='vertical-mdl-tabs-bar'>
@@ -387,8 +394,9 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                             <?php
                                 $settings = SettingsPersistencyHelper::getAllSetting();
                                 foreach(SettingsPersistencyHelper::$visibleSettings AS $settingName){
+                                    $settingValue = isset($settings[$settingName]) ? $settings[$settingName] : "";
                                     echo '  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                                                <input class="mdl-textfield__input" type="text" id="setting-'.$settingName.'" value="'.$settings[$settingName].'" name="'.$settingName.'">
+                                                <input class="mdl-textfield__input" type="text" id="setting-'.$settingName.'" value="'.$settingValue.'" name="'.$settingName.'">
                                                 <label class="mdl-textfield__label" for="setting-'.$settingName.'" style="text-transform: uppercase;">'.str_replace("_", " ", $settingName).'</label>
                                             </div><br />';
                                 }

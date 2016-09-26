@@ -48,6 +48,13 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
 </script>
 
 <div id="gw2i-container">
+    <div id="gw2i-notification-container">
+        <?php
+            if(SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::IS_API_DOWN)){
+                echo '<div class="alert-box warning">The Guild Wars 2 API is current experiencing issues</div>';
+            }
+        ?>
+    </div>
     <div class="mdl-tabs mdl-js-tabs">
         <div class="mdl-tabs__tab-bar">
             <a id="tab1-link" href="#tab1" class="mdl-tabs__tab is-active">Integration Setup</a>

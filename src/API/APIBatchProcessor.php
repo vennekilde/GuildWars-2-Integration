@@ -52,6 +52,8 @@ class APIBatchProcessor {
      * @return LinkedUser
      */
     public function process(){
+        APIKeyManager::analyzeAnetAPI();
+        
         global $logger, $gw2i_proccess_keys_per_run;
         $attemptedSynchedUsers = array();
         $apiKeysQuery = APIKeyPersistenceHelper::queryAPIKeys(0, $gw2i_proccess_keys_per_run);

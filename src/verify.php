@@ -1,6 +1,7 @@
 <?php
 
 use GW2Integration\API\APIKeyManager;
+use GW2Integration\Persistence\Helper\SettingsPersistencyHelper;
 use GW2Integration\REST\RESTHelper;
 
 require_once __DIR__ . "/Source.php";

@@ -43,6 +43,12 @@ class SettingsPersistencyHelper {
     const TEAMSPEAK_BOT_ADDRESS = "teamspeak_bot_address";
     const TEMPORARY_ACCESS_EXPIRATION = "temporary_access_expiration";
     
+    public static $visibleSettings = array(
+        self::API_KEY_EXPIRATION_TIME,
+        self::TEAMSPEAK_BOT_ADDRESS,
+        self::TEMPORARY_ACCESS_EXPIRATION
+    );
+    
     private static $settingsCache = array();
     
     /**
@@ -86,11 +92,11 @@ class SettingsPersistencyHelper {
         if($preparedStatement->rowCount() > 0){
             $settings = $preparedStatement->fetchAll(PDO::FETCH_NUM);
             //Cache
-            foreach($settings AS $settingName => $settingValue){
-                static::$settingsCache[$settingName] = $settingValue;
+            foreach($settings AS $settingData){
+                static::$settingsCache[$settingData[0]] = $settingData[1];
             }
         }
-        return $settings;
+        return static::$settingsCache;
     }
     
     /**
@@ -116,6 +122,48 @@ class SettingsPersistencyHelper {
         $result = $preparedStatement->execute($queryParams);
         if($result){
             static::$settingsCache[$settingName] = $settingValue;
+        }
+        return $result;
+    }
+    
+    /**
+     * 
+     * @global type $gw2i_db_prefix
+     * @param type $settings
+     * @return type
+     */
+    public static function persistSettings($settings){
+        global $gw2i_db_prefix;
+        if(empty($settings)){
+            return true;
+        }
+        
+        $queryParams = array();
+        $valuesQuery = "";
+        $first = true;
+        foreach($settings AS $settingName => $settingValue){
+            if($first){
+                $first = false;
+            } else {
+                $valuesQuery .= ", ";
+            }
+            $valuesQuery .= "(?,?)";
+            $queryParams[] = $settingName;
+            $queryParams[] = $settingValue;
+        }
+        
+        $preparedQueryString = '
+            INSERT INTO '.$gw2i_db_prefix.'integration_settings (setting_name, setting_value)
+                VALUES '.$valuesQuery.'
+            ON DUPLICATE KEY UPDATE 
+                setting_value = VALUES(setting_value)';
+        
+        $preparedStatement = Persistence::getDBEngine()->prepare($preparedQueryString);
+        $result = $preparedStatement->execute($queryParams);
+        if($result){
+            foreach($settings AS $settingName => $settingValue){
+                static::$settingsCache[$settingName] = $settingValue;
+            }
         }
         return $result;
     }

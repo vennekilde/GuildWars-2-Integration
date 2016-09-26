@@ -1,5 +1,6 @@
 <?php
 
+use GW2Integration\Persistence\Helper\SettingsPersistencyHelper;
 use GW2Integration\REST\RESTHelper;
 
 require_once __DIR__ . "/RestrictAdminPanel.php";
@@ -379,6 +380,29 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                 <div class="mdl-tabs__panel" id="tab6">
                 </div>
                 <div class="mdl-tabs__panel" id="tab7">
+                    <div class='primaryheading'>
+                        <h5>Settings</h5>
+                        <p>Edit the settings used by the application below</p>
+                        <form action='ManagementController.php' method="POST" name='update-settings' class="default-admin-form">
+                            <?php
+                                $settings = SettingsPersistencyHelper::getAllSetting();
+                                foreach(SettingsPersistencyHelper::$visibleSettings AS $settingName){
+                                    echo '  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                                <input class="mdl-textfield__input" type="text" id="setting-'.$settingName.'" value="'.$settings[$settingName].'" name="'.$settingName.'">
+                                                <label class="mdl-textfield__label" for="setting-'.$settingName.'" style="text-transform: uppercase;">'.str_replace("_", " ", $settingName).'</label>
+                                            </div><br />';
+                                }
+                            ?>
+                            <br />
+                            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner">
+                                Save
+                            </button> 
+                            <div class="mdl-spinner mdl-js-spinner is-active spinner-button"></div>
+
+                            <div class="response-div response-div-style"></div>
+                            <br /><br />
+                        </form>
+                    </div>
                 </div>
                 <div class="mdl-tabs__panel" id="tab8">
 

@@ -9,6 +9,7 @@ use GW2Integration\Exceptions\UnableToDetermineLinkId;
 use GW2Integration\Modules\Verification\VerificationController;
 use GW2Integration\Persistence\Helper\GW2DataPersistence;
 use GW2Integration\Persistence\Helper\LinkingPersistencyHelper;
+use GW2Integration\Persistence\Helper\SettingsPersistencyHelper;
 use function GuzzleHttp\json_encode;
 
 /* 
@@ -184,6 +185,20 @@ switch($form){
 
         fclose($logFile);
             
+        break;
+        
+        
+    case "update-settings":
+        
+        $settings = array();
+        foreach($formData AS $settingName => $settingValue){
+            if($settingName != "form"){
+                $settings[$settingName] = $settingValue;
+            }
+        }
+        $updateResult = SettingsPersistencyHelper::persistSettings($settings);
+        $result["result"] = $updateResult === true ? "Success" : "Failed";
+        
         break;
         
         

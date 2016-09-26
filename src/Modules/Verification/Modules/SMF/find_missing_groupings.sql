@@ -9,7 +9,7 @@ BEGIN
     LEFT JOIN gw2integration_accounts a ON a.link_id = l.link_id
     LEFT JOIN gw2integration_api_keys k ON a.link_id = k.link_id
     LEFT JOIN gw2integration_banned_accounts b ON a.a_username = b.b_username
-    RIGHT JOIN farshiverpeaks.smf_members2 m ON l.service_user_id = m.id_member
+    RIGHT JOIN farshiverpeaks.smf_members m ON l.service_user_id = m.id_member
     INNER JOIN gw2integration_world_to_service_group w ON 
         w.service_id = l.service_id AND a.a_world = w.world AND l.is_primary = w.is_primary /* Get the group id the user is allowed to be assigned to */
 

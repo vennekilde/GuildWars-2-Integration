@@ -140,7 +140,7 @@ class SimpleMachinesForumVerification extends AbstractVerificationModule{
         
         //Taken from Subs-Membergroups.php line 553
         $request = $smcFunc['db_query']('', '
-            UPDATE {db_prefix}members2
+            UPDATE {db_prefix}members
             SET
                 id_group = CASE WHEN id_group = {int:regular_group} THEN {int:id_group} ELSE id_group END,
                 additional_groups = CASE WHEN id_group = {int:id_group} THEN additional_groups
@@ -190,7 +190,7 @@ class SimpleMachinesForumVerification extends AbstractVerificationModule{
         // Taken from Subs-Membergroups.php line 372
         // First, reset those who have this as their primary group - this is the easy one.
         $smcFunc['db_query']('', '
-            UPDATE {db_prefix}members2
+            UPDATE {db_prefix}members
             SET id_group = {int:regular_member}
             WHERE id_group IN ({array_int:group_list})
                 AND id_member IN ({array_int:member_list})',
@@ -204,7 +204,7 @@ class SimpleMachinesForumVerification extends AbstractVerificationModule{
         // Those who have it as part of their additional group must be updated the long way... sadly.
         $request = $smcFunc['db_query']('', '
             SELECT id_member, additional_groups
-            FROM {db_prefix}members2
+            FROM {db_prefix}members
             WHERE (FIND_IN_SET({raw:additional_groups_implode}, additional_groups) != 0)
                 AND id_member IN ({array_int:member_list})
             LIMIT ' . count($members),
@@ -222,7 +222,7 @@ class SimpleMachinesForumVerification extends AbstractVerificationModule{
 
         foreach ($updates as $additional_groups => $memberArray){
             $smcFunc['db_query']('', '
-                UPDATE {db_prefix}members2
+                UPDATE {db_prefix}members
                 SET additional_groups = {string:additional_groups}
                 WHERE id_member IN ({array_int:member_list})',
                 array(

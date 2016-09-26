@@ -51,6 +51,7 @@ global $logger;
 $loggingLevel = LogLevel::INFO;
 $loggingDir = '/var/log/httpd/gw2integration';
 $logger = new Logger($loggingDir, $loggingLevel, array(
+    "filename" => 'log_'.date('Y-m-d'),
     'extension' => 'log',
     'dateFormat' => 'Y-m-d G:i:s - uμ\\s'
 ));

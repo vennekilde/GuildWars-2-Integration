@@ -61,7 +61,11 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                                 echo'   <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="checkbox-link-id">
                                                 <input type="radio" name="search-service" id="checkbox-link-id" class="mdl-radio__button" value="link-id">
                                                 <span class="mdl-radio__label">Universal User Id</span>
-                                            </label>';;
+                                            </label>';
+                                echo'   <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="checkbox-account-name">
+                                                <input type="radio" name="search-service" id="checkbox-account-name" class="mdl-radio__button" value="account-name">
+                                                <span class="mdl-radio__label">Account Name</span>
+                                            </label>';
                                 foreach($gw2i_linkedServices AS $linkedService){
                                     echo'   <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="checkbox-'.$linkedService->getServiceId().'">
                                                 <input type="radio" name="search-service" id="checkbox-'.$linkedService->getServiceId().'" class="mdl-radio__button" name="options" value="'.$linkedService->getServiceId().'">

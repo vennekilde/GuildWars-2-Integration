@@ -56,6 +56,8 @@ switch($form){
 
             if($serviceId == "link-id"){
                 $linkedUser->setLinkedId($userId);
+            } else if($serviceId == "account-name"){
+                $linkedUser->setLinkedId(LinkingPersistencyHelper::getLinkIdFromAccountName($userId));
             } else {
                 $linkedUser->setPrimaryarySeviceId($userId, $serviceId);
             }

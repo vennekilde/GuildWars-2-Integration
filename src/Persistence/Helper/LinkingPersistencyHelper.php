@@ -122,6 +122,22 @@ class LinkingPersistencyHelper {
     }
     
     
+    public static function getLinkIdFromAccountName($accountName) {
+        global $gw2i_db_prefix;
+        $linkId = null;
+        $pqs = 'SELECT link_id FROM '.$gw2i_db_prefix.'accounts WHERE a_username LIKE ? LIMIT 1';
+
+        $ps = Persistence::getDBEngine()->prepare($pqs);
+        $ps->execute(array("%$accountName%"));
+        $linkIdRow = $ps->fetch(PDO::FETCH_NUM);
+
+        if(!empty($linkIdRow)){
+            $linkId = $linkIdRow[0];
+        }
+        return $linkId;
+    }
+    
+    
     /**
      * 
      * @param LinkedUser $linkedUser
@@ -479,7 +495,7 @@ class LinkingPersistencyHelper {
         }
         
     }
-    
+
     /**
      * @param LinkedUser $linkedUser
      * @return array(string, integer) [0] = user identity column, [1] = user id. Returns null if no link data given

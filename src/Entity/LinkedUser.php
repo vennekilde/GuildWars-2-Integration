@@ -26,67 +26,89 @@
 
 namespace GW2Integration\Entity;
 
+use function GuzzleHttp\json_encode;
+
 /**
  * Description of UserId
  *
  * @author Jeppe Boysen Vennekilde
  */
-class LinkedUser {
-    /**
-     * The database id of the linked user
-     * @var integer
-     */
-    private $linkedId;
+class LinkedUser extends LinkIdHolder{
     
     /**
      * 0 = Website Service
      * 1 = Teamspeak service
      * 2 = Discord
-     * @var Array(Array(Long, String)) 
+     * @var UserServiceLink[]
      */
-    public $primaryServiceIds = array();
+    public $primaryUserServiceLinks = array();
     
     /**
      * 0 = Website Service
      * 1 = Teamspeak service
      * 2 = Discord
-     * @var Array(Array(Long => String)) 
+     * @var UserServiceLink[][]
      */
-    public $secondaryServiceIds = array();
+    public $secondaryUserServiceLinks = array();
     
     public $fetchServiceUserId;
     public $fetchServiceId;
     public $fetchServiceDisplayName;
     
-    private $linkedIdSetListeners = array();
+    public function setLinkedId($linkedId) {
+        parent::setLinkedId($linkedId);
+        foreach($this->primaryUserServiceLinks AS $userServiceLink){
+            $userServiceLink->setLinkedId($linkedId);
+        }
+        foreach($this->secondaryUserServiceLinks AS $userServiceLinks){
+            foreach($userServiceLinks AS $userServiceLink){
+                $userServiceLink->setLinkedId($linkedId);
+            }
+        }
+    }
+    
+    public function addUserServiceLink(UserServiceLink $userServiceLink){
+        if(isset($userServiceLink)){
+            $userServiceLink->setLinkedId($this->getLinkedId());
+            if($userServiceLink->isPrimary()){
+                $this->primaryUserServiceLinks[$userServiceLink->getServiceId()] = $userServiceLink;
+            } else {
+                if(!isset($this->secondaryUserServiceLinks[$userServiceLink->getServiceId()])){
+                    $this->secondaryUserServiceLinks[$userServiceLink->getServiceId()] = array();
+                }
+                $this->secondaryUserServiceLinks[$userServiceLink->getServiceId()][] = $userServiceLink;
+            }
+        }
+    }
+    
+    /**
+     * 
+     * @return UserServiceLink[]
+     */
+    public function getPrimaryUserServiceLinks() {
+        return $this->primaryUserServiceLinks;
+    }
 
-    public function setLinkedId($linkedId){
-        $this->linkedId = $linkedId;
-        
-        foreach($this->linkedIdSetListeners AS $listener){
-            $listener();
-        }
-        $this->linkedIdSetListeners = array();
-    }
-    
-    public function getLinkedId(){
-        return $this->linkedId;
+    /**
+     * 
+     * @return UserServiceLink[][]
+     */
+    public function getSecondaryUserServiceLinks() {
+        return $this->secondaryUserServiceLinks;
     }
     
     
-    public function setPrimaryarySeviceId($serviceUserId, $serviceId, $displayName = null, $attributes = null){
-        $this->primaryServiceIds[$serviceId] = array($serviceUserId, $displayName, $attributes);
+    
+    public function clearPrimaryUserServiceLinks(){
+        $this->primaryUserServiceLinks = array();
     }
     
-    public function addSecondarySeviceId($serviceUserId, $serviceId, $displayName = null, $attributes = null){
-        if(!isset($this->secondaryServiceIds[$serviceId])){
-            $this->secondaryServiceIds[$serviceId] = array();
-        }
-        $this->secondaryServiceIds[$serviceId][$serviceUserId] = array($displayName, $attributes);
+    public function clearSecondaryUserServiceLinks(){
+        $this->secondaryUserServiceLinks = array();
     }
     
     public function addOnLinkedIdSetListener($listenerMethod){
-        if(!isset($this->linkedId)){
+        if($this->getLinkedId() != null){
             $this->linkedIdSetListeners[] = $listenerMethod;
         } else {
             $listenerMethod();
@@ -94,15 +116,15 @@ class LinkedUser {
     }
     
     public function compactString(){
-        $compactString = "<LinkedUser ID[$this->linkedId]";
-        foreach($this->primaryServiceIds AS $serviceId => $primaryServiceId){
-            $compactString .= " SID-".$serviceId."[$primaryServiceId[0]]";
+        $compactString = "<LinkedUser ID[".$this->getLinkedId()."]";
+        foreach($this->primaryUserServiceLinks AS $userServiceLink){
+            $compactString .= " SID-".$userServiceLink->getServiceId()."[".$userServiceLink->getServiceUserId()."]]";
         }
         return $compactString . ">";
     }
     
     public function toString() {
-        $toString = "id[$this->linkedId] Linked Primary Services: ".json_encode($this->primaryServiceIds);
+        $toString = "id[".$this->getLinkedId()."] Linked Primary Services: ".json_encode($this->primaryUserServiceLinks);
         if(isset($this->fetchServiceId) && isset($this->fetchServiceUserId)){
             $toString .= " Fetch ID[$this->fetchServiceId - $this->fetchServiceUserId : $this->fetchServiceDisplayName]";
         }
@@ -112,4 +134,8 @@ class LinkedUser {
         return $this->toString();
     }
    
+    public function jsonSerialize() {
+        $parentJson = parent::jsonSerialize();
+        return array_merge($parentJson, get_object_vars($this));
+    }
 }

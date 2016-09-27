@@ -4,6 +4,7 @@ namespace GW2Integration\Processes;
 use GW2Integration\Events\EventListener;
 use GW2Integration\Events\EventManager;
 use GW2Integration\Events\Events\APISyncCompleted;
+use GW2Integration\Persistence\Helper\APIKeyPersistenceHelper;
 use GW2Integration\Persistence\Helper\ServiceSessionPersistenceHelper;
 
 /*
@@ -43,5 +44,6 @@ class Cleanup implements EventListener{
     public function onAPISyncCompleted(APISyncCompleted $event){
         global $session_expiration_periode;
         ServiceSessionPersistenceHelper::cleanupExpiredUserSessions($session_expiration_periode);
+        APIKeyPersistenceHelper::cleanupDatabase();
     }
 }

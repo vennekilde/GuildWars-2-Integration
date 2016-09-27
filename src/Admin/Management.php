@@ -1,5 +1,6 @@
 <?php
 
+use GW2Integration\Persistence\Helper\ServicePersistencyHelper;
 use GW2Integration\Persistence\Helper\SettingsPersistencyHelper;
 use GW2Integration\REST\RESTHelper;
 
@@ -18,6 +19,9 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
 <link rel="stylesheet" href="<?php echo $webPath ?>/css/style.css">
 <!-- MDL JS -->
 <script src="https://code.getmdl.io/1.2.0/material.min.js"></script>
+<!--getmdl-select-->   
+<link rel="stylesheet" href="https://cdn.rawgit.com/CreativeIT/getmdl-select/master/getmdl-select.min.css">
+<script defer src="https://cdn.rawgit.com/CreativeIT/getmdl-select/master/getmdl-select.min.js"></script>
 <!-- JQuery UI JS -->
 <script src="<?php echo $webPath ?>/js/jquery-2.2.3.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
@@ -25,16 +29,16 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
 <script src="<?php echo $webPath ?>/js/common.js"></script>
 <script src="<?php echo $webPath ?>/js/admin.js"></script>
 
-<script> 
+<script>
     webPath = "<?php echo $webPath ?>";
 </script>
 
 <div id="gw2i-container">
     <div id="gw2i-notification-container">
         <?php
-            if(SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::IS_API_DOWN)){
-                echo '<div class="alert-box warning">The Guild Wars 2 API is current experiencing issues</div>';
-            }
+        if (SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::IS_API_DOWN)) {
+            echo '<div class="alert-box warning">The Guild Wars 2 API is current experiencing issues</div>';
+        }
         ?>
     </div>
     <div class="mdl-tabs vertical-mdl-tabs mdl-js-tabs">
@@ -51,13 +55,13 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                     <a id="tab8-link" href="#tab8" class="mdl-tabs__tab">Services</a>
                 </div>
             </div>
-            
+
             <div class="vertical-mdl-tabs-panels">
                 <div class="mdl-tabs__panel is-active" id="tab1">
                     <div class='primaryheading'>
                         <h5>Data Lookup</h5>
                         <p>Lookup data for a user using either of the user's id<br />
-                        Output is currently dumped directly from the database, so it isn't as nice to read as it could be</p>
+                            Output is currently dumped directly from the database, so it isn't as nice to read as it could be</p>
                         <form action='ManagementController.php' method="POST" name='search' class="default-admin-form">
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                                 <input class="mdl-textfield__input" type="text" name="search-user-id" id="search-user-id">
@@ -65,21 +69,20 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                             </div>
                             <br />
                             <?php
-
-                                echo'   <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="checkbox-link-id">
+                            echo'   <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="checkbox-link-id">
                                                 <input type="radio" name="search-service" id="checkbox-link-id" class="mdl-radio__button" value="link-id">
                                                 <span class="mdl-radio__label">Universal User Id</span>
                                             </label>';
-                                echo'   <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="checkbox-account-name">
+                            echo'   <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="checkbox-account-name">
                                                 <input type="radio" name="search-service" id="checkbox-account-name" class="mdl-radio__button" value="account-name">
                                                 <span class="mdl-radio__label">Account Name</span>
                                             </label>';
-                                foreach($gw2i_linkedServices AS $linkedService){
-                                    echo'   <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="checkbox-'.$linkedService->getServiceId().'">
-                                                <input type="radio" name="search-service" id="checkbox-'.$linkedService->getServiceId().'" class="mdl-radio__button" name="options" value="'.$linkedService->getServiceId().'">
-                                                <span class="mdl-radio__label">'. $linkedService->getName() .'</span>
+                            foreach ($gw2i_linkedServices AS $linkedService) {
+                                echo'   <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="checkbox-' . $linkedService->getServiceId() . '">
+                                                <input type="radio" name="search-service" id="checkbox-' . $linkedService->getServiceId() . '" class="mdl-radio__button" name="options" value="' . $linkedService->getServiceId() . '">
+                                                <span class="mdl-radio__label">' . $linkedService->getName() . '</span>
                                             </label>';
-                                }
+                            }
                             ?>
                             <br /><br />
                             <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner">
@@ -104,16 +107,16 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                             </div>
                             <br />
                             <?php
-                                echo'   <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="sync-service-link-id">
+                            echo'   <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="sync-service-link-id">
                                             <input type="radio" id="sync-service-link-id" class="mdl-radio__button" name="sync-service" value="link-id">
                                             <span class="mdl-radio__label">Universal Link Id</span>
                                         </label>';
-                                foreach($gw2i_linkedServices AS $linkedService){
-                                    echo'   <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="sync-service-'.$linkedService->getServiceId().'">
-                                                <input type="radio" id="sync-service-'.$linkedService->getServiceId().'" class="mdl-radio__button" name="sync-service" value="'.$linkedService->getServiceId().'">
-                                                <span class="mdl-radio__label">'. $linkedService->getName() .'</span>
+                            foreach ($gw2i_linkedServices AS $linkedService) {
+                                echo'   <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="sync-service-' . $linkedService->getServiceId() . '">
+                                                <input type="radio" id="sync-service-' . $linkedService->getServiceId() . '" class="mdl-radio__button" name="sync-service" value="' . $linkedService->getServiceId() . '">
+                                                <span class="mdl-radio__label">' . $linkedService->getName() . '</span>
                                             </label>';
-                                }
+                            }
                             ?>
                             <br /><br />
                             <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner">
@@ -131,7 +134,7 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                         <p>Synchronize the next X amount of user's schedualed to be synchronized with the GuildWars 2 API</p>
                         <form action='ManagementController.php' method="POST" name='batch-process' class="default-admin-form">
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                                <input class="mdl-textfield__input" type="text" pattern="-?[0-9]*(\.[0-9]+)?" name="batch-process-count" id="batch-process-count" value="<?php echo $gw2i_proccess_keys_per_run ; ?>">
+                                <input class="mdl-textfield__input" type="text" pattern="-?[0-9]*(\.[0-9]+)?" name="batch-process-count" id="batch-process-count" value="<?php echo $gw2i_proccess_keys_per_run; ?>">
                                 <label class="mdl-textfield__label" for="batch-process-count">Synchronize amount</label>
                                 <span class="mdl-textfield__error">Input is not a number!</span>
                             </div>
@@ -170,12 +173,12 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                             <br />
                             <p>What service is the Id for?</p>
                             <?php
-                                foreach($gw2i_linkedServices AS $linkedService){
-                                    echo'   <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="gen-service-'.$linkedService->getServiceId().'">
-                                                <input type="radio" id="gen-service-'.$linkedService->getServiceId().'" class="mdl-radio__button" name="gen-service" value="'.$linkedService->getServiceId().'">
-                                                <span class="mdl-radio__label">'. $linkedService->getName() .'</span>
+                            foreach ($gw2i_linkedServices AS $linkedService) {
+                                echo'   <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="gen-service-' . $linkedService->getServiceId() . '">
+                                                <input type="radio" id="gen-service-' . $linkedService->getServiceId() . '" class="mdl-radio__button" name="gen-service" value="' . $linkedService->getServiceId() . '">
+                                                <span class="mdl-radio__label">' . $linkedService->getName() . '</span>
                                             </label>';
-                                }
+                            }
                             ?>
                             <br /><br />
                             <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner">
@@ -204,12 +207,12 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                             <br />
 
                             <?php
-                                foreach($gw2i_linkedServices AS $linkedService){
-                                    echo'   <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="set-key-service-'.$linkedService->getServiceId().'">
-                                                <input type="radio" id="set-key-service-'.$linkedService->getServiceId().'" class="mdl-radio__button" name="set-key-service" value="'.$linkedService->getServiceId().'">
-                                                <span class="mdl-radio__label">'. $linkedService->getName() .'</span>
+                            foreach ($gw2i_linkedServices AS $linkedService) {
+                                echo'   <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="set-key-service-' . $linkedService->getServiceId() . '">
+                                                <input type="radio" id="set-key-service-' . $linkedService->getServiceId() . '" class="mdl-radio__button" name="set-key-service" value="' . $linkedService->getServiceId() . '">
+                                                <span class="mdl-radio__label">' . $linkedService->getName() . '</span>
                                             </label>';
-                                }
+                            }
                             ?>
                             <br />
 
@@ -241,12 +244,12 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                             <br />
 
                             <?php
-                                foreach($gw2i_linkedServices AS $linkedService){
-                                    echo'   <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="get-key-name-service-'.$linkedService->getServiceId().'">
-                                                <input type="radio" id="get-key-name-service-'.$linkedService->getServiceId().'" class="mdl-radio__button" name="get-key-name-service" value="'.$linkedService->getServiceId().'">
-                                                <span class="mdl-radio__label">'. $linkedService->getName() .'</span>
+                            foreach ($gw2i_linkedServices AS $linkedService) {
+                                echo'   <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="get-key-name-service-' . $linkedService->getServiceId() . '">
+                                                <input type="radio" id="get-key-name-service-' . $linkedService->getServiceId() . '" class="mdl-radio__button" name="get-key-name-service" value="' . $linkedService->getServiceId() . '">
+                                                <span class="mdl-radio__label">' . $linkedService->getName() . '</span>
                                             </label>';
-                                }
+                            }
                             ?>
                             <br /><br />
 
@@ -325,9 +328,9 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                                     <th class="mdl-data-table__cell--non-numeric">Account Name</th>
 
                                     <?php
-                                        foreach($gw2i_linkedServices AS $linkedService){
-                                            echo '<th class="mdl-data-table__cell--non-numeric">'.$linkedService->getName().'</th>';
-                                        }
+                                    foreach ($gw2i_linkedServices AS $linkedService) {
+                                        echo '<th class="mdl-data-table__cell--non-numeric">' . $linkedService->getName() . '</th>';
+                                    }
                                     ?>
 
                                     <th class="mdl-data-table__cell--non-numeric">Timestamp</th>
@@ -360,8 +363,8 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                     </div>
                     <div class='secondaryheading'>
                         <h5>Detailed Log</h5>
-                        <p>Detailed log read directly from the log file <b><?php echo "log_".date("Y-m-d").".log"; ?></b></p>
-                        
+                        <p>Detailed log read directly from the log file <b><?php echo "log_" . date("Y-m-d") . ".log"; ?></b></p>
+
                         <form action='ManagementController.php' method="POST" name='get-log' class="log-admin-form">
                             <p>
                                 Current Timestamp: <b style="text-transform: uppercase;"><?php echo date("Y-m-d H:i:s"); ?></b>
@@ -392,15 +395,62 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                         <p>Edit the settings used by the application below</p>
                         <form action='ManagementController.php' method="POST" name='update-settings' class="default-admin-form">
                             <?php
-                                $settings = SettingsPersistencyHelper::getAllSetting();
-                                foreach(SettingsPersistencyHelper::$visibleSettings AS $settingName){
-                                    $settingValue = isset($settings[$settingName]) ? $settings[$settingName] : "";
-                                    echo '  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                                                <input class="mdl-textfield__input" type="text" id="setting-'.$settingName.'" value="'.$settingValue.'" name="'.$settingName.'">
-                                                <label class="mdl-textfield__label" for="setting-'.$settingName.'" style="text-transform: uppercase;">'.str_replace("_", " ", $settingName).'</label>
+                            $settings = SettingsPersistencyHelper::getAllSetting();
+                            foreach (SettingsPersistencyHelper::$visibleSettings AS $settingName) {
+                                $settingValue = isset($settings[$settingName]) ? $settings[$settingName] : "";
+                                echo '  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                                <input class="mdl-textfield__input" type="text" id="setting-' . $settingName . '" value="' . $settingValue . '" name="' . $settingName . '">
+                                                <label class="mdl-textfield__label" for="setting-' . $settingName . '" style="text-transform: uppercase;">' . str_replace("_", " ", $settingName) . '</label>
                                             </div><br />';
-                                }
+                            }
                             ?>
+                            <br />
+                            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner">
+                                Save
+                            </button> 
+                            <div class="mdl-spinner mdl-js-spinner is-active spinner-button"></div>
+
+                            <div class="response-div response-div-style"></div>
+                            <br /><br />
+                        </form>
+                    </div>
+                    <div class='secondaryheading'>
+                        <h5>Service Group Mapping</h5>
+                        <p>Map a world to a given group in a service</p>
+                        <form action='ManagementController.php' method="POST" name='update-service-group-mappings' class="default-admin-form">
+                            <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+                                <thead>
+                                    <tr>
+                                        <th>Service</th>
+                                        <th>World</th>
+                                        <th>Group Id</th>
+                                        <th>Primary</th>
+                                        <th>Manage</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    foreach (ServicePersistencyHelper::getWorldToGroupSettings() AS $worldToGroup) {
+                                        echo '<tr class="world-to-group">';
+                                        echo '<td>' . $gw2i_linkedServices[$worldToGroup["service_id"]]->getName() . '</td>';
+                                        echo '<td>' . $worldToGroup["world"] . '</td>';
+                                        echo '<td>' . $worldToGroup["group_id"] . '</td>';
+                                        echo '<td>' . $worldToGroup["is_primary"] . '</td>';
+                                        echo '<td></td>';
+                                        echo '</tr>';
+                                    }
+                                    ?>
+                                </tbody>
+                            </table>
+
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select" style="width: inherit;">
+                                <input class="mdl-textfield__input" value="Belarus" type="text" id="country" readonly tabIndex="-1" data-val="BLR"/>
+                                <label class="mdl-textfield__label" for="country">Country</label>
+                                <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu" for="country">
+                                    <li class="mdl-menu__item" data-val="BLR">Belarus</li>
+                                    <li class="mdl-menu__item" data-val="RUS">Russia</li>
+                                </ul>
+                            </div>
                             <br />
                             <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner">
                                 Save
@@ -416,16 +466,16 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
 
                     <div class="mdl-tabs mdl-js-tabs">
                         <?php
-                            $even = true;
-                            $content = '';
-                            foreach ($gw2i_linkedServices AS $service){
-                                if($service->hasConfigPage()){
-                                    $content .= '<div class="'.($even ? "primaryheading" : "secondaryheading").'" id="service-tab'.$service->getServiceId().'"><h4>'.$service->getName().'</h4>'.$service->getConfigPageHTML().'</div>';
+                        $even = true;
+                        $content = '';
+                        foreach ($gw2i_linkedServices AS $service) {
+                            if ($service->hasConfigPage()) {
+                                $content .= '<div class="' . ($even ? "primaryheading" : "secondaryheading") . '" id="service-tab' . $service->getServiceId() . '"><h4>' . $service->getName() . '</h4>' . $service->getConfigPageHTML() . '</div>';
 
-                                    $even = !$even;
-                                }
+                                $even = !$even;
                             }
-                            echo $content;
+                        }
+                        echo $content;
                         ?>
                     </div>
                 </div>

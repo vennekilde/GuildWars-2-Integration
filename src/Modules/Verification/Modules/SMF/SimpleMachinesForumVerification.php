@@ -27,6 +27,7 @@
 namespace GW2Integration\Modules\Verification\SMF;
 
 use GW2Integration\Entity\LinkedUser;
+use GW2Integration\Entity\UserServiceLink;
 use GW2Integration\Events\Events\APISyncCompleted;
 use GW2Integration\Events\Events\UserServiceLinkEvent;
 use GW2Integration\LinkedServices\SMF\SimpleMachinesForum;
@@ -55,18 +56,19 @@ class SimpleMachinesForumVerification extends AbstractVerificationModule{
      * @param UserServiceLinkEvent $event
      */
     public function onUserServiceLinkEvent(UserServiceLinkEvent $event){
-        if($event->getServiceId() == $this->getServiceId()){
-            $this->refreshAccess($event->getUserId());
+        if($event->getUserServiceLink()->getServiceId() == $this->getServiceId()){
+            $this->refreshAccess($event->getUserServiceLink()->getServiceUserId());
         }
     }
     
     public function handleUserWorldChanged(LinkedUser $linkedUser, $oldWorld, $newWorld) {
-        if(isset($linkedUser->primaryServiceIds[1])){
-            $this->refreshAccess($linkedUser->primaryServiceIds[1][0]);
+        if(isset($linkedUser->getPrimaryUserServiceLinks()[$this->getServiceId()])){
+            $this->refreshAccess($linkedUser->getPrimaryUserServiceLinks()[$this->getServiceId()]->getServiceUserId());
         }
-        if(isset($linkedUser->secondaryServiceIds[1])){
-            foreach($linkedUser->secondaryServiceIds[1] AS $userId => $displayName){
-                $this->refreshAccess($userId);
+        if(isset($linkedUser->getSecondaryUserServiceLinks()[$this->getServiceId()])){
+            foreach($linkedUser->getSecondaryUserServiceLinks()[$this->getServiceId()] AS $userServiceLink){
+                /* @var $userServiceLink UserServiceLink */
+                $this->refreshAccess($userServiceLink->getServiceId());
             }
         }
     }

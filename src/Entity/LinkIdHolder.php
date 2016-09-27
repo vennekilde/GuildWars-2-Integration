@@ -3,7 +3,7 @@
 /*
  * The MIT License
  *
- * Copyright 2015 jeppe.
+ * Copyright 2016 Jeppe Boysen Vennekilde.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,37 +24,38 @@
  * THE SOFTWARE.
  */
 
-namespace GW2Integration\Events\Events;
+namespace GW2Integration\Entity;
 
-use GW2Integration\Entity\UserServiceLink;
+use JsonSerializable;
 
 /**
- * Description of GW2ResponseEvent
+ * Description of LinkIdHolder
  *
- * @author jeppe
+ * @author Jeppe Boysen Vennekilde
  */
-class UserServiceLinkEvent extends Event{
+class LinkIdHolder implements JsonSerializable{
     /**
-     *
-     * @var UserServiceLink 
+     * The database id of the linked user
+     * @var integer
      */
-    private $userServiceLink;
+    private $linkId;
     
-    function __construct(UserServiceLink $userServiceLink) {
-        $this->userServiceLink = $userServiceLink;
-    }
-    
-    /**
-     * 
-     * @return UserServiceLink
-     */
-    public function getUserServiceLink() {
-        return $this->userServiceLink;
-    }
-    
-    public function __toString() {
-        $toString = "UserServiceLinkEvent {".$this->getUserServiceLink()."}";
-        return $toString;
-    }
+    private $linkedIdSetListeners = array();
 
+    public function setLinkedId($linkedId){
+        $this->linkId = $linkedId;
+        
+        foreach($this->linkedIdSetListeners AS $listener){
+            $listener();
+        }
+        $this->linkedIdSetListeners = array();
+    }
+    
+    public function getLinkedId(){
+        return $this->linkId;
+    }
+    
+    public function jsonSerialize() {
+        return array("linkId" => $this->linkId);
+    }
 }

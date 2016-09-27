@@ -102,7 +102,7 @@ class APIKeyManager {
             $logger->info("Set API Key for ".$linkedUser->compactString()." to $apiKey");
         }
         
-        LinkingPersistencyHelper::persistServiceUserLinks($linkedUser);
+        LinkingPersistencyHelper::persistUserServiceLinks($linkedUser);
         
         if($success1 || $success2){
             APIKeyPersistenceHelper::updateLastAPIKeySuccessfulFetch($apiKey);
@@ -226,10 +226,10 @@ class APIKeyManager {
     public static function getAPIKeyNamesForUser($linkedUser){
         global $prefix_api_keyname;
         $validKeyNames = array();
-        foreach($linkedUser->primaryServiceIds AS $serviceId => $linkedServiceUser){
-            $userId = $linkedServiceUser[0];
-            if($serviceId != 0){
-                $preId = $serviceId . "-";
+        foreach($linkedUser->getPrimaryUserServiceLinks() AS $userServiceLink){
+            $userId = $userServiceLink->getServiceUserId();
+            if($userServiceLink->getServiceId() != 0){
+                $preId = $userServiceLink->getServiceId() . "-";
             } else {
                 $preId = "";
             }

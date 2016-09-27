@@ -124,8 +124,8 @@ function parseLinkedUserServices(){
         var userLink = linkedUser["primary"] !== undefined ? linkedUser["primary"][serviceId] : false;
         var isLinked = userLink !== undefined && userLink !== false;
         var serviceName = service["name"];
-        var displayName = isLinked ? (userLink[1] ? userLink[1] : "No name cached") : '<font class="step-error">Not linked</font>';
-        var userId = isLinked ? userLink[0] : '<font class="step-error">Not linked</font>';
+        var displayName = isLinked ? (userLink["serviceDisplayName"] ? userLink["serviceDisplayName"] : "No name cached") : '<font class="step-error">Not linked</font>';
+        var userId = isLinked ? userLink["serviceUserId"] : '<font class="step-error">Not linked</font>';
         
         var optionsHtml = "";
         //Only show options if the user is actually linked with any service
@@ -173,9 +173,10 @@ function parseLinkedUserServices(){
 function parseLinkedUserSecondaryLinks(){
     var hideDefaultMusicBotMsg = false;
     $(".music-bot-entry").remove();
-    $.each(linkedUser["secondary"], function(serviceId, value) {
-        $.each(value, function(userId, displayName) {
-            var displayName = displayName ? displayName : "No name cached";
+    $.each(linkedUser["secondary"], function(serviceId, userServiceLinks) {
+        $.each(userServiceLinks, function(i, userServiceLink) {
+            var userId = userServiceLink["serviceUserId"];
+            var displayName = userServiceLink["serviceDisplayName"] ? userServiceLink["serviceDisplayName"] : "No name cached";
             var serviceName = services[serviceId] ? services[serviceId]["name"] : "Unknown Service";
             var entry = '\
                 <tr id="musicBot-'+serviceId+'-'+userId+'" class="music-bot-entry">\

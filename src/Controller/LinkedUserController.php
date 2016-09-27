@@ -27,6 +27,10 @@
 namespace GW2Integration\Controller;
 
 use GW2Integration\Entity\LinkedUser;
+use GW2Integration\Entity\LinkIdHolder;
+use GW2Integration\Entity\UserServiceLink;
+use GW2Integration\Exceptions\UnableToDetermineLinkId;
+use GW2Integration\Persistence\Helper\GW2DataPersistence;
 use GW2Integration\Persistence\Helper\LinkingPersistencyHelper;
 
 if (!defined('GW2Integration')) {
@@ -42,21 +46,24 @@ class LinkedUserController {
     const TEMPORARY_API_KEY_PERMISSIONS = "none";
     /**
      * 
-     * @param LinkedUser $linkedUser
+     * @param LinkedUser|UserServiceLink|int $userIdentifier
      */
-    public static function getServiceLinks($linkedUser){
-        $serviceLinks = LinkingPersistencyHelper::getServiceLinks($linkedUser);
-
-        //Clear current service ids
-        $linkedUser->primaryServiceIds = array();
-        $linkedUser->secondaryServiceIds = array();
+    public static function getServiceLinks($userIdentifier){
+        $serviceLinks = LinkingPersistencyHelper::getServiceLinks($userIdentifier);
+        if($userIdentifier instanceof LinkedUser){
+            $linkedUser = $userIdentifier;
+            //Clear current service ids
+            $linkedUser->clearPrimaryUserServiceLinks();
+            $linkedUser->clearSecondaryUserServiceLinks();
+        } else {
+            $linkedUser = new LinkedUser();
+        }
         foreach($serviceLinks AS $serviceLink){
             $linkedUser->setLinkedId($serviceLink["link_id"]);
-            if($serviceLink["is_primary"] == 1){
-                $linkedUser->setPrimaryarySeviceId($serviceLink["service_user_id"], $serviceLink["service_id"], $serviceLink["service_display_name"], $serviceLink["attributes"]);
-            } else {
-                $linkedUser->addSecondarySeviceId($serviceLink["service_user_id"], $serviceLink["service_id"], $serviceLink["service_display_name"], $serviceLink["attributes"]);
-            }
+            $linkedUser->addUserServiceLink(new UserServiceLink($serviceLink["service_id"], $serviceLink["service_user_id"], $serviceLink["is_primary"] == 1, $serviceLink["service_display_name"], $serviceLink["attributes"]));
+        }
+        if($userIdentifier != $linkedUser && $userIdentifier instanceof LinkIdHolder){
+            $userIdentifier->setLinkedId($linkedUser->getLinkedId());
         }
         return $linkedUser;
     }
@@ -69,5 +76,73 @@ class LinkedUserController {
      */
     public static function deleteServiceLink($linkedUser, $serviceUserId, $serviceId){
         return LinkingPersistencyHelper::deleteServiceLink($linkedUser, $serviceUserId, $serviceId);
+    }
+    
+    /**
+     * 
+     * @global type $session_expiration_periode
+     * @global type $gw2i_linkedServices
+     * @global type $session_expiration_periode
+     * @param UserServiceLink $mainUserServiceLink
+     * @param UserServiceLink[] $userServiceLinks
+     */
+    public static function mergeUserServiceLinks($mainUserServiceLink, $userServiceLinks){
+        global $logger;
+        //Fetch service links
+        $linkedUser = static::getServiceLinks($mainUserServiceLink);
+        $linkedUsers = array();
+        foreach($userServiceLinks AS $userServiceLink){
+            try {
+                //This should already be null, but in case it isn't, set it to null
+                //The reason is that it isn't possible to link an entire user with another user
+                //Only a user service link with another user
+                $userServiceLink->setLinkedId(null);
+                
+                $linkedUsers[] = static::getServiceLinks($userServiceLink);
+            } catch (UnableToDetermineLinkId $ex) {
+                $linkedUsers[] = null;
+            }
+        }
+        
+        //Proccess
+        foreach($userServiceLinks AS $key => $userServiceLink){
+            //Link doesn't exist, so it can be safely added to the primary link
+            if($userServiceLink->getLinkedId() == null){
+                //Can safely add as link
+                $linkedUser->addUserServiceLink(
+                        new UserServiceLink(
+                            $userServiceLink->getServiceId(),
+                            $userServiceLink->getServiceUserId(), 
+                            $userServiceLink->isPrimary(),
+                            $userServiceLink->getServiceDisplayName(),
+                            $userServiceLink->getAttributes()));
+                
+                
+            //Link is already present on another user
+            } else if($mainUserServiceLink->getLinkedId() != $userServiceLink->getLinkedId()){
+                $conflictLinkedUser = $linkedUsers[$key];
+                $logger->info("Attampting conflict merge of linked users ".$linkedUser->compactString() ." and ".$conflictLinkedUser->compactString());
+                /* @var $linkedUser LinkedUser */
+                //$extensiveData1 = GW2DataPersistence::getExtensiveAccountData($primaryLinkedUser);
+                //$extensiveData2 = GW2DataPersistence::getExtensiveAccountData($userServiceLink);
+                
+                $linkedUser->addUserServiceLink(
+                        new UserServiceLink(
+                            $userServiceLink->getServiceId(),
+                            $userServiceLink->getServiceUserId(), 
+                            $userServiceLink->isPrimary(),
+                            $userServiceLink->getServiceDisplayName(),
+                            $userServiceLink->getAttributes()));
+                
+                
+                if(count($conflictLinkedUser->getPrimaryUserServiceLinks()) <= 1){
+                    //Delete conflict link data, as the only primary reference to the link is removed
+                    $logger->info($conflictLinkedUser->compactString()." Deleted, as last user service link got merged with ".$linkedUser->compactString());
+                    GW2DataPersistence::deleteAllData($conflictLinkedUser);
+                }
+            }
+        }
+        LinkingPersistencyHelper::persistUserServiceLinks($linkedUser);
+        return $linkedUser;
     }
 }

@@ -3,7 +3,7 @@
 /*
  * The MIT License
  *
- * Copyright 2015 jeppe.
+ * Copyright 2016 Jeppe Boysen Vennekilde.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,37 +24,37 @@
  * THE SOFTWARE.
  */
 
-namespace GW2Integration\Events\Events;
+namespace GW2Integration\Persistence\Helper;
 
-use GW2Integration\Entity\UserServiceLink;
+use GW2Integration\Persistence\Persistence;
+use PDO;
 
+if (!defined('GW2Integration')) {
+    die('Hacking attempt...');
+}
 /**
- * Description of GW2ResponseEvent
+ * Description of StatisticsPersistenceHelpter
  *
- * @author jeppe
+ * @author Jeppe Boysen Vennekilde
  */
-class UserServiceLinkEvent extends Event{
-    /**
-     *
-     * @var UserServiceLink 
-     */
-    private $userServiceLink;
-    
-    function __construct(UserServiceLink $userServiceLink) {
-        $this->userServiceLink = $userServiceLink;
-    }
+class ServicePersistencyHelper {
     
     /**
      * 
-     * @return UserServiceLink
+     * 
+     * @global type $gw2i_db_prefix
+     * @return array
      */
-    public function getUserServiceLink() {
-        return $this->userServiceLink;
+    public static function getWorldToGroupSettings() {
+        global $gw2i_db_prefix;
+        $preparedQueryString = 'SELECT * FROM '.$gw2i_db_prefix.'world_to_service_group';
+
+        $preparedStatement = Persistence::getDBEngine()->prepare($preparedQueryString);
+
+        $preparedStatement->execute();
+        
+        $result = $preparedStatement->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
     }
     
-    public function __toString() {
-        $toString = "UserServiceLinkEvent {".$this->getUserServiceLink()."}";
-        return $toString;
-    }
-
 }

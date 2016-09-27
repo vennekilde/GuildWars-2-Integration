@@ -27,7 +27,7 @@
 namespace GW2Integration\LinkedServices\Teamspeak;
 
 use Exception;
-use GW2Integration\Entity\LinkedUser;
+use GW2Integration\Entity\UserServiceLink;
 use GW2Integration\LinkedServices\LinkedService;
 use GW2Integration\Persistence\Helper\SettingsPersistencyHelper;
 
@@ -53,11 +53,11 @@ class Teamspeak extends LinkedService{
     
     /**
      * 
-     * @param LinkedUser $linkedUser
+     * @return UserServiceLink|null
      */
-    public function getLinkedUserIfAvailable(LinkedUser $linkedUser) {
+    public function getAvailableUserServiceLink() {
         //Only way to determine TS línk is via linked session
-        return $linkedUser;
+        return null;
     }
 
     /**

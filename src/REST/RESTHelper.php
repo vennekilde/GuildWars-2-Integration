@@ -4,6 +4,7 @@ namespace GW2Integration\REST;
 
 use GW2Integration\Controller\ServiceSessionController;
 use GW2Integration\Entity\LinkedUser;
+use GW2Integration\Entity\UserServiceLink;
 use GW2Integration\Exceptions\UnableToDetermineLinkId;
 use GW2Integration\Persistence\Helper\LinkingPersistencyHelper;
 
@@ -69,7 +70,10 @@ class RESTHelper{
         
         //First, get users available directly without looking at the provided session
         foreach($gw2i_linkedServices as $linkedService){
-            $linkedService->getLinkedUserIfAvailable($linkedUser);
+            $userUserviceLink = $linkedService->getAvailableUserServiceLink();
+            if(isset($userUserviceLink)){
+                $linkedUser->addUserServiceLink($userUserviceLink);
+            }
         }
         //Attempt to get linked user data from sessions
         $storeCookie = true;
@@ -85,17 +89,10 @@ class RESTHelper{
             $sessionHashes = filter_input(INPUT_COOKIE, 'ls-sessions');
         }
         
-        $persistSessionLinks = filter_input(INPUT_POST, 'ls-persist');
-        if(!isset($persistSessionLinks)){
-            $persistSessionLinks = true;
-        } else {
-            $persistSessionLinks == "false" ? false : true;
-        }
         //Retrieve the primary id's
         if(isset($sessionHashes) && !empty($sessionHashes)){
             $sessions = explode(",",$sessionHashes);
             $oldestTimestamp = null;
-            $persistLinks = array();
             foreach($sessions AS $session){
                 $sessionData = ServiceSessionController::getSessionIfStillValid($session);
                 
@@ -105,27 +102,12 @@ class RESTHelper{
                         && !empty($sessionData) 
                         //&& !isset($linkedUser->primaryServiceIds[$sessionData["service_id"]])
                 ){
-                    $isPrimary = $sessionData["is_primary"] == "1";
-                    if($isPrimary){
-                        $linkedUser->setPrimaryarySeviceId(
-                                $sessionData["service_user_id"], 
-                                $sessionData["service_id"], 
-                                $sessionData["service_display_name"]);
-                    } else {
-                        $linkedUser->addSecondarySeviceId(
-                                $sessionData["service_user_id"], 
-                                $sessionData["service_id"], 
-                                $sessionData["service_display_name"]);
-                    }
-                    
-                    if($persistSessionLinks){
-                        $persistLinks[] = array(
-                            "service_user_id" => $sessionData["service_user_id"], 
-                            "service_id" => $sessionData["service_id"], 
-                            "service_display_name" => $sessionData["service_display_name"],
-                            "is_primary" => $isPrimary
-                        );
-                    }
+                    $linkedUser->addUserServiceLink(
+                        new UserServiceLink(
+                            $sessionData["service_id"], 
+                            $sessionData["service_user_id"], 
+                            $sessionData["is_primary"] == "1",
+                            $sessionData["service_display_name"]));
                     
                     $timestamp = strtotime($sessionData["timestamp"]);
                     if(!isset($oldestTimestamp) || $timestamp < $oldestTimestamp){
@@ -133,20 +115,6 @@ class RESTHelper{
                     }
                 }
             }
-            
-            try{
-                if(LinkingPersistencyHelper::determineLinkedUserId($linkedUser) >= 0){
-                    foreach($persistLinks AS $persistLink){
-                        
-                        LinkingPersistencyHelper::persistServiceUserLink(
-                            $linkedUser, 
-                            $persistLink["service_user_id"], 
-                            $persistLink["service_id"], 
-                            $persistLink["service_display_name"], 
-                            $persistLink["is_primary"]);
-                    }
-                }
-            }catch(UnableToDetermineLinkId $ex){}
 
             //Store sessions as cookie param
             if($storeCookie){
@@ -156,9 +124,90 @@ class RESTHelper{
             }
         }
         
-        if(empty($linkedUser->primaryServiceIds)){
+        $primaryLinks = $linkedUser->getPrimaryUserServiceLinks();
+        if(empty($primaryLinks)){
             return null;
         }
         return $linkedUser;
+    }
+    
+    /**
+     * 
+     * @global type $gw2i_linkedServices
+     * @return UserUserviceLink
+     * @throws MainServiceConflictException
+     */
+    public static function getMainUserServiceLink(){
+        global $gw2i_linkedServices;
+        $mainUserUserviceLink = null;
+        foreach($gw2i_linkedServices as $linkedService){
+            $userUserviceLink = $linkedService->getAvailableUserServiceLink();
+            if(isset($userUserviceLink)){
+                if(isset($mainUserUserviceLink)){
+                    throw new MainServiceConflictException();
+                } else {
+                    $mainUserUserviceLink = $userUserviceLink;
+                }
+            }
+        }
+        return $mainUserUserviceLink;
+    }
+    
+    /**
+     * 
+     * @return UserUserviceLink[]
+     */
+    public static function getSessionUserServiceLinks(){
+        $userServiceLinks = array();
+        
+        //Attempt to get linked user data from sessions
+        $storeCookie = true;
+        $sessionHashes = filter_input(INPUT_POST, 'ls-sessions');
+        if(!isset($sessionHashes)){
+            //Try get params
+            $sessionHashes = filter_input(INPUT_GET, 'ls-sessions');
+        }
+        if(!isset($sessionHashes)){
+            //Try cookies 
+            $storeCookie = false;
+            //No sessions in POST param, so check if there is any cookie sessions stored
+            $sessionHashes = filter_input(INPUT_COOKIE, 'ls-sessions');
+        }
+        
+        //Retrieve the primary id's
+        if(isset($sessionHashes) && !empty($sessionHashes)){
+            $sessions = explode(",",$sessionHashes);
+            $oldestTimestamp = null;
+            foreach($sessions AS $session){
+                $sessionData = ServiceSessionController::getSessionIfStillValid($session);
+                
+                //Only use session if link hasn't already been determined
+                if(
+                        isset($sessionData) 
+                        && !empty($sessionData) 
+                        //&& !isset($linkedUser->primaryServiceIds[$sessionData["service_id"]])
+                ){
+                    $userServiceLinks[] = 
+                        new UserServiceLink(
+                            $sessionData["service_id"], 
+                            $sessionData["service_user_id"], 
+                            $sessionData["is_primary"] == "1",
+                            $sessionData["service_display_name"]);
+                    
+                    $timestamp = strtotime($sessionData["timestamp"]);
+                    if(!isset($oldestTimestamp) || $timestamp < $oldestTimestamp){
+                        $oldestTimestamp = $timestamp;
+                    }
+                }
+            }
+
+            //Store sessions as cookie param
+            if($storeCookie){
+                global $session_expiration_periode;
+                $cookieExpiresIn = $session_expiration_periode - (time() - $oldestTimestamp);
+                setcookie("ls-sessions", $sessionHashes, $cookieExpiresIn);  /* expire in 1 hour */
+            }
+        }
+        return $userServiceLinks;
     }
 }

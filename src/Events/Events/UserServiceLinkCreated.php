@@ -26,39 +26,20 @@
 
 namespace GW2Integration\Events\Events;
 
+use GW2Integration\Entity\UserServiceLink;
+
 /**
  * Description of GW2ResponseEvent
  *
  * @author jeppe
  */
 class UserServiceLinkCreated extends UserServiceLinkEvent{
-
-    private $displayName;
-    private $isPrimary;
-    private $attributes;
-    
-    function __construct($linkId, $serviceId, $userId, $displayName, $isPrimary, $attributes) {
-        parent::__construct($linkId, $serviceId, $userId);
-        $this->displayName = $displayName;
-        $this->isPrimary = $isPrimary;
-        $this->attributes = $attributes;
-    }
-
-
-    public function getDisplayName() {
-        return $this->displayName;
-    }
-
-    public function getIsPrimary() {
-        return $this->isPrimary;
+    function __construct(UserServiceLink $userServiceLink) {
+        parent::__construct($userServiceLink);
     }
     
-    public function getAttributes() {
-        return $this->attributes;
-    }
-
     public function __toString() {
-        return "Created link [linkId: ".$this->getLinkId().", serviceId: ".$this->getServiceId().", userId: ".$this->getUserId().", displayName: $this->displayName, primary: $this->isPrimary, attributes: $this->attributes]";
+        $toString = "UserServiceLinkCreated {".$this->getUserServiceLink()."}";
+        return $toString;
     }
-
 }

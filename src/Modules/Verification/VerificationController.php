@@ -105,7 +105,7 @@ class VerificationController {
         APIKeyPersistenceHelper::persistTokenInfo($linkedUser, $fakeAPIKey, $tokenInfo);
         $unixTimestamp = time() + SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::TEMPORARY_ACCESS_EXPIRATION) - SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_EXPIRATION_TIME);
         APIKeyPersistenceHelper::updateLastAPIKeySuccessfulFetch($fakeAPIKey, $unixTimestamp);
-        LinkingPersistencyHelper::persistServiceUserLink(
+        LinkingPersistencyHelper::persistUserServiceLink(
                 $linkedUser, 
                 $linkedUser->fetchServiceUserId, 
                 $linkedUser->fetchServiceId, 
@@ -182,8 +182,8 @@ class VerificationController {
         }
         if (
                 isset($linkedUser->fetchServiceId) && isset($linkedUser->fetchServiceUserId)
-                && isset($linkedUser->primaryServiceIds[$linkedUser->fetchServiceId][0])
-                && $linkedUser->primaryServiceIds[$linkedUser->fetchServiceId][0] != $linkedUser->fetchServiceUserId
+                && isset($linkedUser->getPrimaryUserServiceLinks()[$linkedUser->fetchServiceId])
+                && $linkedUser->getPrimaryUserServiceLinks()[$linkedUser->fetchServiceId]->getServiceUserId() != $linkedUser->fetchServiceUserId
         ) {
             switch ($result->getValue()) {
                 case VerificationStatus::ACCESS_GRANTED_HOME_WORLD:
@@ -192,7 +192,7 @@ class VerificationController {
                 case VerificationStatus::ACCESS_GRANTED_LIMKED_WORLD_TEMPORARY:
                 case VerificationStatus::ACCESS_DENIED_INVALID_WORLD:
                 case VerificationStatus::ACCESS_DENIED_BANNED:
-                    $result->setMirrorOwnerServiceId($linkedUser->primaryServiceIds[$linkedUser->fetchServiceId][0]);
+                    $result->setMirrorOwnerServiceId($linkedUser->getPrimaryUserServiceLinks()[$linkedUser->fetchServiceId]->getServiceUserId());
                     break;
             }
         }
@@ -200,17 +200,17 @@ class VerificationController {
         
         //If a specific user service link is requested, attach the link attributes to the verification status
         if(isset($linkedUser->fetchServiceId) && isset($linkedUser->fetchServiceUserId)) {
-            if(isset($linkedUser->primaryServiceIds[$linkedUser->fetchServiceId]) 
-                    && $linkedUser->primaryServiceIds[$linkedUser->fetchServiceId][0] == $linkedUser->fetchServiceUserId
-                    && isset($linkedUser->primaryServiceIds[$linkedUser->fetchServiceId][2])){
+            if(isset($linkedUser->getPrimaryUserServiceLinks()[$linkedUser->fetchServiceId]) 
+                    && $linkedUser->getPrimaryUserServiceLinks()[$linkedUser->fetchServiceId]->getServiceUserId() == $linkedUser->fetchServiceUserId
+                    && $linkedUser->getPrimaryUserServiceLinks()[$linkedUser->fetchServiceId]->getAttributes() != null){
                 
-                $result->setAttributes($linkedUser->primaryServiceIds[$linkedUser->fetchServiceId][2]);
+                $result->setAttributes($linkedUser->getPrimaryUserServiceLinks()[$linkedUser->fetchServiceId]->getAttributes());
                 
-            } else if(isset($linkedUser->secondaryServiceIds[$linkedUser->fetchServiceId]) 
-                    && isset($linkedUser->secondaryServiceIds[$linkedUser->fetchServiceId][$linkedUser->fetchServiceUserId])
-                    && isset($linkedUser->secondaryServiceIds[$linkedUser->fetchServiceId][$linkedUser->fetchServiceUserId][1])){
+            } else if(isset($linkedUser->getSecondaryUserServiceLinks()[$linkedUser->fetchServiceId]) 
+                    && isset($linkedUser->getSecondaryUserServiceLinks()[$linkedUser->fetchServiceId][$linkedUser->fetchServiceUserId])
+                    && $linkedUser->getSecondaryUserServiceLinks()[$linkedUser->fetchServiceId][$linkedUser->fetchServiceUserId]->getAttributes() != null){
                 
-                $result->setAttributes($linkedUser->secondaryServiceIds[$linkedUser->fetchServiceId][$linkedUser->fetchServiceUserId][1]);
+                $result->setAttributes($linkedUser->getSecondaryUserServiceLinks()[$linkedUser->fetchServiceId][$linkedUser->fetchServiceUserId]->getAttributes());
                 
             }
         }

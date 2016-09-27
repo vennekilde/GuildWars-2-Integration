@@ -29,6 +29,7 @@ namespace GW2Integration\LinkedServices\SMF;
 require_once($_SERVER['DOCUMENT_ROOT'].'/SSI.php');
 
 use GW2Integration\Entity\LinkedUser;
+use GW2Integration\Entity\UserServiceLink;
 use GW2Integration\LinkedServices\LinkedService;
 
 /**
@@ -55,15 +56,19 @@ class SimpleMachinesForum extends LinkedService{
     
     /**
      * 
-     * @param LinkedUser $linkedUser
-     * @return LinkedUser
+     * @return UserServiceLink|null
      */
-    public function getLinkedUserIfAvailable(LinkedUser $linkedUser) {
+    public function getAvailableUserServiceLink() {
+        $userServiceLink = null;
         $userId = $this->getCurrentlyLoggedInUserId();
         if(isset($userId) && $userId > 0){
-            $linkedUser->setPrimaryarySeviceId($this->getCurrentlyLoggedInUserId(), $this->getServiceId(), $this->getCurrentlyLoggedInDisplayName());
+            $userServiceLink = new UserServiceLink(
+                $this->getServiceId(), 
+                $this->getCurrentlyLoggedInUserId(), 
+                true,
+                $this->getCurrentlyLoggedInDisplayName());
         }
-        return $linkedUser;
+        return $userServiceLink;
     }
     
     /*******************************************

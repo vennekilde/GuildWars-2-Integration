@@ -27,6 +27,7 @@
 namespace GW2Integration\Modules\Verification\Teamspeak;
 
 use GW2Integration\Entity\LinkedUser;
+use GW2Integration\Entity\UserServiceLink;
 use GW2Integration\Events\Events\UserServiceLinkEvent;
 use GW2Integration\LinkedServices\Teamspeak\Teamspeak;
 use GW2Integration\Modules\Verification\AbstractVerificationModule;
@@ -48,8 +49,8 @@ class TeamspeakVerification extends AbstractVerificationModule{
      * @param UserServiceLinkEvent $event
      */
     public function onUserServiceLinkEvent(UserServiceLinkEvent $event){
-        if($event->getServiceId() == $this->getServiceId()){
-            $this->refreshTeamspeakAccess($event->getUserId());
+        if($event->getUserServiceLink()->getServiceId() == $this->getServiceId()){
+            $this->refreshTeamspeakAccess($event->getUserServiceLink()->getServiceUserId());
         }
     }
     
@@ -62,12 +63,13 @@ class TeamspeakVerification extends AbstractVerificationModule{
     }
 
     public function refreshTeamspeakAccessForLinkedUser(LinkedUser $linkedUser){
-        if(isset($linkedUser->primaryServiceIds[1])){
-            $this->refreshTeamspeakAccess($linkedUser->primaryServiceIds[1][0]);
+        if(isset($linkedUser->getPrimaryUserServiceLinks()[$this->getServiceId()])){
+            $this->refreshTeamspeakAccess($linkedUser->getPrimaryUserServiceLinks()[$this->getServiceId()]->getServiceUserId());
         }
-        if(isset($linkedUser->secondaryServiceIds[1])){
-            foreach($linkedUser->secondaryServiceIds[1] AS $tsDbid => $displayName){
-                $this->refreshTeamspeakAccess($tsDbid);
+        if(isset($linkedUser->getSecondaryUserServiceLinks()[$this->getServiceId()])){
+            foreach($linkedUser->getSecondaryUserServiceLinks()[$this->getServiceId()] AS $userServiceLink){
+                /* @var $userServiceLink UserServiceLink */
+                $this->refreshTeamspeakAccess($userServiceLink->getServiceUserId());
             }
         }
     }

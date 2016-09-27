@@ -44,20 +44,20 @@ if(isset($serviceId) && isset($gw2i_linkedServices[$serviceId])){
     //default isPrimary to true if not present
     $isPrimary = isset($isPrimary) ? $isPrimary : true;
     //Get the logged in user
-    $serviceLinkedUser = new LinkedUser();
-    $gw2i_linkedServices[$serviceId]->getLinkedUserIfAvailable($serviceLinkedUser);
-    if(isset($serviceLinkedUser->primaryServiceIds[$serviceId])){
+    $userUserviceLink = $gw2i_linkedServices[$serviceId]->getAvailableUserServiceLink();
+    if(isset($userUserviceLink)){
         $linkedUser = RESTHelper::getLinkedUserFromParams();
         
-        $response["result"] = $serviceLinkedUser->primaryServiceIds[$serviceId];
+        $response["result"] = $userUserviceLink;
         
         try{
-            LinkingPersistencyHelper::persistServiceUserLink(
-                $linkedUser, 
-                $response["result"][0], 
-                $serviceId, 
-                $response["result"][1], 
-                $isPrimary);
+            $userServiceLink = new GW2Integration\Entity\UserServiceLink(
+                        $serviceId, 
+                        $response["result"][0], 
+                        $isPrimary,
+                        $response["result"][1]);
+            $userServiceLink->setLinkedId($linkedUser->getLinkedId());
+            LinkingPersistencyHelper::persistUserServiceLink($userServiceLink);
         } catch(UnableToDetermineLinkId $e){
             $response["result"] = false;
             $response["msg"] = "UnableToDetermineLinkId";

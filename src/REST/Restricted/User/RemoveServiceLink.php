@@ -28,7 +28,8 @@ namespace GW2Integration\REST\User;
 
 require __DIR__.'/../../RestrictedRESTHelper.php';
 
-use GW2Integration\Controller\VerificationController;
+use GW2Integration\Controller\LinkedUserController;
+use GW2Integration\Exceptions\UnableToDetermineLinkId;
 use GW2Integration\REST\RestrictedRESTHelper;
 use function GuzzleHttp\json_encode;
 
@@ -40,7 +41,7 @@ $serviceId = filter_input(INPUT_POST, 'remove-service-id');
 try{
     if(isset($serviceUserId) && isset($serviceId)){
         global $logger;
-        VerificationController::deleteServiceLink($linkedUser, $serviceUserId, $serviceId);
+        LinkedUserController::deleteServiceLink($linkedUser, $serviceUserId, $serviceId);
         $response = array(
             "success" => true
         );

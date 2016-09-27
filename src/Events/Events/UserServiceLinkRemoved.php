@@ -26,36 +26,20 @@
 
 namespace GW2Integration\Events\Events;
 
+use GW2Integration\Entity\UserServiceLink;
+
 /**
  * Description of GW2ResponseEvent
  *
  * @author jeppe
  */
-class UserServiceLinkRemoved extends UserServiceLinkEvent{
-    private $displayName;
-    private $isPrimary;
-    private $attributes;
-    
-    function __construct($linkId, $serviceId, $userId, $displayName, $isPrimary, $attributes) {
-        parent::__construct($linkId, $serviceId, $userId);
-        $this->displayName = $displayName;
-        $this->isPrimary = $isPrimary;
-    }
-
-    public function getDisplayName() {
-        return $this->displayName;
-    }
-
-    public function getIsPrimary() {
-        return $this->isPrimary;
+class UserServiceLinkRemoved extends UserServiceLinkEvent{ 
+    function __construct(UserServiceLink $userServiceLink) {
+        parent::__construct($userServiceLink);
     }
     
-    public function getAttributes() {
-        return $this->attributes;
-    }
-
     public function __toString() {
-        return "Removed link [linkId: ".$this->getLinkId().", serviceId: ".$this->getServiceId().", userId: ".$this->getUserId().", displayName: $this->displayName, IsPrimary: $this->isPrimary, attributes: $this->attributes]";
+        $toString = "UserServiceLinkRemoved {".$this->getUserServiceLink()."}";
+        return $toString;
     }
-
 }

@@ -37,9 +37,9 @@ $serviceId = filter_input(INPUT_POST, 'service-id');
 $response = array();
 if(isset($serviceId) && isset($gw2i_linkedServices[$serviceId])){
     $linkedUser = new \GW2Integration\Entity\LinkedUser();
-    $gw2i_linkedServices[$serviceId]->getLinkedUserIfAvailable($linkedUser);
-    if(isset($linkedUser->primaryServiceIds[$serviceId])){
-        $response["result"] = $linkedUser->primaryServiceIds[$serviceId];
+    $userUserviceLink = $gw2i_linkedServices[$serviceId]->getAvailableUserServiceLink();
+    if(isset($userUserviceLink)){
+        $response["result"] = $userUserviceLink[$serviceId];
     } else {
         $response["result"] = "false";
     }

@@ -30,6 +30,7 @@ use GW2Integration\Entity\LinkedUser;
 use GW2Integration\Exceptions\AccountUsernameBanned;
 use GW2Integration\Exceptions\UserAlreadyLinkedException;
 use GW2Integration\Modules\Guilds\ModuleLoader;
+use GW2Integration\Modules\Verification\VerificationController;
 use GW2Integration\Persistence\Helper\BannedGW2AccountPersistencyHelper;
 use GW2Integration\Persistence\Helper\GW2DataPersistence;
 use GW2Integration\Persistence\Helper\StatisticsAndLoggingPersistenceHelper;
@@ -113,8 +114,8 @@ class GW2AccountDataController {
      */
     public static function processGuildsAccountData($linkedUser, $guildIds, $world) {
         //Temporary, using V2 code
-        if(isset($linkedUser->primaryServiceIds[0][0])){
-            ModuleLoader::updateGuildAssociation($linkedUser->primaryServiceIds[0][0], $guildIds, $world);
+        if($linkedUser->getPrimaryUserServiceLinks()[0]->getServiceUserId() != null){
+            ModuleLoader::updateGuildAssociation($linkedUser->getPrimaryUserServiceLinks()[0]->getServiceUserId(), $guildIds, $world);
         }
     }
 

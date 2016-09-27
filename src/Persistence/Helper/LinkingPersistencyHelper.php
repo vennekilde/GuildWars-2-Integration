@@ -27,6 +27,8 @@
 namespace GW2Integration\Persistence\Helper;
 
 use GW2Integration\Entity\LinkedUser;
+use GW2Integration\Entity\LinkIdHolder;
+use GW2Integration\Entity\UserServiceLink;
 use GW2Integration\Events\EventManager;
 use GW2Integration\Events\Events\UserServiceLinkCreated;
 use GW2Integration\Events\Events\UserServiceLinkRemoved;
@@ -52,46 +54,53 @@ class LinkingPersistencyHelper {
     /**
      * 
      * @global type $gw2i_db_prefix
-     * @param LinkedUser $linkedUser Can also be int for the link-id
+     * @param UserServiceLink|LinkedUser|int $identifier
      * @return int
      * @throws LinkedUserIdConflictException
      */
-    public static function determineLinkedUserId($linkedUser){
+    public static function determineLinkedUserId($identifier){
         $linkId = null;
         //Check if $linkedUser is an integer
-        if(!isset($linkedUser)){
+        if(!isset($identifier)){
             throw new UnableToDetermineLinkId();
-        } else if(ctype_digit($linkedUser)){
-            $linkId = $linkedUser;
-        } else if($linkedUser->getLinkedId() != null){
-            $linkId = $linkedUser->getLinkedId();
-        } else {
-            $values = array();
-            $first = true;
-            $pqsPartial = '';
-            if(isset($linkedUser->fetchServiceUserId) && isset($linkedUser->fetchServiceId)){
-                $pqsPartial .= '(service_user_id = ? AND service_id = ?)';
-                $first = false;
-                $values[] = $linkedUser->fetchServiceUserId;
-                $values[] = $linkedUser->fetchServiceId;
-            }
-            if(!empty($linkedUser->primaryServiceIds)){
-                foreach($linkedUser->primaryServiceIds AS $serviceId => $userId){
-                    $values[] = $userId[0];
-                    $values[] = $serviceId;
-                    if($first){
+        } else if(ctype_digit($identifier)){
+            $linkId = $identifier;
+        } else if($identifier instanceof LinkIdHolder) {
+            if($identifier->getLinkedId() != null){
+                $linkId = $identifier->getLinkedId();
+            } else {
+                global $gw2i_db_prefix;
+                $pqs;
+                $values = array();
+                if($identifier instanceof UserServiceLink){
+                    $pqs = 'SELECT link_id FROM '.$gw2i_db_prefix.'user_service_links WHERE service_user_id = ? AND service_id = ?';
+                    $values = array($identifier->getServiceUserId(), $identifier->getServiceId());
+                } else if($identifier instanceof LinkedUser){
+                    $first = true;
+                    $pqsPartial = '';
+                    if(isset($identifier->fetchServiceUserId) && isset($identifier->fetchServiceId)){
+                        $pqsPartial .= '(service_user_id = ? AND service_id = ?)';
                         $first = false;
-                    } else {
-                        $pqsPartial .= ' OR ';
+                        $values[] = $identifier->fetchServiceUserId;
+                        $values[] = $identifier->fetchServiceId;
                     }
-                    $pqsPartial .= '(service_user_id = ? AND service_id = ?)';
-                }
-            }
-            
-            global $gw2i_db_prefix;
-            if(!empty($values)){
-                $pqs = 'SELECT link_id FROM '.$gw2i_db_prefix.'user_service_links WHERE '.$pqsPartial;
+                    foreach($identifier->getPrimaryUserServiceLinks() AS $userServiceLink){
+                        $values[] = $userServiceLink->getServiceUserId();
+                        $values[] = $userServiceLink->getServiceId();
+                        if($first){
+                            $first = false;
+                        } else {
+                            $pqsPartial .= ' OR ';
+                        }
+                        $pqsPartial .= '(service_user_id = ? AND service_id = ?)';
+                    }
 
+                    if(!empty($values)){
+                        $pqs = 'SELECT link_id FROM '.$gw2i_db_prefix.'user_service_links WHERE '.$pqsPartial;
+                    }
+                } else {
+                    throw new UnableToDetermineLinkId();
+                }
                 $ps = Persistence::getDBEngine()->prepare($pqs);
                 $ps->execute($values);
                 $linkIds = $ps->fetch(PDO::FETCH_NUM);
@@ -108,15 +117,15 @@ class LinkingPersistencyHelper {
                         $lastLinkId = $linkId;
                     }
 
-                    $linkedUser->setLinkedId($lastLinkId);
-                    
-                    $linkId = $linkedUser->getLinkedId();
+                    $identifier->setLinkedId($lastLinkId);
+
+                    $linkId = $identifier->getLinkedId();
                 } else {
                     throw new UnableToDetermineLinkId();
                 }
-            } else {
-                throw new UnableToDetermineLinkId();
             }
+        } else {
+            throw new UnableToDetermineLinkId();
         }
         return $linkId;
     }
@@ -142,28 +151,32 @@ class LinkingPersistencyHelper {
      * 
      * @param LinkedUser $linkedUser
      */
-    public static function persistServiceUserLinks($linkedUser){
-        foreach($linkedUser->primaryServiceIds AS $serviceId => $userId){
-            static::persistServiceUserLink($linkedUser, $userId[0], $serviceId, $userId[1], true);
+    public static function persistUserServiceLinks($linkedUser){
+        foreach($linkedUser->getPrimaryUserServiceLinks() AS $userServiceLink){
+            static::persistUserServiceLink($userServiceLink);
         }
-        foreach($linkedUser->secondaryServiceIds AS $serviceId => $userId){
-            static::persistServiceUserLink($linkedUser, $userId[0], $serviceId, $userId[1], false);
+        foreach($linkedUser->getSecondaryUserServiceLinks() AS $userServiceLinks){
+            foreach($userServiceLinks AS $userServiceLink){
+                static::persistUserServiceLink($userServiceLink);
+            }
         }
     }
     
-    public static function persistServiceUserLink($linkedUser, $serviceUserId, $serviceId, $displayName = null, $isPrimary = true, $attributes = null){
+    public static function persistUserServiceLink(UserServiceLink $userServiceLink){
         global $gw2i_db_prefix;
         //Determine the link id for the given linked user
-        $linkId = LinkingPersistencyHelper::determineLinkedUserId($linkedUser);
+        $linkId = LinkingPersistencyHelper::determineLinkedUserId($userServiceLink);
         
         //Generate events that will be created by this new link
-        $linkEventsFromNewLink = static::getLinkEventsFromNewLink($linkId, $serviceUserId, $serviceId, $displayName, $isPrimary, $attributes);
+        $linkEventsFromNewLink = static::getLinkEventsFromNewLink($userServiceLink);
         
         if($linkEventsFromNewLink == false){
             //No events means that the new link is either the same as the current link, or it simply isn't worth persisting
             return false;
         }
        
+        $displayName = $userServiceLink->getServiceDisplayName();
+        $attributes = $userServiceLink->getAttributes();
         $preparedQueryString = '
             INSERT INTO '.$gw2i_db_prefix.'user_service_links (link_id, service_user_id, service_id, is_primary' . (!empty($displayName) ? ", service_display_name" : "") . (isset($attributes) ? ", attributes" : "") . ')
                 VALUES(?,?,?,?' . (!empty($displayName) ? ",?" : "") . (isset($attributes) ? ",?" : "") . ')
@@ -176,9 +189,9 @@ class LinkingPersistencyHelper {
         
         $queryParams = array(
             $linkId,
-            $serviceUserId,
-            $serviceId,
-            $isPrimary
+            $userServiceLink->getServiceUserId(),
+            $userServiceLink->getServiceId(),
+            $userServiceLink->isPrimary()
         );
         if(!empty($displayName)){
             $queryParams[] = $displayName;
@@ -189,8 +202,8 @@ class LinkingPersistencyHelper {
         
         $preparedStatement = Persistence::getDBEngine()->prepare($preparedQueryString);
         
-        if($isPrimary){
-            static::removePrimaryLinks($linkId, $serviceId);
+        if($userServiceLink->isPrimary()){
+            static::removePrimaryLinks($linkId, $userServiceLink->getServiceId());
         }
         
         $result = $preparedStatement->execute($queryParams);
@@ -230,8 +243,8 @@ class LinkingPersistencyHelper {
         return $result;
     }
     
-    public static function getLinkEventsFromNewLink($linkId, $serviceUserId, $serviceId, $displayName, $isPrimary, $attributes){
-        $affectedLinks = static::getAffectedLinksFromNewLink($linkId, $isPrimary, $serviceUserId, $serviceId);
+    public static function getLinkEventsFromNewLink(UserServiceLink $userServiceLink){
+        $affectedLinks = static::getAffectedLinksFromNewLink($userServiceLink);
         $events = array();
         $isLinkNew = true;
         //Loop through each link for the given user for the given service
@@ -240,49 +253,36 @@ class LinkingPersistencyHelper {
         foreach($affectedLinks AS $affectedLink){
             if(     //Don't bother updating if nothing is different
                     //Also do not bother updating if display name is different, but new value is null
-                    ($affectedLink["service_display_name"] == $displayName || $displayName == null)
-                    && $affectedLink["service_user_id"] == $serviceUserId
-                    && $affectedLink["is_primary"] == $isPrimary
-                    && $affectedLink["link_id"] == $linkId
-                    && $affectedLink["attributes"] == $attributes
+                    ($affectedLink["service_display_name"] == $userServiceLink->getServiceDisplayName() || $userServiceLink->getServiceDisplayName() == null)
+                    && $affectedLink["service_user_id"] == $userServiceLink->getServiceUserId()
+                    && $affectedLink["is_primary"] == $userServiceLink->getIsPrimary()
+                    && $affectedLink["link_id"] == $userServiceLink->getLinkedId()
+                    && $affectedLink["attributes"] == $userServiceLink->getAttributes()
                 ){
                 //no need to update
                 return false;
             } else if(
                     //Determine if the new link is just an update of an old link
-                    $affectedLink["link_id"] == $linkId
-                    && $affectedLink["service_user_id"] == $serviceUserId
+                    $affectedLink["link_id"] == $userServiceLink->getLinkedId()
+                    && $affectedLink["service_user_id"] == $userServiceLink->getServiceUserId()
                 ){
                 $isLinkNew = false;
                 $events[] =  new UserServiceLinkUpdated(
-                        $linkId, 
-                        $serviceId, 
-                        $serviceUserId, 
-                        $displayName, 
-                        $isPrimary,
-                        $attributes,
-                        $affectedLink["service_display_name"], 
-                        $affectedLink["is_primary"],
-                        $affectedLink["attributes"]);
+                        $userServiceLink,
+                        new UserServiceLink(
+                            $affectedLink["service_id"],
+                            $affectedLink["service_user_id"],
+                            $affectedLink["is_primary"],
+                            $affectedLink["service_display_name"],
+                            $affectedLink["attributes"])
+                        );
             } else {
                 //If the link isn't the same link, then the affected link is removed
-                $events[] =  new UserServiceLinkRemoved(
-                        $affectedLink["link_id"], 
-                        $affectedLink["service_id"], 
-                        $affectedLink["service_user_id"], 
-                        $affectedLink["service_display_name"], 
-                        $affectedLink["is_primary"],
-                        $affectedLink["attributes"]);
+                $events[] = new UserServiceLinkRemoved($userServiceLink);
             }
         }
         if($isLinkNew){
-            $events[] =  new UserServiceLinkCreated(
-                    $linkId, 
-                    $serviceId, 
-                    $serviceUserId, 
-                    $displayName, 
-                    $isPrimary,
-                    $attributes);
+            $events[] = new UserServiceLinkCreated($userServiceLink);
         }
         return $events;
     }
@@ -296,20 +296,20 @@ class LinkingPersistencyHelper {
      * @param type $serviceId
      * @return type
      */
-    public static function getAffectedLinksFromNewLink($linkId, $isPrimary, $serviceUserId, $serviceId){
+    public static function getAffectedLinksFromNewLink(UserServiceLink $userServiceLink){
         global $gw2i_db_prefix;
         
         $preparedQueryString = 'SELECT * FROM '.$gw2i_db_prefix.'user_service_links WHERE (service_id = ? AND service_user_id = ?)';
         $values = array(
-            $serviceId,
-            $serviceUserId,
+            $userServiceLink->getServiceId(),
+            $userServiceLink->getServiceUserId(),
         );
         
         //There can be multiple secondary links on the same service, so only run this check if the link is primary
-        if($isPrimary){
+        if($userServiceLink->isPrimary()){
             $preparedQueryString .= " OR (link_id = ? AND service_id = ? AND is_primary = 1)";
-            $values[] = $linkId;
-            $values[] = $serviceId;
+            $values[] = $userServiceLink->getLinkedId();
+            $values[] = $userServiceLink->getServiceId();
         }
         
         $preparedStatement = Persistence::getDBEngine()->prepare($preparedQueryString);
@@ -484,12 +484,14 @@ class LinkingPersistencyHelper {
             $preparedStatement->execute($queryParams);
 
             if($preparedStatement->rowCount() > 0){
-                $event = new UserServiceLinkRemoved(
-                            $serviceLink["link_id"], 
+                $userServiceLink = new UserServiceLink(
                             $serviceLink["service_id"], 
                             $serviceLink["service_user_id"], 
+                            $serviceLink["is_primary"],
                             $serviceLink["service_display_name"], 
-                            $serviceLink["is_primary"]);
+                            $serviceLink["attributes"]);
+                $userServiceLink->setLinkedId($serviceLink["link_id"]);
+                $event = new UserServiceLinkRemoved($userServiceLink);
                 EventManager::fireEvent($event);
             }
         }

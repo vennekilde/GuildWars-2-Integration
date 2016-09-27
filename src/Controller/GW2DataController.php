@@ -28,8 +28,10 @@ namespace GW2Integration\Controller;
 
 use GW2Integration\API\GW2APICommunicator;
 use GW2Integration\Entity\LinkedUser;
+use GW2Integration\Entity\UserServiceLink;
 use GW2Integration\Exceptions\GW2APIException;
 use GW2Integration\Persistence\Helper\GW2DataPersistence;
+use GW2Integration\Persistence\Helper\LinkingPersistencyHelper;
 use GW2Treasures\GW2Api\GW2Api;
 
 /**

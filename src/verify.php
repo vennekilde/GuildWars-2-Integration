@@ -1,11 +1,18 @@
 <?php
 
 use GW2Integration\API\APIKeyManager;
+use GW2Integration\Controller\LinkedUserController;
 use GW2Integration\Persistence\Helper\SettingsPersistencyHelper;
 use GW2Integration\REST\RESTHelper;
 
 require_once __DIR__ . "/Source.php";
 
+$mainUserServiceLink = RESTHelper::getMainUserServiceLink();
+
+if(isset($mainUserServiceLink)){
+    $sessionUserServiceLinks = RESTHelper::getSessionUserServiceLinks();
+    LinkedUserController::mergeUserServiceLinks($mainUserServiceLink, $sessionUserServiceLinks);
+}
 $linkedUser = RESTHelper::getLinkedUserFromParams();
 ?>
 
@@ -76,7 +83,7 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                         <?php
                             foreach($gw2i_linkedServices AS $linkedService){
 
-                                $isAvailable = $linkedService->canDetermineLinkDuringSetup() ? true : isset($linkedUser->primaryServiceIds[$linkedService->getServiceId()]);
+                                $isAvailable = $linkedService->canDetermineLinkDuringSetup() ? true : isset($linkedUser->getPrimaryUserServiceLinks()[$linkedService->getServiceId()]);
 
                                 echo'<div class="linked-service-container"><label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="checkbox-'.$linkedService->getServiceId().'">
                                         <input type="checkbox" id="checkbox-'.$linkedService->getServiceId().'" class="mdl-checkbox__input" '.($isAvailable ? "checked" : "disabled").'>

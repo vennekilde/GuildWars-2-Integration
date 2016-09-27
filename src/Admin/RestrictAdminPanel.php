@@ -1,6 +1,7 @@
 <?php
 
 use GW2Integration\Entity\LinkedUser;
+use GW2Integration\LinkedServices\LinkedService;
 
 /* 
  * The MIT License
@@ -31,13 +32,15 @@ require_once __DIR__ . "/../Source.php";
 //Check if user can view admin panel
 $canViewAdminPanel = false;
 foreach($gw2i_admin_allowed AS $serviceId => $groups){
-    foreach($groups AS $group){
-        $service = $gw2i_linkedServices[$serviceId];
-        if($service->canCheckGroupId()){
-            $linkedUser = $service->getLinkedUserIfAvailable(new LinkedUser());
-            
-            if(isset($linkedUser->primaryServiceIds[$serviceId])){
-                $hasGroup = $service->hasUserGroupId($linkedUser->primaryServiceIds[$serviceId][0], $group);
+    $service = $gw2i_linkedServices[$serviceId];
+    /* @var $service LinkedService */
+    if($service->canCheckGroupId()){
+        $userUserviceLink = $service->getAvailableUserServiceLink();
+        
+        if(isset($userUserviceLink)){
+            $userId = $userUserviceLink->getServiceUserId();
+            foreach($groups AS $group){
+                $hasGroup = $service->hasUserGroupId($userId, $group);
                 if($hasGroup){
                     $canViewAdminPanel = true;
                     goto doneAdminAccessCheck;

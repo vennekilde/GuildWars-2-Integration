@@ -3,7 +3,7 @@
 /*
  * The MIT License
  *
- * Copyright 2015 jeppe.
+ * Copyright 2016 venne.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,37 +24,11 @@
  * THE SOFTWARE.
  */
 
-namespace GW2Integration\Events\Events;
-
-use GW2Integration\Entity\UserServiceLink;
-
 /**
- * Description of GW2ResponseEvent
+ * Description of MainServiceConflictException
  *
- * @author jeppe
+ * @author venne
  */
-class UserServiceLinkEvent extends Event{
-    /**
-     *
-     * @var UserServiceLink 
-     */
-    private $userServiceLink;
-    
-    function __construct(UserServiceLink $userServiceLink) {
-        $this->userServiceLink = $userServiceLink;
-    }
-    
-    /**
-     * 
-     * @return UserServiceLink
-     */
-    public function getUserServiceLink() {
-        return $this->userServiceLink;
-    }
-    
-    public function __toString() {
-        $toString = "UserServiceLinkEvent {".$this->getUserServiceLink()."}";
-        return $toString;
-    }
-
+class MainServiceConflictException extends Exception{
+    //put your code here
 }

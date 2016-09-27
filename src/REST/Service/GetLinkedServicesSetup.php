@@ -56,9 +56,10 @@ if(isset($servicesToLinkStr)){
         //Check if the service link can be determined during setup
         if($linkedService->canDetermineLinkDuringSetup()){
             //Check if any check for existing primary id's can be done
-            if(!empty($linkedUser->primaryServiceIds)){
+            $primaryUserServiceLinks = $linkedUser->getPrimaryUserServiceLinks();
+            if(!empty($primaryUserServiceLinks)){
                 //Check if the link is already known
-                if(!array_key_exists($serviceToLink, $linkedUser->primaryServiceIds)){
+                if(!array_key_exists($serviceToLink, $primaryUserServiceLinks)){
                     //Add setup html
                     $result[$serviceToLink] = $linkedService->getLinkSetupHTML($successJSFunction);
                 }

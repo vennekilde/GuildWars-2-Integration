@@ -3,8 +3,10 @@
 use GW2Integration\API\APIBatchProcessor;
 use GW2Integration\API\APIKeyManager;
 use GW2Integration\API\APIKeyProcessor;
+use GW2Integration\Controller\LinkedUserController;
 use GW2Integration\Controller\ServiceSessionController;
 use GW2Integration\Entity\LinkedUser;
+use GW2Integration\Entity\UserServiceLink;
 use GW2Integration\Exceptions\UnableToDetermineLinkId;
 use GW2Integration\Modules\Verification\VerificationController;
 use GW2Integration\Persistence\Helper\GW2DataPersistence;
@@ -60,7 +62,7 @@ switch($form){
             } else if($serviceId == "account-name"){
                 $linkedUser->setLinkedId(LinkingPersistencyHelper::getLinkIdFromAccountName($userId));
             } else {
-                $linkedUser->setPrimaryarySeviceId($userId, $serviceId);
+                $linkedUser->addUserServiceLink(new UserServiceLink($serviceId, $userId, true));
             }
             
             try{
@@ -103,7 +105,7 @@ switch($form){
                     if($serviceId == "link-id"){
                         $linkedUser->setLinkedId($userId);
                     } else {
-                        $linkedUser->setPrimaryarySeviceId($userId, $serviceId);
+                        $linkedUser->addUserServiceLink(new UserServiceLink($serviceId, $userId, true));
                     }
                     APIKeyProcessor::resyncLinkedUser($linkedUser);
                     $result[$userId] = "Success";
@@ -138,9 +140,12 @@ switch($form){
             $userId = $formData["user-id"];
             $apiKey = $formData["api-key"];
             $serviceId = $formData["set-key-service"];
-            $linkedUser->setPrimaryarySeviceId($userId, $serviceId);
+            $linkedUser->addUserServiceLink(new UserServiceLink($serviceId, $userId, true));
             
             try {
+                //Fetch existing links before trying to add the api key
+                LinkedUserController::getServiceLinks($linkedUser);
+                
                 $keyNames = APIKeyManager::addAPIKeyForUser($linkedUser, $apiKey);
                 $result["result"] = "success";
             } catch(Exception $e){
@@ -157,7 +162,7 @@ switch($form){
             $linkedUser = new LinkedUser();
             $userId = $formData["user-id"];
             $serviceId = $formData["get-key-name-service"];
-            $linkedUser->setPrimaryarySeviceId($userId, $serviceId);
+            $linkedUser->addUserServiceLink(new UserServiceLink($serviceId, $userId, true));
             
             $keyNames = APIKeyManager::getAPIKeyNamesForUser($linkedUser);
             $result["valid-api-key-names"] = $keyNames;

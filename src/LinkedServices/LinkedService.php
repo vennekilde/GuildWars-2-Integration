@@ -51,7 +51,7 @@ abstract class LinkedService {
         $this->hasConfigPage = $hasConfigPage;
     }
     
-    public abstract function getLinkedUserIfAvailable(LinkedUser $linkedUser);
+    public abstract function getAvailableUserServiceLink();
     
     public function getServiceId(){
         return $this->serviceId;

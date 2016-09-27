@@ -40,8 +40,8 @@ try{
     $linkedUserWithLinks = LinkedUserController::getServiceLinks($linkedUser);
     $response = array(
         "link_id" => $linkedUserWithLinks->getLinkedId(),
-        "primary" => $linkedUserWithLinks->primaryServiceIds,
-        "secondary" => $linkedUserWithLinks->secondaryServiceIds,
+        "primary" => $linkedUserWithLinks->getPrimaryUserServiceLinks(),
+        "secondary" => $linkedUserWithLinks->getSecondaryUserServiceLinks(),
         "data" => GW2DataPersistence::getExtensiveAccountData($linkedUser)
     );
 

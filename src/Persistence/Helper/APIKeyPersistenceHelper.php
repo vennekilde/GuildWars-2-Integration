@@ -198,4 +198,15 @@ class APIKeyPersistenceHelper {
         
         return $apiKeys;
     }
+    
+    public static function cleanupDatabase(){
+        //Currently takes too long to execute
+//        $queries = array(
+//            "DELETE k FROM gw2integration_api_keys k LEFT JOIN gw2integration_user_service_links l ON k.link_id = l.link_id WHERE l.link_id IS NULL",
+//            "DELETE a FROM gw2integration_accounts a LEFT JOIN gw2integration_user_service_links l ON a.link_id = l.link_id WHERE l.link_id IS NULL",
+//        );
+//        foreach($queries AS $query){
+//            Persistence::getDBEngine()->exec($query);
+//        }
+    }
 }

@@ -95,6 +95,27 @@ class GW2DataPersistence {
         return $result;
     }
     
+    
+    /**
+     * 
+     * @param LinkedUser|UserServiceLink|integer $identifier
+     */
+    public static function deleteAllData($identifier) {
+        $linkId = LinkingPersistencyHelper::determineLinkedUserId($identifier);
+        
+        $deleteQueries = array(
+            "DELETE FROM gw2integration_api_keys WHERE link_id = ?",
+            "DELETE FROM gw2integration_accounts WHERE link_id = ?"
+        );
+        
+        $values = array($linkId);
+        
+        foreach($deleteQueries AS $deleteQuery){
+            $preparedStatement = Persistence::getDBEngine()->prepare($deleteQuery);
+            $preparedStatement->execute($values);
+        }
+    }
+    
     /**
      * 
      * @param LinkedUser $linkedUser

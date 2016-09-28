@@ -60,10 +60,10 @@ CREATE TABLE IF NOT EXISTS gw2integration_api_keys (
     FOREIGN KEY (link_id) REFERENCES gw2integration_accounts(link_id)
 );
 
-CREATE TABLE IF NOT EXISTS gw2integration_statistics (
+CREATE TABLE IF NOT EXISTS gw2integration_api_statistics (
     `rid` int(11) NOT NULL AUTO_INCREMENT,
     `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `statistic` int(11) NOT NULL,
+    `value` int(11) NOT NULL,
     `type` int(11) NOT NULL,
     PRIMARY KEY (rid)
 );
@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS `gw2integration_banned_accounts` (
     `b_reason` int(11) NOT NULL,
     `b_banned_by` int(11) NOT NULL,
     `b_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    /*FOREIGN KEY (b_banned_by) REFERENCES gw2integration_accounts(link_id),*/
+    FOREIGN KEY (b_banned_by) REFERENCES gw2integration_accounts(link_id),
     PRIMARY KEY (b_ban_id)
 );
 
@@ -144,7 +144,7 @@ CREATE TABLE IF NOT EXISTS `gw2integration_guild_membership` (
     `g_uuid` char(36) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
     `g_representing` bit(1) NOT NULL DEFAULT b'0',
     PRIMARY KEY (`link_id`,`g_uuid`),
-    FOREIGN KEY (link_id) REFERENCES gw2integration_accounts(link_id) ON DELETE CASCADE
+    FOREIGN KEY (link_id) REFERENCES gw2integration_accounts(link_id)
 );
 
 CREATE TABLE `gw2integration_characters` (
@@ -160,7 +160,7 @@ CREATE TABLE `gw2integration_characters` (
     `c_deaths` int(10) unsigned NOT NULL DEFAULT '0',
     `c_title` int(11) DEFAULT NULL,
     PRIMARY KEY (`c_name`),
-    FOREIGN KEY (link_id) REFERENCES gw2integration_accounts(link_id) ON DELETE CASCADE
+    FOREIGN KEY (link_id) REFERENCES gw2integration_accounts(link_id)
 );
 
 CREATE TABLE `gw2integration_character_crafting` (
@@ -169,6 +169,5 @@ CREATE TABLE `gw2integration_character_crafting` (
     `cr_rating` int(10) unsigned NOT NULL,
     `cr_active` tinyint(1) unsigned NOT NULL DEFAULT '0',
     PRIMARY KEY (`c_name`,`cr_discipline`)
-    FOREIGN KEY (c_name) REFERENCES gw2integration_characters.c_name  ON DELETE CASCADE
 );
 

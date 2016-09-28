@@ -36,9 +36,12 @@ require __DIR__.'/../RESTHelper.php';
 
 use Exception;
 use GW2Integration\API\APIKeyManager;
+use GW2Integration\Exceptions\AccountAlreadyLinked;
+use GW2Integration\Exceptions\AccountUsernameBanned;
 use GW2Integration\Exceptions\InvalidAPIKeyFormatException;
 use GW2Integration\Exceptions\InvalidAPIKeyNameException;
 use GW2Integration\Exceptions\MissingRequiredAPIKeyPermissions;
+use GW2Integration\Exceptions\RequirementsNotMetException;
 use GW2Integration\Exceptions\UnableToDetermineLinkId;
 use GW2Integration\Persistence\Helper\GW2DataPersistence;
 use GW2Integration\REST\RESTHelper;
@@ -81,6 +84,11 @@ try {
             //Could not add API key for what ever reason
             $logger->info($baseErrorMsg . $e->getMessage());
             $errorMsg = "API Key is invalid or the API is down";
+        } else if(
+                $e instanceof AccountAlreadyLinked 
+                || $e instanceof AccountUsernameBanned 
+                || $e instanceof RequirementsNotMetException){
+            $logger->info($baseErrorMsg . $e->getMessage());
         } else {
             //Could not add API key for what ever reason
             $logger->info($baseErrorMsg . $e->getMessage(), $e->getTrace());

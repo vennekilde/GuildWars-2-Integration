@@ -33,6 +33,7 @@ use GW2Integration\Events\EventManager;
 use GW2Integration\Events\Events\APISyncCompleted;
 use GW2Integration\Persistence\Helper\APIKeyPersistenceHelper;
 use GW2Treasures\GW2Api\GW2Api;
+use GW2Treasures\GW2Api\V2\Authentication\Exception\AuthenticationException;
 
 
 if (!defined('GW2Integration')) {

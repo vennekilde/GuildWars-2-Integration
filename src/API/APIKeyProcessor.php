@@ -89,7 +89,12 @@ class APIKeyProcessor {
                         $success = true;
                     }
                 } catch(Exception $e){
-                    $logger->error(get_class($e) . ": " . $e->getMessage(), $e->getTrace());
+                    $base_msg = "Could not sync API Key \"$apiKey\" for user ".$linkedUser->compactString()." - ";
+                    if($e instanceof AuthenticationException){
+                        $logger->error($base_msg . get_class($e) . ": " . $e->getMessage());
+                    } else {
+                        $logger->error($base_msg . get_class($e) . ": " . $e->getMessage(), $e->getTrace());
+                    }
                 }
             }
             

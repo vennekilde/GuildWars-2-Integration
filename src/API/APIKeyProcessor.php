@@ -89,7 +89,7 @@ class APIKeyProcessor {
                         $success = true;
                     }
                 } catch(Exception $e){
-                    $logger->error(get_class($e) . ": " . $e->getMessage(), $e);
+                    $logger->error(get_class($e) . ": " . $e->getMessage(), $e->getTrace());
                 }
             }
             

@@ -56,6 +56,7 @@ class APIBatchProcessor {
         
         global $logger;
         $attemptedSynchedUsers = array();
+        $timeStarted = microtime(true) * 1000; 
         
         if(empty($keysToProcess)){
             $keysToProcess = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEYS_PER_RUN);
@@ -82,12 +83,9 @@ class APIBatchProcessor {
             }
         }
         
-        if($errors > 0){
-            $logger->info("Successfully synced $success users, where an addition $errors failed to sync");
-        } else {
-            $logger->info("Successfully synced $success users");
-        }
-        EventManager::fireEvent(new APISyncCompleted());
+        //Time ended in MS
+        $timeEnded = microtime(true) * 1000; 
+        EventManager::fireEvent(new APISyncCompleted($keysToProcess, $keysToProcess - $errors, $timeStarted, $timeEnded));
         
         return $attemptedSynchedUsers;
     }

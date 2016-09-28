@@ -46,10 +46,15 @@ if (!defined('GW2Integration')) {
  */
 class APIMultiThreadedProcessor {
     
-    public function process(){
+    public function process($keysToProcess){
         global $logger;
-        $keysToProccess = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEYS_PER_RUN);
+        //Time started in MS
+        $timeStarted = microtime(true) * 1000; 
+        if(empty($keysToProcess)){
+            $keysToProccess = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEYS_PER_RUN);
+        }
         $apiKeysQuery = APIKeyPersistenceHelper::queryAPIKeys(0, $keysToProccess);
+        $errors = 0;
         foreach($apiKeysQuery AS $apiKeyData){
             print_r($apiKeyData);
             $linkedUser = new LinkedUser();
@@ -63,9 +68,12 @@ class APIMultiThreadedProcessor {
                         false);
             } catch(Exception $e){
                 $logger->error($e->getMessage(), $e->getTrace());
+                $errors++;
             }
         }
-        EventManager::fireEvent(new APISyncCompleted());
+        //Time ended in MS
+        $timeEnded = microtime(true) * 1000; 
+        EventManager::fireEvent(new APISyncCompleted($keysToProcess, $keysToProcess - $errors, $timeStarted, $timeEnded));
     }
 }
 

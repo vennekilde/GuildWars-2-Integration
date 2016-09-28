@@ -71,6 +71,11 @@ class APIKeyProcessor {
             //True if successful in fetching updated data from the api
             $success = false;
 
+            if($fireAPISyncCompletedEvent){
+                //Time started in MS
+                $timeStarted = microtime(true) * 1000; 
+            }
+            
             foreach($permissions as $permission){
                 $result = false;
                 try{
@@ -95,7 +100,9 @@ class APIKeyProcessor {
                 APIKeyPersistenceHelper::updateLastAPIKeyAttemptedFetch($apiKey);
             }
             if($fireAPISyncCompletedEvent){
-                EventManager::fireEvent(new APISyncCompleted());
+                //Time ended in MS
+                $timeEnded = microtime(true) * 1000; 
+                EventManager::fireEvent(new APISyncCompleted(1, $success ? 1 : 0, $timeStarted, $timeEnded));
             }
         } catch(Exception $e){
             APIKeyPersistenceHelper::updateLastAPIKeyAttemptedFetch($apiKey);

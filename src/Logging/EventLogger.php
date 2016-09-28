@@ -53,6 +53,6 @@ class EventLogger implements EventListener{
     
     public function onAPISyncCompleted(APISyncCompleted $event){
         global $logger;
-        $logger->debug("API Sync Completed");
+        $logger->info($event);
     }
 }

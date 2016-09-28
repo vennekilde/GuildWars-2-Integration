@@ -3,6 +3,7 @@
 use GW2Integration\LinkedServices\SMF\SimpleMachinesForum;
 use GW2Integration\LinkedServices\Teamspeak\Teamspeak;
 use GW2Integration\Logger\EventLogger;
+use GW2Integration\Logger\StatisticsLogger;
 use GW2Integration\Modules\Verification\ModuleLoader;
 use GW2Integration\Modules\Verification\SMF\SimpleMachinesForumVerification;
 use GW2Integration\Modules\Verification\Teamspeak\TeamspeakVerification;
@@ -84,6 +85,7 @@ foreach($gw2i_modules as $module) {
     $module->init();
 }
 
+$statistics = new StatisticsLogger();
 $eventLogger = new EventLogger();
 $cleanupProcess = new Cleanup();
 

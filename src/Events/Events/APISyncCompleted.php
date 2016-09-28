@@ -32,4 +32,44 @@ namespace GW2Integration\Events\Events;
  * @author jeppe
  */
 class APISyncCompleted extends Event{
+
+    private $timeEnded;
+    private $timeStarted;
+    private $successfulSyncs;
+    private $attemptedKeySyncs;
+
+    public function __construct($attemptedKeySyncs, $successfulSyncs, $timeStarted, $timeEnded) {
+        $this->attemptedKeySyncs = $attemptedKeySyncs;
+        $this->successfulSyncs = $successfulSyncs;
+        $this->timeStarted = $timeStarted;
+        $this->timeEnded = $timeEnded;
+    }
+    
+    public function getTimeEnded() {
+        return $this->timeEnded;
+    }
+
+    public function getTimeStarted() {
+        return $this->timeStarted;
+    }
+
+    public function getSuccessfulSyncs() {
+        return $this->successfulSyncs;
+    }
+
+    public function getAttemptedKeySyncs() {
+        return $this->attemptedKeySyncs;
+    }
+    
+    public function getFailedSyncs(){
+        return $this->attemptedKeySyncs - $this->successfulSyncs;
+    }
+    
+    public function getTimePassed(){
+        return $this->timeEnded - $this->timeStarted;
+    }
+
+    public function __toString() {
+        return "APISyncCompleted {attemptedKeySyncs: ".$this->getAttemptedKeySyncs().", successes: ".$this->getSuccessfulSyncs().", failed: ".$this->getFailedSyncs().", timePassed: ".$this->getTimePassed()."ms, timeStarted: ".$this->getTimeStarted()." UNIX TIMESTAMP, timeEnded: ".$this->getTimeEnded()." UNIX TIMESTAMP}";
+    }
 }

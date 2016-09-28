@@ -33,7 +33,7 @@ use GW2Integration\Modules\Guilds\ModuleLoader;
 use GW2Integration\Modules\Verification\VerificationController;
 use GW2Integration\Persistence\Helper\BannedGW2AccountPersistencyHelper;
 use GW2Integration\Persistence\Helper\GW2DataPersistence;
-use GW2Integration\Persistence\Helper\StatisticsAndLoggingPersistenceHelper;
+use GW2Integration\Persistence\Helper\VerificationEventPersistence;
 use PDOException;
 
 if (!defined('GW2Integration')) {
@@ -97,7 +97,7 @@ class GW2AccountDataController {
      */
     public static function checkWorldChanged($linkedUser, $accountData, $oldWorld, $newWorld) {
         if ($oldWorld != $newWorld) {
-            StatisticsAndLoggingPersistenceHelper::persistVerificationEvent($linkedUser, 0, $oldWorld . "," . $newWorld);
+            VerificationEventPersistence::persistVerificationEvent($linkedUser, 0, $oldWorld . "," . $newWorld);
 
             VerificationController::onAccessStatusChanged($linkedUser, $accountData);
             //Remove from old world group

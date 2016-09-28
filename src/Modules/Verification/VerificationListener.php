@@ -30,7 +30,7 @@ use GW2Integration\Events\EventListener;
 use GW2Integration\Events\Events\GW2DataPrePersistEvent;
 use GW2Integration\Exceptions\UnableToDetermineLinkId;
 use GW2Integration\Persistence\Helper\GW2DataPersistence;
-use GW2Integration\Persistence\Helper\StatisticsAndLoggingPersistenceHelper;
+use GW2Integration\Persistence\Helper\VerificationEventPersistence;
 
 /**
  * Description of VerificationListener
@@ -58,7 +58,7 @@ class VerificationListener implements EventListener{
                 //link-id. Will run instantly if link-id is already assigned
                 $listenerMethod = function() use($linkedUser, $oldWorld, $newWorld){
                     global $logger;
-                    StatisticsAndLoggingPersistenceHelper::persistVerificationEvent($linkedUser, 0, $oldWorld . "," . $newWorld);
+                    VerificationEventPersistence::persistVerificationEvent($linkedUser, 0, $oldWorld . "," . $newWorld);
                     
                     $logger->info($linkedUser->compactString()." has changed world from ".(empty($oldWorld) ? "NO PREVIOUSE WORLD" : $oldWorld)." to $newWorld");
 

@@ -37,7 +37,7 @@ if (!defined('GW2Integration')) {
  *
  * @author Jeppe Boysen Vennekilde
  */
-class StatisticsAndLoggingPersistenceHelper {
+class VerificationEventPersistence {
     
     /**
      * 

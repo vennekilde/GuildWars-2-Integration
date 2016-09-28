@@ -187,7 +187,7 @@ class APIKeyPersistenceHelper {
      */
     public static function getExpiredAPIKeys(){
         global $gw2i_db_prefix;
-        $preparedQueryString = 'SELECT * FROM '.$gw2i_db_prefix.'api_keys WHERE last_success >= NOW() - INTERVAL ? SECOND';
+        $preparedQueryString = 'SELECT * FROM '.$gw2i_db_prefix.'api_keys WHERE last_success <= NOW() - INTERVAL ? SECOND';
         $queryParams = array(
             SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_EXPIRATION_TIME)
         );

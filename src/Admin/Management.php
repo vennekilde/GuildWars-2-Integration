@@ -29,6 +29,7 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
 <script src="<?php echo $webPath ?>/js/common.js"></script>
 <script src="<?php echo $webPath ?>/js/admin.js"></script>
 
+<meta name="viewport" content="initial-scale=1, maximum-scale=1">
 <script>
     webPath = "<?php echo $webPath ?>";
 </script>
@@ -42,7 +43,7 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
         ?>
     </div>
     <div class="mdl-tabs vertical-mdl-tabs mdl-js-tabs">
-        <div style="display: table; width: 100%;">
+        <div style="width: 100%;">
             <div class='vertical-mdl-tabs-bar'>
                 <div class="mdl-tabs__tab-bar">
                     <a id="tab1-link" href="#tab1" class="mdl-tabs__tab is-active">Lookup</a>

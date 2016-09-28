@@ -50,6 +50,7 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
 <script src="<?php echo $webPath ?>/js/common.js"></script>
 <script src="<?php echo $webPath ?>/js/api-link-setup.js"></script>
 <script src="<?php echo $webPath ?>/js/service-links-tab.js"></script>
+<meta name="viewport" content="initial-scale=1, maximum-scale=1">
 
 <script> 
     webPath = "<?php echo $webPath ?>";

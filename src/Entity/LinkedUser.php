@@ -55,6 +55,10 @@ class LinkedUser extends LinkIdHolder{
     public $fetchServiceId;
     public $fetchServiceDisplayName;
     
+    public function __construct($linkId = null) {
+        parent::__construct($linkId);
+    }
+    
     public function setLinkedId($linkedId) {
         parent::setLinkedId($linkedId);
         foreach($this->primaryUserServiceLinks AS $userServiceLink){

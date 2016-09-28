@@ -274,11 +274,20 @@ class LinkingPersistencyHelper {
                             $affectedLink["service_user_id"],
                             $affectedLink["is_primary"],
                             $affectedLink["service_display_name"],
-                            $affectedLink["attributes"])
+                            $affectedLink["attributes"],
+                            $affectedLink["link_id"])
                         );
             } else {
                 //If the link isn't the same link, then the affected link is removed
-                $events[] = new UserServiceLinkRemoved($userServiceLink);
+                $events[] = new UserServiceLinkRemoved(
+                        new UserServiceLink(
+                            $affectedLink["service_id"],
+                            $affectedLink["service_user_id"],
+                            $affectedLink["is_primary"],
+                            $affectedLink["service_display_name"],
+                            $affectedLink["attributes"],
+                            $affectedLink["link_id"])
+                        );
             }
         }
         if($isLinkNew){

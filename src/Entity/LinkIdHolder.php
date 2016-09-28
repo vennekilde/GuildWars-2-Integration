@@ -42,6 +42,10 @@ class LinkIdHolder implements JsonSerializable{
     
     private $linkedIdSetListeners = array();
 
+    public function __construct($linkId = null) {
+        $this->linkId = $linkId;
+    }
+
     public function setLinkedId($linkedId){
         $this->linkId = $linkedId;
         

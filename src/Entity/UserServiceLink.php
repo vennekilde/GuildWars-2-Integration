@@ -32,7 +32,8 @@ namespace GW2Integration\Entity;
  * @author Jeppe Boysen Vennekilde
  */
 class UserServiceLink extends LinkIdHolder{
-    
+
+    private $linkId;
     private $serviceId;
     
     private $serviceUserId;
@@ -43,7 +44,8 @@ class UserServiceLink extends LinkIdHolder{
     
     private $attributes;
     
-    public function __construct($serviceId, $serviceUserId, $isPrimary, $serviceDisplayName = null, $attributes = null) {
+    public function __construct($serviceId, $serviceUserId, $isPrimary, $serviceDisplayName = null, $attributes = null, $linkId = null) {
+        parent::__construct($linkId);
         $this->serviceId = $serviceId;
         $this->serviceUserId = $serviceUserId;
         $this->isPrimary = $isPrimary;

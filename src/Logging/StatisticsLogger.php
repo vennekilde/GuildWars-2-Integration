@@ -58,19 +58,19 @@ class StatisticsLogger implements EventListener{
         
         $timestamp = strtotime(time());
         foreach($notExpiredPerWorld AS $notExpired){
-            StatisticsPersistence::persistStatistic($notExpired["count"], StatisticsPersistence::VALID_KEYS, $timestamp, $notExpired["world"]);
+            StatisticsPersistence::persistStatistic($notExpired["count"], StatisticsPersistence::VALID_KEYS, $timestamp, $notExpired["a_world"]);
         }
         
         foreach($expiredKeysPerWorld AS $expiredKeys){
-            StatisticsPersistence::persistStatistic($expiredKeys["count"], StatisticsPersistence::EXPIRED_KEYS, $timestamp, $expiredKeys["world"]);
+            StatisticsPersistence::persistStatistic($expiredKeys["count"], StatisticsPersistence::EXPIRED_KEYS, $timestamp, $expiredKeys["a_world"]);
         }
         
         foreach($tempAccessPerWorld AS $tempAccess){
-            StatisticsPersistence::persistStatistic($tempAccess["count"], StatisticsPersistence::TEMPORARY_ACCESS, $timestamp, $tempAccess["world"]);
+            StatisticsPersistence::persistStatistic($tempAccess["count"], StatisticsPersistence::TEMPORARY_ACCESS, $timestamp, $tempAccess["a_world"]);
         }
         
         foreach($tempAccessExpriedPerWorld AS $tempAccessExpried){
-            StatisticsPersistence::persistStatistic($tempAccessExpried["count"], StatisticsPersistence::TEMPORARY_ACCESS_EXPIRED, $timestamp, $tempAccessExpried["world"]);
+            StatisticsPersistence::persistStatistic($tempAccessExpried["count"], StatisticsPersistence::TEMPORARY_ACCESS_EXPIRED, $timestamp, $tempAccessExpried["a_world"]);
         }
     }
     

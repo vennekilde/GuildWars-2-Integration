@@ -29,11 +29,14 @@ namespace GW2Integration\Persistence\Helper;
 use GW2Integration\Controller\GW2DataController;
 use GW2Integration\Controller\GW2DataFieldConverter;
 use GW2Integration\Entity\LinkedUser;
+use GW2Integration\Entity\UserServiceLink;
 use GW2Integration\Events\EventManager;
 use GW2Integration\Events\Events\GW2DataPrePersistEvent;
+use GW2Integration\Exceptions\AccountAlreadyLinked;
 use GW2Integration\Exceptions\UnableToDetermineLinkId;
 use GW2Integration\Persistence\Persistence;
 use PDO;
+use PDOException;
 use UnderflowException;
 
 /**
@@ -138,6 +141,8 @@ class GW2DataPersistence {
                 VALUES(' . (isset($linkId) ? ($linkId . ", ") : "") . ':a_uuid, :a_username, :a_world, :a_created, :a_access, :a_commander, :a_fractal_level, :a_daily_ap, :a_monthly_ap, :a_wvw_rank)
             ON DUPLICATE KEY UPDATE 
                 link_id = LAST_INSERT_ID(link_id),
+                a_uuid = VALUES(a_uuid),
+                a_username = VALUES(a_username),
                 a_world = VALUES(a_world),
                 a_created = VALUES(a_created),
                 a_access = VALUES(a_access),
@@ -175,7 +180,18 @@ class GW2DataPersistence {
         
         //Persist account data
         $preparedStatement = Persistence::getDBEngine()->prepare($preparedQueryString);
-        $result = $preparedStatement->execute($values);
+        
+        try{
+            $result = $preparedStatement->execute($values);
+        } catch (PDOException $e) {
+            if ($e->errorInfo[1] == 1062) {
+               // duplicate entry, do something else
+                throw new AccountAlreadyLinked($values[":a_username"]);
+            } else {
+               // an error other than duplicate entry occurred
+                throw $e;
+            }
+         }
         
         //Get inserted id. Account data holds the primary link_id table
         $insertedId = Persistence::getDBEngine()->lastInsertId();

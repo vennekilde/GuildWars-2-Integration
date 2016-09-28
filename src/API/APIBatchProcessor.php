@@ -63,7 +63,6 @@ class APIBatchProcessor {
         }
         
         $apiKeysQuery = APIKeyPersistenceHelper::queryAPIKeys(0, $keysToProcess);
-        $success = 0;
         $errors = 0;
         foreach($apiKeysQuery AS $apiKeyData){
             $linkedUser = new LinkedUser();
@@ -71,12 +70,14 @@ class APIBatchProcessor {
             $attemptedSynchedUsers[] = $linkedUser;
             try {
                 LinkedUserController::getServiceLinks($linkedUser);
-                APIKeyProcessor::resyncAPIKey(
+                $success = APIKeyProcessor::resyncAPIKey(
                         $linkedUser, 
                         $apiKeyData["api_key"], 
                         explode(",", $apiKeyData["api_key_permissions"]),
                         false);
-                $success++;
+                if(!$success){
+                    $errors++;
+                }
             } catch(Exception $e){
                 $logger->error($e->getMessage(), $e);
                 $errors++;

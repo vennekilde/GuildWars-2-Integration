@@ -61,11 +61,15 @@ class APIMultiThreadedProcessor {
             $linkedUser->setLinkedId($apiKeyData["link_id"]);
             try {
                 VerificationController::getServiceLinks($linkedUser);
-                APIKeyProcessor::resyncAPIKey(
+                $success = APIKeyProcessor::resyncAPIKey(
                         $linkedUser, 
                         $apiKeyData["api_key"], 
                         explode(",", $apiKeyData["api_key_permissions"]),
                         false);
+                
+                if(!$success){
+                    $errors++;
+                }
             } catch(Exception $e){
                 $logger->error($e->getMessage(), $e->getTrace());
                 $errors++;

@@ -32,7 +32,15 @@ namespace GW2Integration\Exceptions;
  * @author Jeppe Boysen Vennekilde
  */
 class AccountAlreadyLinked extends \Exception{
-    public function __construct($accountName) {
+
+    private $errorMsg;
+
+    public function __construct($accountName, $errorMsg) {
         parent::__construct("GW2 Account \"$accountName\" is already in use by another user. If you believe this to be a mistake, please contact an admin");
+        $this->errorMsg = $errorMsg;
+    }
+    
+    public function getErrorMsg() {
+        return $this->errorMsg;
     }
 }

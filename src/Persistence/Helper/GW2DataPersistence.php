@@ -186,7 +186,7 @@ class GW2DataPersistence {
         } catch (PDOException $e) {
             if ($e->errorInfo[1] == 1062) {
                // duplicate entry, do something else
-                throw new AccountAlreadyLinked($values[":a_username"]);
+                throw new AccountAlreadyLinked($values[":a_username"], $e->getMessage());
             } else {
                // an error other than duplicate entry occurred
                 throw $e;

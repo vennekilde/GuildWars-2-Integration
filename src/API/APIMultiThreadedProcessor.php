@@ -32,6 +32,7 @@ use GW2Integration\Entity\LinkedUser;
 use GW2Integration\Events\EventManager;
 use GW2Integration\Events\Events\APISyncCompleted;
 use GW2Integration\Persistence\Helper\APIKeyPersistenceHelper;
+use GW2Integration\Persistence\Helper\SettingsPersistencyHelper;
 
 
 if (!defined('GW2Integration')) {
@@ -46,8 +47,9 @@ if (!defined('GW2Integration')) {
 class APIMultiThreadedProcessor {
     
     public function process(){
-        global $gw2i_proccess_keys_per_run, $logger;
-        $apiKeysQuery = APIKeyPersistenceHelper::queryAPIKeys(0, $gw2i_proccess_keys_per_run);
+        global $logger;
+        $keysToProccess = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEYS_PER_RUN);
+        $apiKeysQuery = APIKeyPersistenceHelper::queryAPIKeys(0, $keysToProccess);
         foreach($apiKeysQuery AS $apiKeyData){
             print_r($apiKeyData);
             $linkedUser = new LinkedUser();

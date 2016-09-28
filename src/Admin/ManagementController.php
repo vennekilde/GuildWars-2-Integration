@@ -83,12 +83,11 @@ switch($form){
         
     case "batch-process":
         if(!empty($formData["batch-process-count"])){
-            global $gw2i_proccess_keys_per_run;
-            $gw2i_proccess_keys_per_run = intval($formData["batch-process-count"]);
+            $keysToProcess = intval($formData["batch-process-count"]);
             
             $processor = new APIBatchProcessor();
             $result = array( 
-                "proccessed-users" => $processor->process()
+                "proccessed-users" => $processor->process($keysToProcess)
             );
         }
         break;

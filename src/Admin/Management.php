@@ -135,7 +135,7 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                         <p>Synchronize the next X amount of user's schedualed to be synchronized with the GuildWars 2 API</p>
                         <form action='ManagementController.php' method="POST" name='batch-process' class="default-admin-form">
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                                <input class="mdl-textfield__input" type="text" pattern="-?[0-9]*(\.[0-9]+)?" name="batch-process-count" id="batch-process-count" value="<?php echo $gw2i_proccess_keys_per_run; ?>">
+                                <input class="mdl-textfield__input" type="text" pattern="-?[0-9]*(\.[0-9]+)?" name="batch-process-count" id="batch-process-count" value="<?php echo SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEYS_PER_RUN); ?>">
                                 <label class="mdl-textfield__label" for="batch-process-count">Synchronize amount</label>
                                 <span class="mdl-textfield__error">Input is not a number!</span>
                             </div>

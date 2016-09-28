@@ -32,6 +32,7 @@ use GW2Integration\Entity\LinkedUser;
 use GW2Integration\Events\EventManager;
 use GW2Integration\Events\Events\APISyncCompleted;
 use GW2Integration\Persistence\Helper\APIKeyPersistenceHelper;
+use GW2Integration\Persistence\Helper\SettingsPersistencyHelper;
 
 
 if (!defined('GW2Integration')) {
@@ -48,15 +49,19 @@ class APIBatchProcessor {
     /**
      * 
      * @global type $logger
-     * @global type $gw2i_proccess_keys_per_run
      * @return LinkedUser
      */
-    public function process(){
+    public function process($keysToProcess = 0){
         APIKeyManager::analyzeAnetAPI();
         
-        global $logger, $gw2i_proccess_keys_per_run;
+        global $logger;
         $attemptedSynchedUsers = array();
-        $apiKeysQuery = APIKeyPersistenceHelper::queryAPIKeys(0, $gw2i_proccess_keys_per_run);
+        
+        if(empty($keysToProcess)){
+            $keysToProcess = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEYS_PER_RUN);
+        }
+        
+        $apiKeysQuery = APIKeyPersistenceHelper::queryAPIKeys(0, $keysToProcess);
         $success = 0;
         $errors = 0;
         foreach($apiKeysQuery AS $apiKeyData){

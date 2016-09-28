@@ -26,6 +26,7 @@
 
 namespace GW2Integration\Persistence\Helper;
 
+use GW2Integration\Modules\Verification\VerificationController;
 use GW2Integration\Persistence\Persistence;
 use PDO;
 

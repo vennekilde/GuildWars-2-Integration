@@ -68,8 +68,12 @@ class APISyncCompleted extends Event{
     public function getTimePassed(){
         return $this->timeEnded - $this->timeStarted;
     }
+    
+    public function getAvgTimePerKey(){
+        return $this->getTimePassed() / $this->getAttemptedKeySyncs();
+    }
 
     public function __toString() {
-        return "APISyncCompleted {attemptedKeySyncs: ".$this->getAttemptedKeySyncs().", successes: ".$this->getSuccessfulSyncs().", failed: ".$this->getFailedSyncs().", timePassed: ".$this->getTimePassed()."ms, timeStarted: ".$this->getTimeStarted()." UNIX TIMESTAMP, timeEnded: ".$this->getTimeEnded()." UNIX TIMESTAMP}";
+        return "APISyncCompleted {attemptedKeySyncs: ".$this->getAttemptedKeySyncs().", successes: ".$this->getSuccessfulSyncs().", failed: ".$this->getFailedSyncs().", timePassed: ".$this->getTimePassed()."ms, avgTimePerKey: ".$this->getAvgTimePerKey().", timeStarted: ".$this->getTimeStarted()." UNIX TIMESTAMP, timeEnded: ".$this->getTimeEnded()." UNIX TIMESTAMP}";
     }
 }

@@ -55,7 +55,8 @@ $( document ).ready(function(){
                         if(typeof data[key] === 'object') {
                             html += JSON.stringify(data[key], null, 4);
                         } else {
-                            html += data[key];
+                            var str = data[key].replace(/\</g,"&lt;");
+                            html = str.replace(/\>/g,"&gt;");
                         }
                     }
                 } else {

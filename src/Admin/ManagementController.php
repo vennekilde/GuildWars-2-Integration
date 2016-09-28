@@ -86,8 +86,13 @@ switch($form){
             $keysToProcess = intval($formData["batch-process-count"]);
             
             $processor = new APIBatchProcessor();
+            $proccessedUsers = $processor->process($keysToProcess);
+            $stringResult = "";
+            foreach($proccessedUsers AS $user){
+                $stringResult .= $user->compactString() . "\n";
+            }
             $result = array( 
-                "proccessed-users" => $processor->process($keysToProcess)
+                "proccessed-users" => $stringResult
             );
         }
         break;

@@ -49,7 +49,7 @@ class APIBatchProcessor {
     /**
      * 
      * @global type $logger
-     * @return LinkedUser
+     * @return LinkedUser[]
      */
     public function process($keysToProcess = 0){
         APIKeyManager::analyzeAnetAPI();

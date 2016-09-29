@@ -105,12 +105,17 @@ class VerificationController {
         APIKeyPersistenceHelper::persistTokenInfo($linkedUser, $fakeAPIKey, $tokenInfo);
         $unixTimestamp = time() + SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::TEMPORARY_ACCESS_EXPIRATION) - SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_EXPIRATION_TIME);
         APIKeyPersistenceHelper::updateLastAPIKeySuccessfulFetch($fakeAPIKey, $unixTimestamp);
+        
+        $linkId = $linkedUser->getLinkedId();
         LinkingPersistencyHelper::persistUserServiceLink(
-                $linkedUser, 
-                $linkedUser->fetchServiceUserId, 
-                $linkedUser->fetchServiceId, 
-                $linkedUser->fetchServiceDisplayName, 
-                true
+                new GW2Integration\Entity\UserServiceLink(
+                    $linkedUser->fetchServiceId, 
+                    $linkedUser->fetchServiceUserId,  
+                    true,
+                    $linkedUser->fetchServiceDisplayName, 
+                    null,
+                    (isset($linkId) ? $linkId : null)
+                )
             );
         
         LinkingPersistencyHelper::removeAttributeFromAllUserLinks($linkedUser, "tempExpired");

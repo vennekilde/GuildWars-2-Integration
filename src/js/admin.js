@@ -179,11 +179,17 @@ function fetchWorldDistributionChart(form, data) {
 
                 var options = {
                     interpolateNulls: true,
-                    'height': 500,
+                    height: 500,
+                    hAxis : {
+                        format: 'decimal'
+                    },
+                    backgroundColor: { fill:'transparent' }
                 };
 
                 var chart = new google.charts.Line(document.getElementById('chart_div'));
                 chart.draw(data, google.charts.Line.convertOptions(options));
+                
+                adjustHeight();
             }
         },
         error: function (response) {

@@ -175,31 +175,30 @@ function fetchStatisticsChart(form, data) {
         url: form.attr('action'),
         data: data,
         success: function (response) {
-            try{
-                console.log(response);
-                var json = JSON.parse(response)
-                if(json["data"]["chart"] !== undefined){
-                    var data = google.visualization.arrayToDataTable(json["data"]["chart"]);
+            console.log(response);
+            var json = JSON.parse(response)
+            if(json["data"]["chart"] !== undefined){
+                var data = google.visualization.arrayToDataTable(json["data"]["chart"]);
 
-                    var options = {
-                        interpolateNulls: true,
-                        height: 500,
-                        vAxis : {
-                            format: "decimal"
-                        },
-                        backgroundColor: { fill:'transparent' }
-                    };
+                var options = {
+                    interpolateNulls: true,
+                    height: 500,
+                    vAxis : {
+                        format: "decimal"
+                    },
+                    backgroundColor: { fill:'transparent' }
+                };
 
-                    if(json["data"]["options"] !== undefined){
-                        options = mergeObjects(options, json["data"]["options"]);
-                    }
-                    var chart = new google.charts.Line(form.find(".chart_div").get(0));
-                    chart.draw(data, google.charts.Line.convertOptions(options));
-
-                    adjustHeight();
+                if(json["data"]["options"] !== undefined){
+                    options = mergeObjects(options, json["data"]["options"]);
                 }
-            } finally {
-                stopSpinner(form);
+                var chart = new google.charts.Line(form.find(".chart_div").get(0));
+                google.visualization.events.addListener(chart, 'ready', function(){
+                    stopSpinner(form);
+                });
+                chart.draw(data, google.charts.Line.convertOptions(options));
+
+                adjustHeight();
             }
         },
         error: function (response) {

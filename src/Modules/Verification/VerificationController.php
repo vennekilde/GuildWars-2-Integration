@@ -30,6 +30,7 @@ use DateTime;
 use GW2Integration\API\APIKeyManager;
 use GW2Integration\Controller\LinkedUserController;
 use GW2Integration\Entity\LinkedUser;
+use GW2Integration\Entity\UserServiceLink;
 use GW2Integration\Exceptions\UnableToDetermineLinkId;
 use GW2Integration\Persistence\Helper\APIKeyPersistenceHelper;
 use GW2Integration\Persistence\Helper\GW2DataPersistence;
@@ -108,7 +109,7 @@ class VerificationController {
         
         $linkId = $linkedUser->getLinkedId();
         LinkingPersistencyHelper::persistUserServiceLink(
-                new GW2Integration\Entity\UserServiceLink(
+                new UserServiceLink(
                     $linkedUser->fetchServiceId, 
                     $linkedUser->fetchServiceUserId,  
                     true,

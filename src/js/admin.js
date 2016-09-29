@@ -118,11 +118,14 @@ $(document).ready(function () {
     //Retrieve the latest log
     $("#fetch-latest-log-btn").click();
     
-    
+    var fetchedOnce = false;
     $("#tab6-link").on("click" ,function(){
         //Retrieve charts
-        $("#update-world-dist-btn").click();
-        $("#update-api-stats-btn").click();
+        if(!fetchedOnce){
+            $("#update-world-dist-btn").click();
+            $("#update-api-stats-btn").click();
+            fetchedOnce = true;
+        }
     });
 });
 

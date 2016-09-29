@@ -61,7 +61,7 @@ class StatisticsPersistence {
         
         $preparedQueryString = '
             INSERT INTO '.$gw2i_db_prefix.'statistics (statistic, type, timestamp'.(isset($data) ? ", data" : "").')
-                VALUES(?, ?, ?'.(isset($data) ? ", ?" : "").')';
+                VALUES(?, ?, FROM_UNIXTIME(?)'.(isset($data) ? ", ?" : "").')';
         $queryParams = array(
             $statistic,
             $type,
@@ -73,8 +73,53 @@ class StatisticsPersistence {
         
         $preparedStatement = Persistence::getDBEngine()->prepare($preparedQueryString);
         
-        return $preparedStatement->execute($queryParams);
+        $result = $preparedStatement->execute($queryParams);
+        
+        $lastInsertedId = Persistence::getDBEngine()->lastInsertId();
+        static::cleanStatisticValue($statistic, $lastInsertedId, $type, $data);
+        
+        return $result;
     }
+    
+    
+    public static function cleanStatisticValue($statistic, $rid, $type, $data = null){
+        global $gw2i_db_prefix;
+        
+        $preparedQueryString = 'SELECT * FROM '.$gw2i_db_prefix.'statistics WHERE rid < ? AND type = ?'.(isset($data) ? " AND data = ?" : "").' ORDER BY timestamp DESC LIMIT 2';
+        
+        $queryParams = array(
+            $rid,
+            $type
+        );
+        if(isset($data)){
+            $queryParams[] = $data;
+        }
+        
+        $preparedStatement = Persistence::getDBEngine()->prepare($preparedQueryString);
+        
+        $preparedStatement->execute($queryParams);
+        
+        $prevTwoRows = $preparedStatement->fetchAll(PDO::FETCH_ASSOC);
+        if(count($prevTwoRows) == 2){
+            if($prevTwoRows[0]["statistic"] == $statistic && $prevTwoRows[1]["statistic"] == $statistic){
+                static::deleteStatistic($prevTwoRows[0]["rid"]);
+            }
+        }
+    }
+    
+    public static function deleteStatistic($rid){
+        global $gw2i_db_prefix;
+        $preparedQueryString = 'DELETE FROM '.$gw2i_db_prefix.'statistics WHERE rid = ?';
+        
+        $queryParams = array(
+            $rid
+        );
+        
+        $preparedStatement = Persistence::getDBEngine()->prepare($preparedQueryString);
+        
+        $preparedStatement->execute($queryParams);
+    }
+    
     
     
     /**
@@ -83,13 +128,13 @@ class StatisticsPersistence {
      * @param int[] $types
      * @return array
      */
-    public static function getStatistic(...$types){
+    public static function getStatistics($types){
         global $gw2i_db_prefix;
         
         $inQuery = implode(',', array_fill(0, count($types), '?'));
         $preparedQueryString = '
             SELECT * FROM '.$gw2i_db_prefix.'statistics 
-                WHERE type IN('.$inQuery.') ORDER BY timestamp ASC';
+                WHERE type IN('.$inQuery.') ORDER BY timestamp ASC, rid ASC';
         $queryParams = $types;
         
         $preparedStatement = Persistence::getDBEngine()->prepare($preparedQueryString);

@@ -85,6 +85,7 @@ foreach($gw2i_modules as $module) {
     $module->init();
 }
 
+/* @var $statistics StatisticsLogger */
 $statistics = new StatisticsLogger();
 $eventLogger = new EventLogger();
 $cleanupProcess = new Cleanup();

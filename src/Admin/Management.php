@@ -26,6 +26,7 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
 <script src="<?php echo $webPath ?>/js/jquery-2.2.3.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
 <script src="https://malsup.github.io/jquery.form.js"></script> 
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script src="<?php echo $webPath ?>/js/common.js"></script>
 <script src="<?php echo $webPath ?>/js/admin.js"></script>
 
@@ -389,6 +390,33 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                     </div>
                 </div>
                 <div class="mdl-tabs__panel" id="tab6">
+                    <div class='primaryheading'>
+                        <h5>World Distribution</h5>
+                        <p>See how world distrubution for the linked members evolv over time</p>
+                        <form action='ManagementController.php' method="POST" name='get-statistics-world-distribution' class="statistics-admin-form">
+                            <div id="chart_div"></div>
+                            <button id='update-world-dist-btn' class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner">
+                                Update
+                            </button>
+                            <div class="mdl-spinner mdl-js-spinner is-active spinner-button"></div>
+
+                            <div class="response-div response-div-style"></div>
+                            <br /><br />
+                        </form>
+                    </div>
+                    <div class='secondaryheading'>
+                        <h5>Collect Available Statistics</h5>
+                        <p>Collect the currently available statistics that does not require certain events to be collected</p>
+                        <form action='ManagementController.php' method="POST" name='collect-statistics' class="default-admin-form">
+                            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner">
+                                Collect Statistics
+                            </button> 
+                            <div class="mdl-spinner mdl-js-spinner is-active spinner-button"></div>
+
+                            <div class="response-div response-div-style"></div>
+                            <br /><br />
+                        </form>
+                    </div>
                 </div>
                 <div class="mdl-tabs__panel" id="tab7">
                     <div class='primaryheading'>

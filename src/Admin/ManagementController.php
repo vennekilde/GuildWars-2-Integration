@@ -3,6 +3,7 @@
 use GW2Integration\API\APIBatchProcessor;
 use GW2Integration\API\APIKeyManager;
 use GW2Integration\API\APIKeyProcessor;
+use GW2Integration\Utils\GW2DataFieldConverter;
 use GW2Integration\Controller\LinkedUserController;
 use GW2Integration\Controller\ServiceSessionController;
 use GW2Integration\Entity\LinkedUser;
@@ -12,6 +13,7 @@ use GW2Integration\Modules\Verification\VerificationController;
 use GW2Integration\Persistence\Helper\GW2DataPersistence;
 use GW2Integration\Persistence\Helper\LinkingPersistencyHelper;
 use GW2Integration\Persistence\Helper\SettingsPersistencyHelper;
+use GW2Integration\Persistence\Helper\StatisticsPersistence;
 use function GuzzleHttp\json_encode;
 
 /* 
@@ -52,6 +54,7 @@ foreach($_POST AS $key => $value){
 }
 switch($form){
     case "search":
+        global $statistics;
         if(!empty($formData["search-user-id"]) && (!empty($formData["search-service"]) || (isset($formData["search-service"]) && $formData["search-service"] == "0"))){
             $linkedUser = new LinkedUser();
             $userId = $formData["search-user-id"];
@@ -197,6 +200,38 @@ switch($form){
         break;
         
         
+    case "collect-statistics":
+        global $statistics;
+        $statistics->collectStatistics();
+        $result["result"] = "Success";
+        break;
+        
+    
+    case "get-statistics-world-distribution":
+        global $statistics;
+        $graphData = $statistics->getCombinedChartData(array(StatisticsPersistence::VALID_KEYS, StatisticsPersistence::TEMPORARY_ACCESS));
+        
+        if(isset($graphData[0])){
+            foreach($graphData[0] AS $key => $columnName){
+                if($key > 0){
+                    $split = explode(":", $columnName);
+                    if($split[0] == 6){
+                        $newName = "[T] ";
+                    } else {
+                        $newName = "";
+                    }
+                    $newName .= GW2DataFieldConverter::getWorldNameById($split[1]);
+                    $graphData[0][$key] = $newName;
+                } else {
+                    $graphData[0][$key] = "Population";
+                }
+            }
+        }
+        
+        $result["chart"] = $graphData;
+        break;
+        
+        
     case "update-settings":
         
         $settings = array();
@@ -218,4 +253,4 @@ switch($form){
 
 echo json_encode(array(
     "data" => $result
-));
+), JSON_NUMERIC_CHECK );

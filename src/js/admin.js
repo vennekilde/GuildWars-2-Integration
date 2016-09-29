@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-$( document ).ready(function(){
+$(document).ready(function () {
     //initialize ajax forms
     $('.default-admin-form').submit(function (ev) {
         form = $(this);
@@ -30,10 +30,10 @@ $( document ).ready(function(){
 
         var data = form.serialize();
         var formName = form.attr("name");
-        if(data){
-            data += "&form="+formName;
+        if (data) {
+            data += "&form=" + formName;
         } else {
-            data = "form="+formName;
+            data = "form=" + formName;
         }
         console.log(data);
         startSpinner(form);
@@ -48,15 +48,15 @@ $( document ).ready(function(){
                 var json = JSON.parse(response)
                 var div = form.find(".response-div");
                 var html = "";
-                if(json["data"] !== false){
+                if (json["data"] !== false) {
                     var data = json["data"];
                     for (var key in data) {
-                        html += "<h5 style='text-transform: uppercase'>"+key.replace(/\-/g," ")+"</h5>";
-                        if(typeof data[key] === 'object') {
+                        html += "<h5 style='text-transform: uppercase'>" + key.replace(/\-/g, " ") + "</h5>";
+                        if (typeof data[key] === 'object') {
                             html += JSON.stringify(data[key], null, 4);
                         } else {
-                            var str = data[key].replace(/\</g,"&lt;");
-                            html = str.replace(/\>/g,"&gt;");
+                            var str = data[key].replace(/\</g, "&lt;");
+                            html = str.replace(/\>/g, "&gt;");
                         }
                     }
                 } else {
@@ -66,40 +66,66 @@ $( document ).ready(function(){
                 div.show();
                 adjustHeight();
             },
-            error: function(response){
+            error: function (response) {
                 console.log("error");
                 console.log(response);
                 stopSpinner(form);
             }
         });
     });
-    
+
     $('.log-admin-form').submit(function (ev) {
         form = $(this);
         ev.preventDefault();
 
         var data = form.serialize();
         var formName = form.attr("name");
-        if(data){
-            data += "&form="+formName;
+        if (data) {
+            data += "&form=" + formName;
         } else {
-            data = "form="+formName;
+            data = "form=" + formName;
         }
         console.log(data);
         startSpinner(form);
         retrieveLog(form, data);
     });
+
+    $('.statistics-admin-form').each(function(){
+        google.charts.load('current', {packages: ['line']});
+    });
     
+    $('.statistics-admin-form').submit(function (ev) {
+        form = $(this);
+        ev.preventDefault();
+
+        var data = form.serialize();
+        var formName = form.attr("name");
+        if (data) {
+            data += "&form=" + formName;
+        } else {
+            data = "form=" + formName;
+        }
+        console.log(data);
+        startSpinner(form);
+        fetchWorldDistributionChart(form, data);
+    });
+
     //Auto resize if within an IFrame
-    $(".detailed-log").bind('resize', function(){
+    $(".detailed-log").bind('resize', function () {
         adjustHeight();
-     }); 
-     
+    });
+    
     //Retrieve the latest log
     $("#fetch-latest-log-btn").click();
+    
+    
+    $("#tab6-link").on("click" ,function(){
+        //Retrieve charts
+        $("#update-world-dist-btn").click();
+    });
 });
 
-function retrieveLog(form, data){
+function retrieveLog(form, data) {
     $.ajax({
         type: form.attr('method'),
         url: form.attr('action'),
@@ -109,20 +135,20 @@ function retrieveLog(form, data){
             var json = JSON.parse(response)
             var div = form.find(".response-div");
             var html = "";
-            if(json["data"]["log"] !== false){
+            if (json["data"]["log"] !== false) {
                 html = json["data"]["log"];
             } else {
                 html = "No results found";
             }
             div.html(html);
             div.show();
-            
+
             //Scroll log to bottom
             scrollToBottom(".detailed-log-container");
-            
+
             adjustHeight();
         },
-        error: function(response){
+        error: function (response) {
             console.log("error");
             console.log(response);
             stopSpinner(form);
@@ -130,11 +156,40 @@ function retrieveLog(form, data){
     });
 }
 
-function startSpinner(form){
+function startSpinner(form) {
     form.find(".spinner-button").css('display', 'inline-block');
-    form.find(".mdl-button").prop("disabled",true);
+    form.find(".mdl-button").prop("disabled", true);
 }
-function stopSpinner(form){
+function stopSpinner(form) {
     form.find(".spinner-button").hide();
-    form.find(".mdl-button").prop("disabled",false);
+    form.find(".mdl-button").prop("disabled", false);
+}
+
+function fetchWorldDistributionChart(form, data) {
+    $.ajax({
+        type: form.attr('method'),
+        url: form.attr('action'),
+        data: data,
+        success: function (response) {
+            stopSpinner(form);
+            console.log(response);
+            var json = JSON.parse(response)
+            if(json["data"]["chart"] !== undefined){
+                var data = google.visualization.arrayToDataTable(json["data"]["chart"]);
+
+                var options = {
+                    interpolateNulls: true,
+                    'height': 500,
+                };
+
+                var chart = new google.charts.Line(document.getElementById('chart_div'));
+                chart.draw(data, google.charts.Line.convertOptions(options));
+            }
+        },
+        error: function (response) {
+            console.log("error");
+            console.log(response);
+            stopSpinner(form);
+        }
+    });
 }

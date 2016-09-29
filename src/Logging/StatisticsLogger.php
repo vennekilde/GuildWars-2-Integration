@@ -43,7 +43,7 @@ class StatisticsLogger implements EventListener{
     }
     
     public function onAPISyncCompleted(APISyncCompleted $event){
-        $timestamp = strtotime(time()); 
+        $timestamp = time(); 
         StatisticsPersistence::persistStatistic($event->getAvgTimePerKey(), StatisticsPersistence::AVERAGE_TIME_PER_KEY, $timestamp);
         StatisticsPersistence::persistStatistic($event->getFailedSyncs(), StatisticsPersistence::API_ERRORS, $timestamp);
         
@@ -56,7 +56,7 @@ class StatisticsLogger implements EventListener{
         $tempAccessPerWorld = StatisticsPersistence::countNotExpiredTemporaryAccess();
         $tempAccessExpriedPerWorld = StatisticsPersistence::countExpiredTemporaryAccess();
         
-        $timestamp = strtotime(time());
+        $timestamp = time();
         foreach($notExpiredPerWorld AS $notExpired){
             StatisticsPersistence::persistStatistic($notExpired["count"], StatisticsPersistence::VALID_KEYS, $timestamp, $notExpired["a_world"]);
         }
@@ -78,8 +78,80 @@ class StatisticsLogger implements EventListener{
      * 
      * @param int[] $statisticTypes
      */
-    public function getCombinedChartData(...$statisticTypes){
-        $statisticsData = StatisticsPersistence::getStatistic($statisticTypes);
+    public function getCombinedChartData($statisticTypes){
+        $chartData = array(null);
+        $statisticsData = StatisticsPersistence::getStatistics($statisticTypes);
+        
+        $typeToColumnId = array("x-axis" => 0);
+        $lastRowTimestamp = null;
+        $lastRow = null;
+        foreach($statisticsData AS $dataPoint){
+            if($lastRowTimestamp != $dataPoint["timestamp"]){
+                if($lastRow != null){
+                    $chartData[] = $lastRow;
+                }
+                $lastRow = array_fill(0, count($typeToColumnId), null);
+                $lastRow[0] = $dataPoint["timestamp"];
+                $lastRowTimestamp = $dataPoint["timestamp"];
+            }
+            $key = $this->getIndexFromChart($typeToColumnId, $dataPoint["type"], intval($dataPoint["data"]));
+            $lastRow[$key] = $dataPoint["statistic"];
+        }
+        $chartData[] = $lastRow;
+        
+        $this->interpolateNulls($chartData, count($typeToColumnId));
+        
+        $chartData[0] = array_keys($typeToColumnId);
+        
+        return $chartData;
     }
 
+    public function getIndexFromChart(&$typeToColumnId, $type, $data){
+        $key = "$type:$data";
+        $index = -1;
+        if(!isset($typeToColumnId[$key])){
+            $index = count($typeToColumnId);
+            $typeToColumnId[$key] = $index;
+        } else {
+            $index = $typeToColumnId[$key];
+        }
+        return $index;
+    }
+    
+    public function interpolateNulls(&$array, $size){
+        foreach($array AS $key => $row){
+            for($i = 0; $i < $size; $i++){
+                if(!isset($row[$i])){
+                    $this->interpolateNull($array, $key, $i);
+                }
+            }
+        }
+    }
+    
+    public function interpolateNull(&$array, $rowIndex, $columnIndex, $startPosition = 1){
+        for($i = $rowIndex - 1; $i >= $startPosition; $i--){
+            if(isset($array[$i][$columnIndex])){
+                $array[$rowIndex][$columnIndex] = $array[$i][$columnIndex];
+                return;
+            }
+        }
+        
+        for($i = $rowIndex + 1; $i < count($array); $i++){
+            if(isset($array[$i][$columnIndex])){
+                $array[$rowIndex][$columnIndex] = $array[$i][$columnIndex];
+                return;
+            }
+        }
+        
+    }
+    
+    public function fillNullWith(&$array, $size, $replacement){
+        foreach($array AS $key => $row){
+            for($i = 0; $i < $size; $i++){
+                if(!isset($row[$i])){
+                    $array[$key][$i] = $replacement;
+                }
+            }
+        }
+    }
 }

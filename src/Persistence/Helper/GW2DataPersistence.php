@@ -27,7 +27,7 @@
 namespace GW2Integration\Persistence\Helper;
 
 use GW2Integration\Controller\GW2DataController;
-use GW2Integration\Controller\GW2DataFieldConverter;
+use GW2Integration\Utils\GW2DataFieldConverter;
 use GW2Integration\Entity\LinkedUser;
 use GW2Integration\Entity\UserServiceLink;
 use GW2Integration\Events\EventManager;
@@ -45,8 +45,6 @@ use UnderflowException;
  * @author Jeppe Boysen Vennekilde
  */
 class GW2DataPersistence {
-    
-    
     /**
      * 
      * @param LinkedUser $linkedUser

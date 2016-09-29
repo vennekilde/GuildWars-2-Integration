@@ -107,7 +107,7 @@ $(document).ready(function () {
         }
         console.log(data);
         startSpinner(form);
-        fetchWorldDistributionChart(form, data);
+        fetchStatisticsChart(form, data);
     });
 
     //Auto resize if within an IFrame
@@ -169,34 +169,37 @@ function stopSpinner(form) {
     form.find(".mdl-button").prop("disabled", false);
 }
 
-function fetchWorldDistributionChart(form, data) {
+function fetchStatisticsChart(form, data) {
     $.ajax({
         type: form.attr('method'),
         url: form.attr('action'),
         data: data,
         success: function (response) {
-            stopSpinner(form);
-            console.log(response);
-            var json = JSON.parse(response)
-            if(json["data"]["chart"] !== undefined){
-                var data = google.visualization.arrayToDataTable(json["data"]["chart"]);
+            try{
+                console.log(response);
+                var json = JSON.parse(response)
+                if(json["data"]["chart"] !== undefined){
+                    var data = google.visualization.arrayToDataTable(json["data"]["chart"]);
 
-                var options = {
-                    interpolateNulls: true,
-                    height: 500,
-                    vAxis : {
-                        format: "decimal"
-                    },
-                    backgroundColor: { fill:'transparent' }
-                };
-                
-                if(json["data"]["options"] !== undefined){
-                    options = mergeObjects(options, json["data"]["options"]);
+                    var options = {
+                        interpolateNulls: true,
+                        height: 500,
+                        vAxis : {
+                            format: "decimal"
+                        },
+                        backgroundColor: { fill:'transparent' }
+                    };
+
+                    if(json["data"]["options"] !== undefined){
+                        options = mergeObjects(options, json["data"]["options"]);
+                    }
+                    var chart = new google.charts.Line(form.find(".chart_div").get(0));
+                    chart.draw(data, google.charts.Line.convertOptions(options));
+
+                    adjustHeight();
                 }
-                var chart = new google.charts.Line(form.find(".chart_div").get(0));
-                chart.draw(data, google.charts.Line.convertOptions(options));
-                
-                adjustHeight();
+            } finally {
+                stopSpinner(form);
             }
         },
         error: function (response) {

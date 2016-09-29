@@ -394,17 +394,27 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                         <h5>World Distribution</h5>
                         <p>See how world distrubution for the linked members evolv over time</p>
                         <form action='ManagementController.php' method="POST" name='get-statistics-world-distribution' class="statistics-admin-form">
-                            <div id="chart_div"></div>
+                            <div class="chart_div"></div>
                             <button id='update-world-dist-btn' class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner">
                                 Update
                             </button>
                             <div class="mdl-spinner mdl-js-spinner is-active spinner-button"></div>
-
-                            <div class="response-div response-div-style"></div>
                             <br /><br />
                         </form>
                     </div>
                     <div class='secondaryheading'>
+                        <h5>API Statistics</h5>
+                        <p>Useful for determining if there are any issues with the API</p>
+                        <form action='ManagementController.php' method="POST" name='get-statistics-api-calls' class="statistics-admin-form">
+                            <div class="chart_div"></div>
+                            <button id='update-api-stats-btn' class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner">
+                                Update
+                            </button>
+                            <div class="mdl-spinner mdl-js-spinner is-active spinner-button"></div>
+                            <br /><br />
+                        </form>
+                    </div>
+                    <div class='primaryheading'>
                         <h5>Collect Available Statistics</h5>
                         <p>Collect the currently available statistics that does not require certain events to be collected</p>
                         <form action='ManagementController.php' method="POST" name='collect-statistics' class="default-admin-form">

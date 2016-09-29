@@ -223,10 +223,55 @@ switch($form){
                     $newName .= GW2DataFieldConverter::getWorldNameById($split[1]);
                     $graphData[0][$key] = $newName;
                 } else {
-                    $graphData[0][$key] = "Population";
+                    $graphData[0][$key] = "Date";
                 }
             }
         }
+        
+        $result["chart"] = $graphData;
+        break;
+        
+    
+    case "get-statistics-api-calls":
+        global $statistics;
+        $graphData = $statistics->getCombinedChartData(array(StatisticsPersistence::API_ERRORS, StatisticsPersistence::API_SUCCESS, StatisticsPersistence::AVERAGE_TIME_PER_KEY));
+         
+        $series = array();
+        if(isset($graphData[0])){
+            foreach($graphData[0] AS $key => $columnName){
+                if($key > 0){
+                    $split = explode(":", $columnName);
+                    switch($split[0]){
+                        case StatisticsPersistence::API_ERRORS:
+                            $newName = "API Errors";
+                            $series[] = array("axis" => "Count");
+                            break;
+                        case StatisticsPersistence::API_SUCCESS:
+                            $newName = "API Successes";
+                            $series[] = array("axis" => "Count");
+                            break;
+                        case StatisticsPersistence::AVERAGE_TIME_PER_KEY:
+                            $newName = "Average Time Per Key";
+                            $series[] = array("axis" => "TimeMS");
+                            break;
+                        default:
+                            $newName = $columnName;
+                    }
+                    $graphData[0][$key] = $newName;
+                } else {
+                    $graphData[0][$key] = "Date";
+                }
+            }
+        }
+        $result["options"] = array(
+            "series" => $series,
+            "axes" => array(
+                "y" => array(
+                    "TimeMS" => array("label" => "Time (ms)"),
+                    "Count" => array("label" => "Count")
+                )
+            ),
+        );
         
         $result["chart"] = $graphData;
         break;

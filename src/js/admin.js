@@ -122,6 +122,7 @@ $(document).ready(function () {
     $("#tab6-link").on("click" ,function(){
         //Retrieve charts
         $("#update-world-dist-btn").click();
+        $("#update-api-stats-btn").click();
     });
 });
 
@@ -185,8 +186,11 @@ function fetchWorldDistributionChart(form, data) {
                     },
                     backgroundColor: { fill:'transparent' }
                 };
-
-                var chart = new google.charts.Line(document.getElementById('chart_div'));
+                
+                if(json["data"]["options"] !== undefined){
+                    options = mergeObjects(options, json["data"]["options"]);
+                }
+                var chart = new google.charts.Line(form.find(".chart_div").get(0));
                 chart.draw(data, google.charts.Line.convertOptions(options));
                 
                 adjustHeight();

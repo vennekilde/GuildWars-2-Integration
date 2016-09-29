@@ -46,6 +46,7 @@ class StatisticsPersistence {
     const EXPIRED_KEYS = 5;
     const TEMPORARY_ACCESS = 6;
     const TEMPORARY_ACCESS_EXPIRED = 7;
+    const API_SUCCESS = 8;
     
     /**
      * 

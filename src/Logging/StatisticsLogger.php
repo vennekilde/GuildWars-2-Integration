@@ -46,6 +46,7 @@ class StatisticsLogger implements EventListener{
         $timestamp = time(); 
         StatisticsPersistence::persistStatistic($event->getAvgTimePerKey(), StatisticsPersistence::AVERAGE_TIME_PER_KEY, $timestamp);
         StatisticsPersistence::persistStatistic($event->getFailedSyncs(), StatisticsPersistence::API_ERRORS, $timestamp);
+        StatisticsPersistence::persistStatistic($event->getSuccessfulSyncs(), StatisticsPersistence::API_SUCCESS, $timestamp);
         
         $this->collectStatistics();
     }

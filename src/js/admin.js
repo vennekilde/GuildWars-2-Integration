@@ -184,8 +184,8 @@ function fetchWorldDistributionChart(form, data) {
                 var options = {
                     interpolateNulls: true,
                     height: 500,
-                    hAxis : {
-                        format: 'decimal'
+                    vAxis : {
+                        format: "decimal"
                     },
                     backgroundColor: { fill:'transparent' }
                 };

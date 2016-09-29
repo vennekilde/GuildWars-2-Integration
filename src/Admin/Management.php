@@ -404,7 +404,8 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                     </div>
                     <div class='secondaryheading'>
                         <h5>API Statistics</h5>
-                        <p>Useful for determining if there are any issues with the API</p>
+                        <p>Errors are to be expected, due to people deleting their API key, however spikes in api errors usually indicate that there is a problem with the GW2 API<br />
+                        Successes and errors should be seen in relation to each other, as the amount of keys processed very from time to time</p>
                         <form action='ManagementController.php' method="POST" name='get-statistics-api-calls' class="statistics-admin-form">
                             <div class="chart_div"></div>
                             <button id='update-api-stats-btn' class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner">

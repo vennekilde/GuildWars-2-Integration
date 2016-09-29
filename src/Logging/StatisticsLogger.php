@@ -78,10 +78,11 @@ class StatisticsLogger implements EventListener{
     /**
      * 
      * @param int[] $statisticTypes
+     * @param int $newerThan in seconds
      */
-    public function getCombinedChartData($statisticTypes){
+    public function getCombinedChartData($statisticTypes, $newerThan = null){
         $chartData = array(null);
-        $statisticsData = StatisticsPersistence::getStatistics($statisticTypes);
+        $statisticsData = StatisticsPersistence::getStatistics($statisticTypes, $newerThan);
         
         $typeToColumnId = array("x-axis" => 0);
         $lastRowTimestamp = null;

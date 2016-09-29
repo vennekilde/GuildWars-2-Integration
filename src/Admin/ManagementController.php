@@ -234,7 +234,9 @@ switch($form){
     
     case "get-statistics-api-calls":
         global $statistics;
-        $graphData = $statistics->getCombinedChartData(array(StatisticsPersistence::API_ERRORS, StatisticsPersistence::API_SUCCESS, StatisticsPersistence::AVERAGE_TIME_PER_KEY));
+        $graphData = $statistics->getCombinedChartData(
+                array(StatisticsPersistence::API_ERRORS, StatisticsPersistence::API_SUCCESS, StatisticsPersistence::AVERAGE_TIME_PER_KEY),
+                604800); //1 week in seconds
          
         $series = array();
         if(isset($graphData[0])){

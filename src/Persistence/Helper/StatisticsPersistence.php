@@ -127,16 +127,21 @@ class StatisticsPersistence {
      * 
      * @global type $gw2i_db_prefix
      * @param int[] $types
+     * @param int $newerThan in seconds
      * @return array
      */
-    public static function getStatistics($types){
+    public static function getStatistics($types, $newerThan = null){
         global $gw2i_db_prefix;
         
         $inQuery = implode(',', array_fill(0, count($types), '?'));
         $preparedQueryString = '
             SELECT * FROM '.$gw2i_db_prefix.'statistics 
-                WHERE type IN('.$inQuery.') ORDER BY timestamp ASC, rid ASC';
+                WHERE type IN('.$inQuery.') '.(isset($newerThan) ? "AND timestamp >= NOW() - INTERVAL ? SECOND" : "").' ORDER BY timestamp ASC, rid ASC';
         $queryParams = $types;
+        
+        if(isset($newerThan)){
+            $queryParams[] = $newerThan;
+        }
         
         $preparedStatement = Persistence::getDBEngine()->prepare($preparedQueryString);
         

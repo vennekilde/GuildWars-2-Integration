@@ -193,6 +193,10 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                         </tr>
                     </tbody>
                 </table>
+                <br />
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner" onclick="document.getElementById('tab1-link').click();">
+                    Change API Key
+                </button> 
             </div>
             <div class='secondaryheading'>
                 <h5>Service Linking</h5>

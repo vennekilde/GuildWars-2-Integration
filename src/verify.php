@@ -11,7 +11,9 @@ $mainUserServiceLink = RESTHelper::getMainUserServiceLink();
 
 if(isset($mainUserServiceLink)){
     $sessionUserServiceLinks = RESTHelper::getSessionUserServiceLinks();
-    LinkedUserController::mergeUserServiceLinks($mainUserServiceLink, $sessionUserServiceLinks);
+    if(!empty($sessionUserServiceLinks)){
+        LinkedUserController::mergeUserServiceLinks($mainUserServiceLink, $sessionUserServiceLinks);
+    }
 }
 $linkedUser = RESTHelper::getLinkedUserFromParams();
 ?>

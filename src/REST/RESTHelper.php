@@ -3,10 +3,12 @@
 namespace GW2Integration\REST;
 
 use GW2Integration\Controller\ServiceSessionController;
+use GW2Integration\Controller\ServiceSessionController;
 use GW2Integration\Entity\LinkedUser;
 use GW2Integration\Entity\UserServiceLink;
 use GW2Integration\Exceptions\UnableToDetermineLinkId;
 use GW2Integration\Persistence\Helper\LinkingPersistencyHelper;
+use MainServiceConflictException;
 
 /* 
  * The MIT License
@@ -141,12 +143,20 @@ class RESTHelper{
         global $gw2i_linkedServices;
         $mainUserUserviceLink = null;
         foreach($gw2i_linkedServices as $linkedService){
-            $userUserviceLink = $linkedService->getAvailableUserServiceLink();
-            if(isset($userUserviceLink)){
+            $userServiceLink = $linkedService->getAvailableUserServiceLink();
+            /* @var $userServiceLink UserServiceLink */
+            try{
+                $linkId = LinkingPersistencyHelper::determineLinkedUserId($userServiceLink);
+                $userServiceLink->setLinkedId($linkId);
+                $mainUserServiceLink = $userServiceLink;
+            } catch (UnableToDetermineLinkId $ex) {
+                continue;
+            }
+            if(isset($mainUserServiceLink)){
                 if(isset($mainUserUserviceLink)){
                     throw new MainServiceConflictException();
                 } else {
-                    $mainUserUserviceLink = $userUserviceLink;
+                    $mainUserUserviceLink = $mainUserServiceLink;
                 }
             }
         }

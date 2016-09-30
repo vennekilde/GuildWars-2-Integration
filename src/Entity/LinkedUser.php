@@ -112,7 +112,7 @@ class LinkedUser extends LinkIdHolder{
     }
     
     public function addOnLinkedIdSetListener($listenerMethod){
-        if($this->getLinkedId() != null){
+        if($this->getLinkedId() == null){
             $this->linkedIdSetListeners[] = $listenerMethod;
         } else {
             $listenerMethod();

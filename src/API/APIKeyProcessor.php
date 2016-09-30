@@ -27,6 +27,7 @@
 namespace GW2Integration\API;
 
 use Exception;
+use GuzzleHttp\Exception\ConnectException;
 use GW2Integration\Controller\GW2DataController;
 use GW2Integration\Entity\LinkedUser;
 use GW2Integration\Events\EventManager;
@@ -91,7 +92,7 @@ class APIKeyProcessor {
                     }
                 } catch(Exception $e){
                     $base_msg = "Could not sync API Key \"$apiKey\" for user ".$linkedUser->compactString()." - ";
-                    if($e instanceof AuthenticationException){
+                    if($e instanceof AuthenticationException || $e instanceof ConnectException){
                         $logger->error($base_msg . get_class($e) . ": " . $e->getMessage());
                     } else {
                         $logger->error($base_msg . get_class($e) . ": " . $e->getMessage(), $e->getTrace());

@@ -275,6 +275,7 @@ switch($form){
                 if($lastRowDate != $date){
                     $roundedGraphData[] = array_merge(array($date), array_slice($graphData[$i], 1));
                     $roundedIndex++;
+                    $lastRowDate = $date;
                 } else {
                     for($k = 1; $k < count($graphData[$i]); $k++){
                         $roundedGraphData[$roundedIndex][$k] += $graphData[$i][$k];

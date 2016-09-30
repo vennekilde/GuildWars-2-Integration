@@ -289,8 +289,8 @@ switch($form){
                     $roundedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::API_ERRORS]] 
                             += $graphData[$i][$typeToIndex[StatisticsPersistence::API_ERRORS]];
                     
-                    $totalNNew = $roundedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::API_SUCCESS]] 
-                            + $roundedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::API_ERRORS]];
+                    $totalNNew = $graphData[$i][$typeToIndex[StatisticsPersistence::API_SUCCESS]] 
+                            + $graphData[$i][$typeToIndex[StatisticsPersistence::API_ERRORS]];
                     
                     //Calculate new average
                     $weightOld = $totalNOld / ($totalNOld + $totalNNew);

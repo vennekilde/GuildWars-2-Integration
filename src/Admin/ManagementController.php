@@ -156,7 +156,7 @@ switch($form){
                 $keyNames = APIKeyManager::addAPIKeyForUser($linkedUser, $apiKey);
                 $result["result"] = "success";
             } catch(Exception $e){
-                $result["error"] = "Exception: ".$e->getMessage();
+                $result["error"] = "Exception: ".$e->getMessage()."\n".$e->getTraceAsString();
             }
         } else {
             $result["error"] = "Missing Input";

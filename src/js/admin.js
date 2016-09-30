@@ -91,7 +91,7 @@ $(document).ready(function () {
     });
 
     $('.statistics-admin-form').each(function(){
-        google.charts.load('current', {packages: ['line']});
+        google.charts.load('upcoming', {packages: ['line']});
     });
     
     $('.statistics-admin-form').submit(function (ev) {

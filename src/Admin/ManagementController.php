@@ -229,6 +229,10 @@ switch($form){
         }
         
         $result["chart"] = $graphData;
+        
+        $result["options"] = array(
+            "vAxis" => array("logScale" => true)
+        );
         break;
         
     

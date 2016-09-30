@@ -149,10 +149,7 @@ switch($form){
             $serviceId = $formData["set-key-service"];
             $linkedUser->addUserServiceLink(new UserServiceLink($serviceId, $userId, true));
             
-            try {
-                //Fetch existing links before trying to add the api key
-                LinkedUserController::getServiceLinks($linkedUser);
-                
+            try {                
                 $keyNames = APIKeyManager::addAPIKeyForUser($linkedUser, $apiKey);
                 $result["result"] = "success";
             } catch(Exception $e){

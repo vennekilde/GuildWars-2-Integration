@@ -29,6 +29,8 @@ namespace GW2Integration\API;
 use GW2Integration\Controller\GW2DataController;
 use GW2Integration\Controller\GW2TokenInfoController;
 use GW2Integration\Entity\LinkedUser;
+use GW2Integration\Events\EventManager;
+use GW2Integration\Events\Events\APISyncCompleted;
 use GW2Integration\Exceptions\InvalidAPIKeyFormatException;
 use GW2Integration\Exceptions\InvalidAPIKeyNameException;
 use GW2Integration\Exceptions\MissingRequiredAPIKeyPermissions;
@@ -75,6 +77,7 @@ class APIKeyManager {
      */
     public static function addAPIKeyForUser($linkedUser, $apiKey, $ignoreAPIKeyFormat = false, $ignoreAPIKeyName = false, $ignoreAPIKeyPermissions = false){
         global $logger;
+        $timeStarted = microtime(true) * 1000; 
         //Throws exceptions if not valid'
         $tokenInfo = static::isAPIKeyValid($linkedUser, $apiKey, $ignoreAPIKeyFormat, $ignoreAPIKeyName);
         
@@ -118,7 +121,11 @@ class APIKeyManager {
         }
 
         //Request data for the rest of the endpoints
-        APIKeyProcessor::resyncAPIKey($linkedUser, $apiKey, $permissions);
+        APIKeyProcessor::resyncAPIKey($linkedUser, $apiKey, $permissions, false);
+        
+        
+        $timeEnded = microtime(true) * 1000; 
+        EventManager::fireEvent(new APISyncCompleted(1, 1, $timeStarted, $timeEnded));
     }
     
     public static function getRequiredAPIKeyPermissions(){

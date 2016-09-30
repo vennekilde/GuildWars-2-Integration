@@ -69,6 +69,7 @@ class APIKeyProcessor {
      */
     public static function resyncAPIKey($linkedUser, $apiKey, $permissions, $fireAPISyncCompletedEvent = true){
         global $logger;
+        $fireAPISyncCompletedEvent = $fireAPISyncCompletedEvent && !empty($permissions);
         //True if successful in fetching updated data from the api
         $success = false;
         try {
@@ -109,7 +110,7 @@ class APIKeyProcessor {
             if($fireAPISyncCompletedEvent){
                 //Time ended in MS
                 $timeEnded = microtime(true) * 1000; 
-                EventManager::fireEvent(new APISyncCompleted(1, $success ? 1 : 0, $timeStarted, $timeEnded));
+                EventManager::fireEvent(new APISyncCompleted(1, ($success ? 1 : 0), $timeStarted, $timeEnded));
             }
         } catch(Exception $e){
             APIKeyPersistenceHelper::updateLastAPIKeyAttemptedFetch($apiKey);

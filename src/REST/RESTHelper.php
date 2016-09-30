@@ -3,7 +3,6 @@
 namespace GW2Integration\REST;
 
 use GW2Integration\Controller\ServiceSessionController;
-use GW2Integration\Controller\ServiceSessionController;
 use GW2Integration\Entity\LinkedUser;
 use GW2Integration\Entity\UserServiceLink;
 use GW2Integration\Exceptions\UnableToDetermineLinkId;

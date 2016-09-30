@@ -239,6 +239,7 @@ switch($form){
                 604800); //1 week in seconds
          
         $series = array();
+        $typeToIndex = array();
         if(isset($graphData[0])){
             foreach($graphData[0] AS $key => $columnName){
                 if($key > 0){
@@ -247,14 +248,17 @@ switch($form){
                         case StatisticsPersistence::API_ERRORS:
                             $newName = "API Errors";
                             $series[] = array("axis" => "Count");
+                            $typeToIndex[StatisticsPersistence::API_ERRORS] = $key;
                             break;
                         case StatisticsPersistence::API_SUCCESS:
                             $newName = "API Successes";
                             $series[] = array("axis" => "Count");
+                            $typeToIndex[StatisticsPersistence::API_SUCCESS] = $key;
                             break;
                         case StatisticsPersistence::AVERAGE_TIME_PER_KEY:
                             $newName = "Average Time Per Key";
                             $series[] = array("axis" => "TimeMS");
+                            $typeToIndex[StatisticsPersistence::AVERAGE_TIME_PER_KEY] = $key;
                             break;
                         default:
                             $newName = $columnName;
@@ -277,9 +281,24 @@ switch($form){
                     $roundedIndex++;
                     $lastRowDate = $date;
                 } else {
-                    for($k = 1; $k < count($graphData[$i]); $k++){
-                        $roundedGraphData[$roundedIndex][$k] += $graphData[$i][$k];
-                    }
+                    $totalNOld = $roundedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::API_SUCCESS]];
+                    $roundedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::API_SUCCESS]] 
+                            += $graphData[$i][$typeToIndex[StatisticsPersistence::API_SUCCESS]];
+                    
+                    $totalNOld += $roundedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::API_ERRORS]];
+                    $roundedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::API_ERRORS]] 
+                            += $graphData[$i][$typeToIndex[StatisticsPersistence::API_ERRORS]];
+                    
+                    $totalNNew = $roundedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::API_SUCCESS]] 
+                            + $roundedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::API_ERRORS]];
+                    
+                    //Calculate new average
+                    $weightOld = $totalNOld / ($totalNOld + $totalNNew);
+                    $weightNew = $totalNNew / ($totalNOld + $totalNNew);
+                    $roundedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::AVERAGE_TIME_PER_KEY]] 
+                            = ($weightOld * $roundedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::AVERAGE_TIME_PER_KEY]])
+                            + ($weightNew * $graphData[$i][$typeToIndex[StatisticsPersistence::AVERAGE_TIME_PER_KEY]]);
+                    
                 }
             }
             $graphData = $roundedGraphData;

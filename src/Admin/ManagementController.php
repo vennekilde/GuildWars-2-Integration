@@ -264,6 +264,24 @@ switch($form){
                     $graphData[0][$key] = "Date";
                 }
             }
+            $roundedGraphData = array($graphData[0]);
+            $roundedIndex = 0;
+            $lastRowDate = null;
+            for($i = 1; $i < count($graphData); $i++){
+                $time = strtotime($graphData[$i][0]);
+                $roundedTime = ceil($time / 300) * 300;
+                $date = date("Y-m-d H:i:s", $roundedTime);
+                
+                if($lastRowDate != $date){
+                    $roundedGraphData[] = array_merge(array($date), array_slice($graphData[$i], 1));
+                    $roundedIndex++;
+                } else {
+                    for($k = 1; $k < count($graphData[$i]); $k++){
+                        $roundedGraphData[$roundedIndex][$k] += $graphData[$i][$k];
+                    }
+                }
+            }
+            $graphData = $roundedGraphData;
         }
         $result["options"] = array(
             "series" => $series,

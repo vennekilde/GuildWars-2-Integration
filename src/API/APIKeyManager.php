@@ -89,7 +89,7 @@ class APIKeyManager {
         }
         
         //Check level requirement
-        global $level_restriction;
+        $level_restriction = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::ACCOUNT_LEVEL_REQUIREMENT);
         $charactersData = null;
         if($level_restriction > 0 && $hasRequiredPermissions === true){
             $charactersData = (array)static::$api->characters($apiKey)->all();
@@ -130,9 +130,8 @@ class APIKeyManager {
     
     public static function getRequiredAPIKeyPermissions(){
         $requiredPermission = array("account");
-        global $level_restriction;
         
-        if($level_restriction > 0){
+        if(SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::ACCOUNT_LEVEL_REQUIREMENT) > 0){
             $requiredPermission[] = "characters";
         }
         
@@ -150,7 +149,7 @@ class APIKeyManager {
     
     
     public static function hasCharacterInRequiredLevel($charactersData){
-        global $level_restriction;
+        $level_restriction = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::ACCOUNT_LEVEL_REQUIREMENT);
         if($level_restriction > 0){
             $passed = false;
             $highestLevel = 0;
@@ -189,12 +188,12 @@ class APIKeyManager {
     
     /**
      * 
-     * @global type $strict_api_keyname
-     * @param LinkedUser $linkedUser
+     * @param type $linkedUser
      * @param type $apiKey
      * @param type $ignoreAPIKeyFormat
-     * @return array Token info of API Key if successfully retrieved
-     * @throws InvalidAPIKeyFormatException
+     * @param type $ignoreAPIKeyName
+     * @return type
+     * @throws InvalidAPIKeyNameException
      */
     public static function isAPIKeyValid($linkedUser, $apiKey, $ignoreAPIKeyFormat = false, $ignoreAPIKeyName = false){
         if(!$ignoreAPIKeyFormat){
@@ -205,8 +204,7 @@ class APIKeyManager {
         $tokenInfo = (array)static::$api->tokeninfo($apiKey)->get();
         
         if(!$ignoreAPIKeyName){
-            global $strict_api_keyname;
-            if($strict_api_keyname){
+            if(SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::STRICT_API_KEY_NAME) != "0"){
                 $apiKeyName = str_replace(" ", "", $tokenInfo["name"]);
                 $validKeyNames = static::getAPIKeyNamesForUser($linkedUser);
                 $isValid = false;
@@ -231,7 +229,6 @@ class APIKeyManager {
      * @param integer $userType 0 = Forum User, 1 = Teamspeak User
      */
     public static function getAPIKeyNamesForUser($linkedUser){
-        global $prefix_api_keyname;
         $validKeyNames = array();
         foreach($linkedUser->getPrimaryUserServiceLinks() AS $userServiceLink){
             $userId = $userServiceLink->getServiceUserId();
@@ -240,7 +237,7 @@ class APIKeyManager {
             } else {
                 $preId = "";
             }
-            $validKeyNames[] = $prefix_api_keyname . $preId .  strtoupper(HashingUtils::generateWeakHash($userId));
+            $validKeyNames[] = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_NAME_PREFIX) . $preId .  strtoupper(HashingUtils::generateWeakHash($userId));
         }
         
         if($userId === null){

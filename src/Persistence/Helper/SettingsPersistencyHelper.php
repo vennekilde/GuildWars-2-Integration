@@ -45,6 +45,10 @@ class SettingsPersistencyHelper {
     const IS_API_DOWN = "is_api_down";
     const TEAMSPEAK_BOT_ADDRESS = "teamspeak_bot_address";
     const TEMPORARY_ACCESS_EXPIRATION = "temporary_access_expiration";
+    const STRICT_API_KEY_NAME = "strict_api_key_name";
+    const API_KEY_NAME_PREFIX = "api_key_name_prefix";
+    const ACCOUNT_LEVEL_REQUIREMENT = "account_level_requirement";
+    
     
     public static $visibleSettings = array(
         "API Settings" => array(
@@ -53,6 +57,9 @@ class SettingsPersistencyHelper {
             self::DEBUG_API_KEY,
         ),
         "Access Settings" => array(
+            self::STRICT_API_KEY_NAME,
+            self::API_KEY_NAME_PREFIX,
+            self::ACCOUNT_LEVEL_REQUIREMENT,
             self::TEMPORARY_ACCESS_EXPIRATION
         )
     );

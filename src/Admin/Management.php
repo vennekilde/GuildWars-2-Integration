@@ -431,17 +431,19 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                 </div>
                 <div class="mdl-tabs__panel" id="tab7">
                     <div class='primaryheading'>
-                        <h5>Settings</h5>
-                        <p>Edit the settings used by the application below</p>
                         <form action='ManagementController.php' method="POST" name='update-settings' class="default-admin-form">
                             <?php
                             $settings = SettingsPersistencyHelper::getAllSetting();
-                            foreach (SettingsPersistencyHelper::$visibleSettings AS $settingName) {
-                                $settingValue = isset($settings[$settingName]) ? $settings[$settingName] : "";
-                                echo '  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                                                <input class="mdl-textfield__input" type="text" id="setting-' . $settingName . '" value="' . $settingValue . '" name="' . $settingName . '">
-                                                <label class="mdl-textfield__label" for="setting-' . $settingName . '" style="text-transform: uppercase;">' . str_replace("_", " ", $settingName) . '</label>
-                                            </div><br />';
+                            foreach (SettingsPersistencyHelper::$visibleSettings AS $key => $settingCategory) {
+                                echo '<div class="settings-cat"><h5>'.$key.'</h5>';
+                                foreach($settingCategory AS $settingName){
+                                    $settingValue = isset($settings[$settingName]) ? $settings[$settingName] : "";
+                                    echo '  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                                    <input class="mdl-textfield__input" type="text" id="setting-' . $settingName . '" value="' . $settingValue . '" name="' . $settingName . '">
+                                                    <label class="mdl-textfield__label" for="setting-' . $settingName . '" style="text-transform: uppercase;">' . str_replace("_", " ", $settingName) . '</label>
+                                                </div><br />';
+                                }
+                                echo "</div>";
                             }
                             ?>
                             <br />
@@ -472,7 +474,7 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                                     <?php
                                     foreach (ServicePersistencyHelper::getWorldToGroupSettings() AS $worldToGroup) {
                                         echo '<tr class="world-to-group">';
-                                        echo '<td>' . $gw2i_linkedServices[$worldToGroup["service_id"]]->getName() . '</td>';
+                                        echo '<td>' . (isset($gw2i_linkedServices[$worldToGroup["service_id"]]) ? $gw2i_linkedServices[$worldToGroup["service_id"]]->getName() : $worldToGroup["service_id"]) . '</td>';
                                         echo '<td>' . $worldToGroup["world"] . '</td>';
                                         echo '<td>' . $worldToGroup["group_id"] . '</td>';
                                         echo '<td>' . $worldToGroup["is_primary"] . '</td>';

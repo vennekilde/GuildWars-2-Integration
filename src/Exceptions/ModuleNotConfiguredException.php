@@ -1,9 +1,6 @@
 <?php
 
-use GW2Integration\Entity\LinkedUser;
-use GW2Integration\LinkedServices\LinkedService;
-
-/* 
+/*
  * The MIT License
  *
  * Copyright 2016 Jeppe Boysen Vennekilde.
@@ -27,32 +24,17 @@ use GW2Integration\LinkedServices\LinkedService;
  * THE SOFTWARE.
  */
 
-require_once __DIR__ . "/../Source.php";
+namespace GW2Integration\Exceptions;
 
-//Check if user can view admin panel
-$canViewAdminPanel = false;
-foreach($gw2i_admin_allowed AS $serviceId => $groups){
-    $service = $gw2i_linkedServices[$serviceId];
-    /* @var $service LinkedService */
-    if(isset($service) && $service->canCheckGroupId()){
-        $userUserviceLink = $service->getAvailableUserServiceLink();
-        
-        if(isset($userUserviceLink)){
-            $userId = $userUserviceLink->getServiceUserId();
-            foreach($groups AS $group){
-                $hasGroup = $service->hasUserGroupId($userId, $group);
-                if($hasGroup){
-                    $canViewAdminPanel = true;
-                    goto doneAdminAccessCheck;
-                }
-            }
-        }
+use Exception;
+
+/**
+ * Description of ModuleNotConfiguredException
+ *
+ * @author Jeppe Boysen Vennekilde
+ */
+class ModuleNotConfiguredException extends Exception{
+    public function __construct($msg) {
+        parent::__construct($msg);
     }
-}
-doneAdminAccessCheck:
-    
-if(!$canViewAdminPanel){
-    http_response_code(403);
-    echo "Not allowed";
-    exit(0);
 }

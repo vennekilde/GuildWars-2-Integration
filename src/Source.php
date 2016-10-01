@@ -1,5 +1,6 @@
 <?php
 
+use GW2Integration\Exceptions\ModuleNotConfiguredException;
 use GW2Integration\LinkedServices\SMF\SimpleMachinesForum;
 use GW2Integration\LinkedServices\Teamspeak\Teamspeak;
 use GW2Integration\Logger\EventLogger;
@@ -74,12 +75,23 @@ $gw2i_modules = array(
  * Linked Services
  *******************************************/
 
-$gw2i_smf = new SimpleMachinesForum();
-$gw2i_ts = new Teamspeak();
-$gw2i_linkedServices = array(
-    $gw2i_smf->getServiceId() => $gw2i_smf,
-    $gw2i_ts->getServiceId() => $gw2i_ts,
-);
+$gw2i_linkedServices = array();
+
+//SMF Module
+try{
+    $gw2i_smf = new SimpleMachinesForum();
+    $gw2i_linkedServices[$gw2i_smf->getServiceId()] = $gw2i_smf;
+} catch(ModuleNotConfiguredException $e){
+    $logger->info($e->getMessage());
+}
+
+//TS Module
+try{
+    $gw2i_ts = new Teamspeak();
+    $gw2i_linkedServices[$gw2i_ts->getServiceId()] = $gw2i_ts;
+} catch(ModuleNotConfiguredException $e){
+    $logger->info($e->getMessage());
+}
 
 foreach($gw2i_modules as $module) {
     $module->init();

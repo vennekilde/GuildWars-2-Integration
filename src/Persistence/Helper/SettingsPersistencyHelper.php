@@ -47,11 +47,14 @@ class SettingsPersistencyHelper {
     const TEMPORARY_ACCESS_EXPIRATION = "temporary_access_expiration";
     
     public static $visibleSettings = array(
-        self::API_KEY_EXPIRATION_TIME,
-        self::API_KEYS_PER_RUN,
-        self::DEBUG_API_KEY,
-        self::TEAMSPEAK_BOT_ADDRESS,
-        self::TEMPORARY_ACCESS_EXPIRATION
+        "API Settings" => array(
+            self::API_KEY_EXPIRATION_TIME,
+            self::API_KEYS_PER_RUN,
+            self::DEBUG_API_KEY,
+        ),
+        "Access Settings" => array(
+            self::TEMPORARY_ACCESS_EXPIRATION
+        )
     );
     
     private static $settingsCache = array();

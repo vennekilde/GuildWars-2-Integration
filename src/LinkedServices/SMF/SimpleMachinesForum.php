@@ -26,11 +26,10 @@
 
 namespace GW2Integration\LinkedServices\SMF;
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/SSI.php');
-
-use GW2Integration\Entity\LinkedUser;
 use GW2Integration\Entity\UserServiceLink;
+use GW2Integration\Exceptions\ModuleNotConfiguredException;
 use GW2Integration\LinkedServices\LinkedService;
+use GW2Integration\Persistence\Helper\SettingsPersistencyHelper;
 
 /**
  * Description of SimpleMachineForums
@@ -42,6 +41,10 @@ class SimpleMachinesForum extends LinkedService{
     const serviceId = 0;
     
     function __construct() {
+        global $gw2i_smf_source_dir;
+        if(!include_once($gw2i_smf_source_dir.'/SSI.php')){
+            throw new ModuleNotConfiguredException("SMF Has not been configured, cannot load SMF module");
+        }
         parent::__construct(
                 static::serviceId, 
                 "Website", //"Simple Machine Forums", 
@@ -51,7 +54,6 @@ class SimpleMachinesForum extends LinkedService{
                 true,
                 false
             );
-        $this->hasUserGroupId(151,16);
     }
     
     /**

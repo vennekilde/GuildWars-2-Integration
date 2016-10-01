@@ -216,3 +216,9 @@ THE SOFTWARE.
     background:#e3f7fc no-repeat 10px 50%;
     border:1px solid #8ed9f6;
 }
+
+.settings-cat{
+    display: inline-block;
+    padding: 0px 35px 0px 0px;
+    vertical-align: top;
+}

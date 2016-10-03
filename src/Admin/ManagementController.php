@@ -276,12 +276,17 @@ switch($form){
             $roundedGraphData = array($graphData[0]);
             $roundedIndex = 0;
             $lastRowDate = null;
+            $keysPerRun = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEYS_PER_RUN);
             for($i = 1; $i < count($graphData); $i++){
                 $time = strtotime($graphData[$i][0]);
                 $roundedTime = ceil($time / 300) * 300;
                 $date = date("Y-m-d H:i:s", $roundedTime);
                 
-                if($lastRowDate != $date){
+                if(
+                        $lastRowDate != $date 
+                        || $keysPerRun == ($graphData[$i][$typeToIndex[StatisticsPersistence::API_SUCCESS]] 
+                                + $graphData[$i][$typeToIndex[StatisticsPersistence::API_ERRORS]])
+                    ){
                     $roundedGraphData[] = array_merge(array($date), array_slice($graphData[$i], 1));
                     $roundedIndex++;
                     $lastRowDate = $date;

@@ -15,20 +15,25 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
 <link rel="stylesheet" href="https://code.getmdl.io/1.2.0/material.indigo-blue.min.css" />
 <!-- JQuery UI CSS -->
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
-<!-- Custom CSS -->
-<link rel="stylesheet" href="<?php echo $webPath ?>/css/style.css">
 <!-- MDL JS -->
 <script src="https://code.getmdl.io/1.2.0/material.min.js"></script>
 <!--getmdl-select-->   
 <link rel="stylesheet" href="https://cdn.rawgit.com/CreativeIT/getmdl-select/master/getmdl-select.min.css">
 <script defer src="https://cdn.rawgit.com/CreativeIT/getmdl-select/master/getmdl-select.min.js"></script>
-<!-- JQuery UI JS -->
-<script src="<?php echo $webPath ?>/js/jquery-2.2.3.min.js"></script>
+<!-- JQuery -->
+<script src="../Public/js/jquery-2.2.3.min.js"></script>
+<!-- JQuery UI -->
 <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+<!-- JQuery Form -->
 <script src="https://malsup.github.io/jquery.form.js"></script> 
+<!-- Google Chart -->
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<script src="<?php echo $webPath ?>/js/common.js"></script>
-<script src="<?php echo $webPath ?>/js/admin.js"></script>
+
+<!-- Custom CSS -->
+<link rel="stylesheet" href="../Public/css/style.css">
+<!-- Custom JS -->
+<script src="../Public/js/common.js"></script>
+<script src="js/admin.js"></script>
 
 <meta name="viewport" content="initial-scale=1, maximum-scale=1">
 <script>

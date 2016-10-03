@@ -5,7 +5,7 @@ use GW2Integration\Controller\LinkedUserController;
 use GW2Integration\Persistence\Helper\SettingsPersistencyHelper;
 use GW2Integration\REST\RESTHelper;
 
-require_once __DIR__ . "/Source.php";
+require_once __DIR__ . "/../Source.php";
 
 $mainUserServiceLink = RESTHelper::getMainUserServiceLink();
 
@@ -43,15 +43,18 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
 <!-- MDL JS -->
 <script src="https://code.getmdl.io/1.2.0/material.min.js"></script>
 <!-- Stepper minified CSS -->
-<link rel="stylesheet" href="<?php echo $webPath ?>/mdl/css/stepper.min.css">
-<!-- Custom CSS -->
-<link rel="stylesheet" href="<?php echo $webPath ?>/css/style.css">
+<link rel="stylesheet" href="mdl/css/stepper.min.css">
 <!-- Stepper minified JS -->
-<script src="<?php echo $webPath ?>/mdl/js/stepper.min.js"></script>
-<script src="<?php echo $webPath ?>/js/jquery-2.2.3.min.js"></script>
-<script src="<?php echo $webPath ?>/js/common.js"></script>
-<script src="<?php echo $webPath ?>/js/api-link-setup.js"></script>
-<script src="<?php echo $webPath ?>/js/service-links-tab.js"></script>
+<script src="mdl/js/stepper.min.js"></script>
+
+<!-- Custom CSS -->
+<link rel="stylesheet" href="css/style.css">
+<!-- Custom JS -->
+<script src="js/jquery-2.2.3.min.js"></script>
+<script src="js/common.js"></script>
+<script src="js/api-link-setup.js"></script>
+<script src="js/service-links-tab.js"></script>
+
 <meta name="viewport" content="initial-scale=1, maximum-scale=1">
 
 <script> 

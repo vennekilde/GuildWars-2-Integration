@@ -208,7 +208,7 @@ switch($form){
         global $statistics;
         $graphData = $statistics->getCombinedChartData(
                 array(StatisticsPersistence::VALID_KEYS, StatisticsPersistence::TEMPORARY_ACCESS), 
-                259200 //3 days in seconds
+                43200 //12 hours in seconds
             );
         
         if(isset($graphData[0])){

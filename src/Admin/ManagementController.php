@@ -282,11 +282,7 @@ switch($form){
                 $roundedTime = ceil($time / 300) * 300;
                 $date = date("Y-m-d H:i:s", $roundedTime);
                 
-                if(
-                        $lastRowDate != $date 
-                        || $keysPerRun == ($graphData[$i][$typeToIndex[StatisticsPersistence::API_SUCCESS]] 
-                                + $graphData[$i][$typeToIndex[StatisticsPersistence::API_ERRORS]])
-                    ){
+                if($lastRowDate != $date){
                     $roundedGraphData[] = array_merge(array($date), array_slice($graphData[$i], 1));
                     $roundedIndex++;
                     $lastRowDate = $date;

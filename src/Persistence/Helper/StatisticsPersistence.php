@@ -151,6 +151,44 @@ class StatisticsPersistence {
     }
     
     
+    /**
+     * 
+     * @global type $gw2i_db_prefix
+     * @param int[] $types
+     * @param int $useHourlyResultsAfter in seconds
+     * @param int $newerThan in seconds
+     * @return array
+     */
+    public static function getHourlyStatistics($types, $useHourlyResultsAfter = null, $newerThan = null){
+        global $gw2i_db_prefix;
+        
+        $inQuery = implode(',', array_fill(0, count($types), '?'));
+        $preparedQueryString = '
+            SELECT * FROM (
+                (SELECT * FROM '.$gw2i_db_prefix.'statistics
+                    WHERE timestamp >= NOW() - INTERVAL ? SECOND
+                    ORDER BY timestamp)
+                UNION
+                (SELECT * FROM '.$gw2i_db_prefix.'statistics
+                    WHERE timestamp < NOW() - INTERVAL ? SECOND
+                    GROUP BY DATE(timestamp), HOUR(timestamp)
+                    ORDER BY timestamp)
+            ) AS t
+            WHERE t.type IN('.$inQuery.') '.(isset($newerThan) ? "AND t.timestamp >= NOW() - INTERVAL ? SECOND" : "").' ORDER BY t.timestamp ASC, t.rid ASC';
+        $queryParams = array_merge(array($useHourlyResultsAfter, $useHourlyResultsAfter), $types);
+        
+        if(isset($newerThan)){
+            $queryParams[] = $newerThan;
+        }
+        
+        $preparedStatement = Persistence::getDBEngine()->prepare($preparedQueryString);
+        
+        $preparedStatement->execute($queryParams);
+        
+        return $preparedStatement->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    
     public static function countExpiredAPIKeys(){
         global $gw2i_db_prefix;
         $preparedQueryString = 'SELECT a_world, COUNT(*) as count FROM '.$gw2i_db_prefix.'api_keys k INNER JOIN gw2integration_accounts a ON k.link_id = a.link_id WHERE last_success <= NOW() - INTERVAL ? SECOND AND api_key_permissions != "' . VerificationController::TEMPORARY_API_KEY_PERMISSIONS . '" GROUP BY a.a_world';

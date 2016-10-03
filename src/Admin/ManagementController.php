@@ -206,7 +206,10 @@ switch($form){
     
     case "get-statistics-world-distribution":
         global $statistics;
-        $graphData = $statistics->getCombinedChartData(array(StatisticsPersistence::VALID_KEYS, StatisticsPersistence::TEMPORARY_ACCESS));
+        $graphData = $statistics->getCombinedChartData(
+                array(StatisticsPersistence::VALID_KEYS, StatisticsPersistence::TEMPORARY_ACCESS), 
+                259200 //3 days in seconds
+            );
         
         if(isset($graphData[0])){
             foreach($graphData[0] AS $key => $columnName){
@@ -237,6 +240,7 @@ switch($form){
         global $statistics;
         $graphData = $statistics->getCombinedChartData(
                 array(StatisticsPersistence::API_ERRORS, StatisticsPersistence::API_SUCCESS, StatisticsPersistence::AVERAGE_TIME_PER_KEY),
+                null,
                 604800); //1 week in seconds
          
         $series = array();

@@ -6,7 +6,6 @@ use GW2Integration\REST\RESTHelper;
 
 require_once __DIR__ . "/RestrictAdminPanel.php";
 
-$linkedUser = RESTHelper::getLinkedUserFromParams();
 ?>
 
 <!-- Material Icons -->

@@ -75,30 +75,62 @@ class StatisticsLogger implements EventListener{
         }
     }
     
+    
     /**
      * 
      * @param int[] $statisticTypes
-     * @param int $newerThan in seconds
+     * @param int $useHoursGranularityAfter
+     * @param int $useDaysGranularityAfter
+     * @param int $newerThan
+     * @param int $sortMethod, 1 == highest, 2 == type
+     * @return array
      */
-    public function getCombinedChartData($statisticTypes, $useHoursGranularityAfter = null, $newerThan = null){
+    public function getCombinedChartData($statisticTypes, $useHoursGranularityAfter = null, $useDaysGranularityAfter = null, $newerThan = null, $sortMethod = 1){
         $chartData = array(null);
-        if(isset($useHoursGranularityAfter)){
-            $statisticsData = StatisticsPersistence::getHourlyStatistics($statisticTypes, $useHoursGranularityAfter, $newerThan);
-        } else {
-            $statisticsData = StatisticsPersistence::getStatistics($statisticTypes, $newerThan);
-        }
+        $statisticsData = StatisticsPersistence::getStatistics($statisticTypes, $newerThan);
         
         $typeToColumnId = array("x-axis" => 0);
+        
+        
+        //Temporary solution until google chart can sort labels by value
+        if($sortMethod == 1){
+            $newestStatisticsData = StatisticsPersistence::getNewestStatistics($statisticTypes);
+            for($i = 0; $i < count($newestStatisticsData); $i++){
+                $newestStatistic = $newestStatisticsData[$i];
+                $typeToColumnId[$newestStatistic["type"].":".$newestStatistic["data"]] = $i + 1;
+            }
+        } else if($sortMethod == 2){
+            for($i = 0; $i < count($statisticTypes); $i++){
+                $typeToColumnId[strval($statisticTypes[$i]).":0"] = $i + 1;
+            }
+        } 
+        
         $lastRowTimestamp = null;
         $lastRow = null;
-        foreach($statisticsData AS $dataPoint){
-            if($lastRowTimestamp != $dataPoint["timestamp"]){
+        $trimData = isset($useHoursGranularityAfter) || isset($useDaysGranularityAfter);
+        for($i = 1; $i < count($statisticsData); $i++){
+            $dataPoint = $statisticsData[$i];
+            
+            $timeStamp = $dataPoint["timestamp"];
+            $time = strtotime($timeStamp);
+            $currentTime = time();
+            if($time >= $currentTime - $useHoursGranularityAfter || !$trimData) {
+                $trimmedTimestamp = $timeStamp;
+            } else if(isset($useHoursGranularityAfter) && $time >= $currentTime - $useDaysGranularityAfter){
+                $roundedTime = ceil($time / 3600) * 3600; //3600 1 hour in seconds
+                $trimmedTimestamp = date("Y-m-d H:i:s", $roundedTime);
+            } else {
+                $roundedTime = ceil($time / 86400) * 86400; //86400 1 day in seconds
+                $trimmedTimestamp = date("Y-m-d H:i:s", $roundedTime);
+            }
+            
+            if($lastRowTimestamp != $trimmedTimestamp){
                 if($lastRow != null){
                     $chartData[] = $lastRow;
                 }
                 $lastRow = array_fill(0, count($typeToColumnId), null);
-                $lastRow[0] = $dataPoint["timestamp"];
-                $lastRowTimestamp = $dataPoint["timestamp"];
+                $lastRow[0] = $trimmedTimestamp;
+                $lastRowTimestamp = $trimmedTimestamp;
             }
             $key = $this->getIndexFromChart($typeToColumnId, $dataPoint["type"], intval($dataPoint["data"]));
             $lastRow[$key] = $dataPoint["statistic"];

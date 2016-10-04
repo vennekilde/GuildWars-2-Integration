@@ -206,9 +206,12 @@ switch($form){
     
     case "get-statistics-world-distribution":
         global $statistics;
+        $timeToSwitchToHours = 86400; //1 day in seconds
+        $timeToSwitchToDays = 259200; //3 days in seconds
         $graphData = $statistics->getCombinedChartData(
                 array(StatisticsPersistence::VALID_KEYS, StatisticsPersistence::TEMPORARY_ACCESS), 
-                43200 //12 hours in seconds
+                $timeToSwitchToHours,
+                $timeToSwitchToDays
             );
         
         if(isset($graphData[0])){
@@ -223,12 +226,34 @@ switch($form){
                     $newName .= GW2DataFieldConverter::getWorldNameById($split[1]);
                     $graphData[0][$key] = $newName;
                 } else {
-                    $graphData[0][$key] = "Date";
+                    $graphData[0][$key] = array("type" => "date", "label" => "Date");
                 }
             }
         }
         
-        $result["chart"] = $graphData;
+        $skimmedGraphData = array($graphData[0]);
+        $roundedIndex = 0;
+        $lastRowDate = null;
+        for($i = 1; $i < count($graphData); $i++){
+            $time = strtotime($graphData[$i][0]);
+            $roundedTime = ceil($time / 3600) * 3600; //3600 1 hour in seconds
+            $date = date("Y-m-d H:i:s", $roundedTime);
+
+            if($time >= time() - $timeToSwitchToHours) {
+                $skimmedGraphData[] = $graphData[$i];
+                $roundedIndex++;
+            } else if($lastRowDate != $date){
+                $skimmedGraphData[] = array_merge(array($date), array_slice($graphData[$i], 1));
+                $roundedIndex++;
+                $lastRowDate = $date;
+            } else {
+                for($k = 1; $k < count($skimmedGraphData[$roundedIndex]) - 1; $k++){
+                    $skimmedGraphData[$roundedIndex][$k] = $graphData[$i][$k];
+                }
+            }
+        }
+        
+        $result["chart"] = $skimmedGraphData;
         
         $result["options"] = array(
             "vAxis" => array("logScale" => true)
@@ -239,9 +264,11 @@ switch($form){
     case "get-statistics-api-calls":
         global $statistics;
         $graphData = $statistics->getCombinedChartData(
-                array(StatisticsPersistence::API_ERRORS, StatisticsPersistence::API_SUCCESS, StatisticsPersistence::AVERAGE_TIME_PER_KEY),
+                array(StatisticsPersistence::AVERAGE_TIME_PER_KEY, StatisticsPersistence::API_ERRORS, StatisticsPersistence::API_SUCCESS),
                 null,
-                604800); //1 week in seconds
+                null,
+                604800, //1 week in seconds
+                2); 
          
         $series = array();
         $typeToIndex = array();
@@ -270,10 +297,10 @@ switch($form){
                     }
                     $graphData[0][$key] = $newName;
                 } else {
-                    $graphData[0][$key] = "Date";
+                    $graphData[0][$key] = array("type" => "date", "label" => "Date");
                 }
             }
-            $roundedGraphData = array($graphData[0]);
+            $skimmedGraphData = array($graphData[0]);
             $roundedIndex = 0;
             $lastRowDate = null;
             $keysPerRun = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEYS_PER_RUN);
@@ -283,16 +310,16 @@ switch($form){
                 $date = date("Y-m-d H:i:s", $roundedTime);
                 
                 if($lastRowDate != $date){
-                    $roundedGraphData[] = array_merge(array($date), array_slice($graphData[$i], 1));
+                    $skimmedGraphData[] = array_merge(array($date), array_slice($graphData[$i], 1));
                     $roundedIndex++;
                     $lastRowDate = $date;
                 } else {
-                    $totalNOld = $roundedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::API_SUCCESS]];
-                    $roundedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::API_SUCCESS]] 
+                    $totalNOld = $skimmedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::API_SUCCESS]];
+                    $skimmedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::API_SUCCESS]] 
                             += $graphData[$i][$typeToIndex[StatisticsPersistence::API_SUCCESS]];
                     
-                    $totalNOld += $roundedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::API_ERRORS]];
-                    $roundedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::API_ERRORS]] 
+                    $totalNOld += $skimmedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::API_ERRORS]];
+                    $skimmedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::API_ERRORS]] 
                             += $graphData[$i][$typeToIndex[StatisticsPersistence::API_ERRORS]];
                     
                     $totalNNew = $graphData[$i][$typeToIndex[StatisticsPersistence::API_SUCCESS]] 
@@ -301,13 +328,13 @@ switch($form){
                     //Calculate new average
                     $weightOld = $totalNOld / ($totalNOld + $totalNNew);
                     $weightNew = $totalNNew / ($totalNOld + $totalNNew);
-                    $roundedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::AVERAGE_TIME_PER_KEY]] 
-                            = ($weightOld * $roundedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::AVERAGE_TIME_PER_KEY]])
+                    $skimmedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::AVERAGE_TIME_PER_KEY]] 
+                            = ($weightOld * $skimmedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::AVERAGE_TIME_PER_KEY]])
                             + ($weightNew * $graphData[$i][$typeToIndex[StatisticsPersistence::AVERAGE_TIME_PER_KEY]]);
                     
                 }
             }
-            $graphData = $roundedGraphData;
+            $graphData = $skimmedGraphData;
         }
         $result["options"] = array(
             "series" => $series,

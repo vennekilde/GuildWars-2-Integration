@@ -178,13 +178,21 @@ function fetchStatisticsChart(form, data) {
             console.log(response);
             var json = JSON.parse(response)
             if(json["data"]["chart"] !== undefined){
-                var data = google.visualization.arrayToDataTable(json["data"]["chart"]);
+                var chart = json["data"]["chart"];
+                for(var i = 1; i < chart.length; i++){
+                    chart[i][0] = new Date(chart[i][0]);
+                }
+                console.log(chart);
+                var data = google.visualization.arrayToDataTable(chart);
 
                 var options = {
                     interpolateNulls: true,
                     height: 500,
                     vAxis : {
                         format: "decimal"
+                    },
+                    hAxis: {
+                      format: 'yy-MM-dd hh:mm:ss'
                     },
                     backgroundColor: { fill:'transparent' }
                 };

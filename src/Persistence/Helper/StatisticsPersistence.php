@@ -150,38 +150,17 @@ class StatisticsPersistence {
         return $preparedStatement->fetchAll(PDO::FETCH_ASSOC);
     }
     
-    
-    /**
-     * 
-     * @global type $gw2i_db_prefix
-     * @param int[] $types
-     * @param int $useHourlyResultsAfter in seconds
-     * @param int $newerThan in seconds
-     * @return array
-     */
-    public static function getHourlyStatistics($types, $useHourlyResultsAfter = null, $newerThan = null){
+    public static function getNewestStatistics($types){
         global $gw2i_db_prefix;
         
         $inQuery = implode(',', array_fill(0, count($types), '?'));
         $preparedQueryString = '
-            SELECT * FROM (
-                (SELECT * FROM '.$gw2i_db_prefix.'statistics
-                    WHERE timestamp >= NOW() - INTERVAL ? SECOND AND type IN('.$inQuery.')'.(isset($newerThan) ? "AND timestamp >= NOW() - INTERVAL ? SECOND" : "").'
-                    ORDER BY timestamp)
-                UNION
-                (SELECT * FROM '.$gw2i_db_prefix.'statistics
-                    WHERE timestamp < NOW() - INTERVAL ? SECOND AND type IN('.$inQuery.')'.(isset($newerThan) ? "AND timestamp >= NOW() - INTERVAL ? SECOND" : "").'
-                    GROUP BY DATE(timestamp), HOUR(timestamp)
-                    ORDER BY timestamp)
-            ) AS t
-            ORDER BY t.timestamp ASC, t.rid ASC';
-        $queryParams = array_merge(array($useHourlyResultsAfter), $types);
-        if(isset($newerThan)){
-            $queryParams[] = $newerThan;
-        }
-        
-        //Add the params twice
-        $queryParams = array_merge($queryParams, $queryParams);
+            SELECT t1.* FROM '.$gw2i_db_prefix.'statistics t1
+            JOIN (SELECT data, MAX(timestamp) as max_timestamp FROM '.$gw2i_db_prefix.'statistics GROUP BY data) t2
+                ON t1.data = t2.data AND t1.timestamp = t2.max_timestamp
+            WHERE type IN('.$inQuery.')
+            ORDER BY t1.statistic DESC';
+        $queryParams = $types;
         
         $preparedStatement = Persistence::getDBEngine()->prepare($preparedQueryString);
         

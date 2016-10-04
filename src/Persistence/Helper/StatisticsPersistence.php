@@ -166,20 +166,22 @@ class StatisticsPersistence {
         $preparedQueryString = '
             SELECT * FROM (
                 (SELECT * FROM '.$gw2i_db_prefix.'statistics
-                    WHERE timestamp >= NOW() - INTERVAL ? SECOND
+                    WHERE timestamp >= NOW() - INTERVAL ? SECOND AND type IN('.$inQuery.')'.(isset($newerThan) ? "AND timestamp >= NOW() - INTERVAL ? SECOND" : "").'
                     ORDER BY timestamp)
                 UNION
                 (SELECT * FROM '.$gw2i_db_prefix.'statistics
-                    WHERE timestamp < NOW() - INTERVAL ? SECOND
+                    WHERE timestamp < NOW() - INTERVAL ? SECOND AND type IN('.$inQuery.')'.(isset($newerThan) ? "AND timestamp >= NOW() - INTERVAL ? SECOND" : "").'
                     GROUP BY DATE(timestamp), HOUR(timestamp)
                     ORDER BY timestamp)
             ) AS t
-            WHERE t.type IN('.$inQuery.') '.(isset($newerThan) ? "AND t.timestamp >= NOW() - INTERVAL ? SECOND" : "").' ORDER BY t.timestamp ASC, t.rid ASC';
-        $queryParams = array_merge(array($useHourlyResultsAfter, $useHourlyResultsAfter), $types);
-        
+            ORDER BY t.timestamp ASC, t.rid ASC';
+        $queryParams = array_merge(array($useHourlyResultsAfter), $types);
         if(isset($newerThan)){
             $queryParams[] = $newerThan;
         }
+        
+        //Add the params twice
+        $queryParams = array_merge($queryParams, $queryParams);
         
         $preparedStatement = Persistence::getDBEngine()->prepare($preparedQueryString);
         

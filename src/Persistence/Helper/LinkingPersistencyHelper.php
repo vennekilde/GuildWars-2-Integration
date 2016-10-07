@@ -97,6 +97,8 @@ class LinkingPersistencyHelper {
 
                     if(!empty($values)){
                         $pqs = 'SELECT link_id FROM '.$gw2i_db_prefix.'user_service_links WHERE '.$pqsPartial;
+                    } else {
+                        throw new UnableToDetermineLinkId();
                     }
                 } else {
                     throw new UnableToDetermineLinkId();

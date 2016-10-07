@@ -85,12 +85,14 @@ class VerificationEventPersistence {
         if(isset($types)){
             $inQuery = implode(',', array_fill(0, count($types), '?'));
             $preparedQueryString = '
-                SELECT * FROM '.$gw2i_db_prefix.'verification_log 
+                SELECT v.*, a.a_username AS username FROM '.$gw2i_db_prefix.'verification_log v
+                    LEFT JOIN '.$gw2i_db_prefix.'accounts a ON a.link_id = v.link_id
                 WHERE type IN('.$inQuery.')' . (isset($newerThan) ? ' AND timestamp >= NOW() - INTERVAL ? SECOND' : "").' ORDER BY timestamp ASC, rid ASC LIMIT ? OFFSET ?';
         } else {
             $inQuery = implode(',', array_fill(0, count($types), '?'));
             $preparedQueryString = '
-                SELECT * FROM '.$gw2i_db_prefix.'verification_log 
+                SELECT v.*, a.a_username AS username FROM '.$gw2i_db_prefix.'verification_log v
+                    LEFT JOIN '.$gw2i_db_prefix.'accounts a ON a.link_id = v.link_id
                 ' . (isset($newerThan) ? 'WHERE timestamp >= NOW() - INTERVAL ? SECOND' : "").' ORDER BY timestamp DESC, rid ASC LIMIT ? OFFSET ?';
         }
         

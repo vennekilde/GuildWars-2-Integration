@@ -162,7 +162,8 @@ $(document).ready(function () {
                         console.log(events[key]);
                         var entry = '\
                         <tr>\
-                            <td class="mdl-data-table__cell--non-numeric">'+events[key]["link_id"]+'</td>';
+                            <td class="mdl-data-table__cell--non-numeric">'+events[key]["link_id"]+'</td>\
+                            <td class="mdl-data-table__cell--non-numeric">'+(events[key]["username"] !== null ? events[key]["username"] : "Not linked")+'</td>';
                         
                         $.each(json["data"]["services"], function(serviceId){
                             var displayName = (events[key]["services"] !== undefined && events[key]["services"][serviceId] !== undefined) ? events[key]["services"][serviceId] : "Not linked";

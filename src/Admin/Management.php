@@ -327,6 +327,7 @@ require_once __DIR__ . "/RestrictAdminPanel.php";
                     <div class='primaryheading'>
                         <h5>Event Log</h5>
                         <p>Log of every event created by the Guild Wars 2 Integration</p>
+                        <p>Current Timestamp: <b style="text-transform: uppercase;"><?php echo date("Y-m-d H:i:s"); ?></b></p>
                         <form action='ManagementController.php' method="POST" name='event-log' class="verification-event-admin-form">
                             <table id="verification-events" class="mdl-data-table mdl-js-data-table mdl-shadow--2dp table-td-ta-left compact-mdl-table" style="width: 100%">
                                 <thead>

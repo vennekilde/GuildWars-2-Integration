@@ -1,5 +1,7 @@
 <?php
 
+namespace GW2Integration\Logger;
+
 use GW2Integration\Events\EventListener;
 use GW2Integration\Events\EventManager;
 use GW2Integration\Events\Events\APISyncCompleted;
@@ -8,7 +10,6 @@ use GW2Integration\Events\Events\GW2AccountDataRefreshedEvent;
 use GW2Integration\Events\Events\UserServiceLinkEvent;
 use GW2Integration\Persistence\Helper\VerificationEventPersistence;
 
-namespace GW2Integration\Logger;
 
 /*
  * The MIT License

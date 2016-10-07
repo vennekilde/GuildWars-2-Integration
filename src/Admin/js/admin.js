@@ -194,7 +194,7 @@ function fetchStatisticsChart(form, data) {
                         format: "decimal"
                     },
                     hAxis: {
-                      format: 'yy-MM-dd hh:mm:ss'
+                      format: 'yy-MM-dd HH:mm:ss'
                     },
                     backgroundColor: { fill:'transparent' }
                 };

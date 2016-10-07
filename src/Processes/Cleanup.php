@@ -43,6 +43,7 @@ class Cleanup implements EventListener{
     
     public function onAPISyncCompleted(APISyncCompleted $event){
         global $session_expiration_periode;
+        APIKeyPersistenceHelper::updateTemporaryAccessLastFetch();
         ServiceSessionPersistenceHelper::cleanupExpiredUserSessions($session_expiration_periode);
         APIKeyPersistenceHelper::cleanupDatabase();
     }

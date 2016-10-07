@@ -20,7 +20,7 @@ BEGIN
         AND (
             l.link_id IS NOT NULL 										/* Ensure link exists */
             AND b.b_username IS NULL 									/* Ensure not banned */
-            AND k.last_success >= NOW() - INTERVAL expirationTime SECOND/* Ensure not expired */
+            AND k.last_success >= k.last_attempted_fetch - INTERVAL expirationTime SECOND/* Ensure not expired */
             AND a.a_world = w.world 									/* Ensure the user is actually in the associated world */
             AND l.is_primary = w.is_primary								/* Ensure the world to group relation is on the same access level */
             AND FIND_IN_SET(w.group_id, m.additional_groups) = 0        /* Ensure the user doesn't have the group as an additional group */
@@ -32,7 +32,7 @@ BEGIN
         AND (
             l.link_id IS NOT NULL 										/* Ensure link exists */
             AND b.b_username IS NULL 									/* Ensure not banned */
-            AND k.last_success >= NOW() - INTERVAL expirationTime SECOND/* Ensure not expired */
+            AND k.last_success >= k.last_attempted_fetch - INTERVAL expirationTime SECOND/* Ensure not expired */
             AND a.a_world = w.world 									/* Ensure the user is actually in the associated world */
             AND l.is_primary = w.is_primary								/* Ensure the world to group relation is on the same access level */
             AND m.id_group != w.group_id                                /* Ensure the user doesn't have the group as the primary group */

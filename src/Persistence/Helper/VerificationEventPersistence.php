@@ -41,6 +41,9 @@ if (!defined('GW2Integration')) {
 class VerificationEventPersistence {
     
     const WORLD_MOVE_EVENT = 0; 
+    const TEMPORARY_ACCESS_EVENT = 1; 
+    const ACCESS_EXPIRED_EVENT = 2; 
+    const SERVICE_GROUP_EVENT = 3; 
     
     /**
      * 

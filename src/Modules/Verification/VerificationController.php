@@ -36,6 +36,7 @@ use GW2Integration\Persistence\Helper\APIKeyPersistenceHelper;
 use GW2Integration\Persistence\Helper\GW2DataPersistence;
 use GW2Integration\Persistence\Helper\LinkingPersistencyHelper;
 use GW2Integration\Persistence\Helper\SettingsPersistencyHelper;
+use GW2Integration\Persistence\Helper\VerificationEventPersistence;
 
 if (!defined('GW2Integration')) {
     die('Hacking attempt...');
@@ -122,6 +123,7 @@ class VerificationController {
         LinkingPersistencyHelper::removeAttributeFromAllUserLinks($linkedUser, "tempExpired");
         
         $logger->info($linkedUser->compactString() . " Has been granted temporary access as world $world");
+        VerificationEventPersistence::persistVerificationEvent($linkedUser, VerificationEventPersistence::TEMPORARY_ACCESS_EVENT, 1);
     }
 
     /**

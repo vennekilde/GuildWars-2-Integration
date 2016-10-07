@@ -23,7 +23,7 @@ BEGIN
         AND (
                 l.link_id IS NULL                                          /* Check if linking exists */
                 OR b.b_username IS NOT NULL                                /* Check if banned */
-                OR k.last_success < NOW() - INTERVAL expirationTime SECOND /* Check if expired */
+                OR k.last_success < k.last_attempted_fetch - INTERVAL expirationTime SECOND /* Check if expired */
                 OR l.is_primary != w.is_primary                            /* Check if link priority is wrong */
                 /* Check if the user world is wrong */
         )					
@@ -34,7 +34,7 @@ BEGIN
         AND (
                 l.link_id IS NULL                                          /* Check if linking exists */
                 OR b.b_username IS NOT NULL                                /* Check if banned */
-                OR k.last_success < NOW() - INTERVAL expirationTime SECOND /* Check if expired */
+                OR k.last_success < k.last_attempted_fetch - INTERVAL expirationTime SECOND /* Check if expired */
                 OR l.is_primary != w.is_primary                            /* Check if link priority is wrong */
         )		
     /* Ensure there isn't 2 worlds who should be linked with the same group) */

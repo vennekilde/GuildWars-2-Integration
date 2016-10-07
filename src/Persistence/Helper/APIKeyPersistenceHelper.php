@@ -49,7 +49,7 @@ class APIKeyPersistenceHelper {
      */
     public static function queryAPIKeys($offset, $limit, $sortByLastAttemptedFetched = true){
         global $gw2i_db_prefix;
-        $preparedQueryString = 'SELECT * FROM '.$gw2i_db_prefix.'api_keys WHERE last_success > NOW() - INTERVAL :expiration SECOND AND api_key_permissions != "' . VerificationController::TEMPORARY_API_KEY_PERMISSIONS . '"';
+        $preparedQueryString = 'SELECT * FROM '.$gw2i_db_prefix.'api_keys WHERE last_success > last_attempted_fetch - INTERVAL :expiration SECOND AND api_key_permissions != "' . VerificationController::TEMPORARY_API_KEY_PERMISSIONS . '"';
         $queryParams = array(
             ":expiration" => SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_EXPIRATION_TIME)
         );
@@ -83,7 +83,7 @@ class APIKeyPersistenceHelper {
         );
         
         if($ignoreExpired){
-            $preparedQueryString .= " AND last_success > NOW() - INTERVAL ? SECOND";
+            $preparedQueryString .= " AND last_success > last_attempted_fetch - INTERVAL ? SECOND";
             $queryParams[] = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_EXPIRATION_TIME);
         }
         
@@ -187,7 +187,7 @@ class APIKeyPersistenceHelper {
      */
     public static function getExpiredAPIKeys(){
         global $gw2i_db_prefix;
-        $preparedQueryString = 'SELECT * FROM '.$gw2i_db_prefix.'api_keys WHERE last_success <= NOW() - INTERVAL ? SECOND';
+        $preparedQueryString = 'SELECT * FROM '.$gw2i_db_prefix.'api_keys WHERE last_attempted_fetch <= NOW() - INTERVAL ? SECOND';
         $queryParams = array(
             SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_EXPIRATION_TIME)
         );

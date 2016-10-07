@@ -172,7 +172,7 @@ class StatisticsPersistence {
     
     public static function countExpiredAPIKeys(){
         global $gw2i_db_prefix;
-        $preparedQueryString = 'SELECT a_world, COUNT(*) as count FROM '.$gw2i_db_prefix.'api_keys k INNER JOIN gw2integration_accounts a ON k.link_id = a.link_id WHERE last_success <= NOW() - INTERVAL ? SECOND AND api_key_permissions != "' . VerificationController::TEMPORARY_API_KEY_PERMISSIONS . '" GROUP BY a.a_world';
+        $preparedQueryString = 'SELECT a_world, COUNT(*) as count FROM '.$gw2i_db_prefix.'api_keys k INNER JOIN gw2integration_accounts a ON k.link_id = a.link_id WHERE last_success <= last_attempted_fetch - INTERVAL ? SECOND AND api_key_permissions != "' . VerificationController::TEMPORARY_API_KEY_PERMISSIONS . '" GROUP BY a.a_world';
         $queryParams = array(
             SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_EXPIRATION_TIME)
         );
@@ -186,7 +186,7 @@ class StatisticsPersistence {
     
     public static function countExpiredTemporaryAccess(){
         global $gw2i_db_prefix;
-        $preparedQueryString = 'SELECT a_world, COUNT(*) as count FROM '.$gw2i_db_prefix.'api_keys k INNER JOIN gw2integration_accounts a ON k.link_id = a.link_id WHERE last_success <= NOW() - INTERVAL ? SECOND AND api_key_permissions = "' . VerificationController::TEMPORARY_API_KEY_PERMISSIONS . '" GROUP BY a.a_world';
+        $preparedQueryString = 'SELECT a_world, COUNT(*) as count FROM '.$gw2i_db_prefix.'api_keys k INNER JOIN gw2integration_accounts a ON k.link_id = a.link_id WHERE last_success <= last_attempted_fetch - INTERVAL ? SECOND AND api_key_permissions = "' . VerificationController::TEMPORARY_API_KEY_PERMISSIONS . '" GROUP BY a.a_world';
         $queryParams = array(
             SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_EXPIRATION_TIME)
         );
@@ -200,7 +200,7 @@ class StatisticsPersistence {
     
     public static function countNotExpiredAPIKeys(){
         global $gw2i_db_prefix;
-        $preparedQueryString = 'SELECT a_world, COUNT(*) as count FROM '.$gw2i_db_prefix.'api_keys k INNER JOIN gw2integration_accounts a ON k.link_id = a.link_id WHERE last_success > NOW() - INTERVAL ? SECOND AND api_key_permissions != "' . VerificationController::TEMPORARY_API_KEY_PERMISSIONS . '" GROUP BY a.a_world';
+        $preparedQueryString = 'SELECT a_world, COUNT(*) as count FROM '.$gw2i_db_prefix.'api_keys k INNER JOIN gw2integration_accounts a ON k.link_id = a.link_id WHERE last_success > last_attempted_fetch - INTERVAL ? SECOND AND api_key_permissions != "' . VerificationController::TEMPORARY_API_KEY_PERMISSIONS . '" GROUP BY a.a_world';
         $queryParams = array(
             SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_EXPIRATION_TIME)
         );
@@ -214,7 +214,7 @@ class StatisticsPersistence {
     
     public static function countNotExpiredTemporaryAccess(){
         global $gw2i_db_prefix;
-        $preparedQueryString = 'SELECT a_world, COUNT(*) as count FROM '.$gw2i_db_prefix.'api_keys k INNER JOIN gw2integration_accounts a ON k.link_id = a.link_id WHERE last_success > NOW() - INTERVAL ? SECOND AND api_key_permissions = "' . VerificationController::TEMPORARY_API_KEY_PERMISSIONS . '"  GROUP BY a.a_world';
+        $preparedQueryString = 'SELECT a_world, COUNT(*) as count FROM '.$gw2i_db_prefix.'api_keys k INNER JOIN gw2integration_accounts a ON k.link_id = a.link_id WHERE last_success > last_attempted_fetch - INTERVAL ? SECOND AND api_key_permissions = "' . VerificationController::TEMPORARY_API_KEY_PERMISSIONS . '"  GROUP BY a.a_world';
         $queryParams = array(
             SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_EXPIRATION_TIME)
         );

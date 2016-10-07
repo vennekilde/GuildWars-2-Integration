@@ -170,7 +170,7 @@ class APIKeyPersistenceHelper {
         $result = $preparedStatement->execute($queryParams);
         
         if($checkIfExpired){
-            $pqs = 'SELECT * FROM '.$gw2i_db_prefix.'api_key WHERE api_key = ? AND last_success <= last_attempted_fetch - INTERVAL ? SECOND';
+            $pqs = 'SELECT * FROM '.$gw2i_db_prefix.'api_keys WHERE api_key = ? AND last_success <= last_attempted_fetch - INTERVAL ? SECOND';
             $pq = Persistence::getDBEngine()->prepare($pqs);
             $isExpired = $pq->execute(array(
                 $apiKey,

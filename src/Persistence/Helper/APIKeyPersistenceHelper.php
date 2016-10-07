@@ -27,6 +27,9 @@
 namespace GW2Integration\Persistence\Helper;
 
 use GW2Integration\Entity\LinkedUser;
+use GW2Integration\Events\EventManager;
+use GW2Integration\Events\Events\GW2AccountDataExpiredEvent;
+use GW2Integration\Events\Events\GW2AccountDataRefreshedEvent;
 use GW2Integration\Modules\Verification\VerificationController;
 use GW2Integration\Persistence\Persistence;
 use PDO;
@@ -101,9 +104,24 @@ class APIKeyPersistenceHelper {
      * @param array $tokenInfo
      * @return boolean
      */
-    public static function persistTokenInfo($linkedUser, $apiKey, $tokenInfo){
+    public static function persistTokenInfo($linkedUser, $apiKey, $tokenInfo, $checkIfAccessRegained = true){
         global $gw2i_db_prefix;
         $linkId = LinkingPersistencyHelper::determineLinkedUserId($linkedUser);
+        
+        if($checkIfAccessRegained){
+            $pqs = 'SELECT * FROM '.$gw2i_db_prefix.'api_key WHERE link_id = ? AND last_success <= last_attempted_fetch - INTERVAL ? SECOND';
+            $pq = Persistence::getDBEngine()->prepare($pqs);
+            $prevAPIData = $pq->execute(array(
+                $linkId,
+                SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_EXPIRATION_TIME)
+            ));
+            
+            if($prevAPIData !== false && isset($prevAPIData)){
+                $event = new GW2AccountDataRefreshedEvent($linkId);
+                EventManager::fireEvent($event);
+            }
+        }
+        
         $preparedQueryString = '
             INSERT INTO '.$gw2i_db_prefix.'api_keys (link_id, api_key, api_key_name, api_key_permissions)
                 VALUES(:link_id, :api_key, :api_key_name, :api_key_permissions)
@@ -128,8 +146,9 @@ class APIKeyPersistenceHelper {
      * @param type $apiKey
      * @param type $unixTimestamp
      */
-    public static function updateLastAPIKeyAttemptedFetch($apiKey, $unixTimestamp = null){
+    public static function updateLastAPIKeyAttemptedFetch($apiKey, $unixTimestamp = null, $checkIfExpired = true){
         global $gw2i_db_prefix;
+        
         if(!isset($unixTimestamp)){
             $unixTimestamp = time();
         }
@@ -148,7 +167,23 @@ class APIKeyPersistenceHelper {
         
         $preparedStatement = Persistence::getDBEngine()->prepare($preparedQueryString);
 
-        return $preparedStatement->execute($queryParams);
+        $result = $preparedStatement->execute($queryParams);
+        
+        if($checkIfExpired){
+            $pqs = 'SELECT * FROM '.$gw2i_db_prefix.'api_key WHERE api_key = ? AND last_success <= last_attempted_fetch - INTERVAL ? SECOND';
+            $pq = Persistence::getDBEngine()->prepare($pqs);
+            $isExpired = $pq->execute(array(
+                $apiKey,
+                SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_EXPIRATION_TIME)
+            ));
+            
+            if($isExpired !== false && isset($isExpired)){
+                $event = new GW2AccountDataExpiredEvent($isExpired["link_id"]);
+                EventManager::fireEvent($event);
+            }
+        }
+        
+        return $result;
     }
 
     /**
@@ -187,7 +222,7 @@ class APIKeyPersistenceHelper {
      */
     public static function getExpiredAPIKeys(){
         global $gw2i_db_prefix;
-        $preparedQueryString = 'SELECT * FROM '.$gw2i_db_prefix.'api_keys WHERE last_attempted_fetch <= NOW() - INTERVAL ? SECOND';
+        $preparedQueryString = 'SELECT * FROM '.$gw2i_db_prefix.'api_keys WHERE last_success <= last_attempted_fetch - INTERVAL ? SECOND';
         $queryParams = array(
             SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_EXPIRATION_TIME)
         );

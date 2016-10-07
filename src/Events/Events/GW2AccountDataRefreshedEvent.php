@@ -3,7 +3,7 @@
 /*
  * The MIT License
  *
- * Copyright 2015 jeppe.
+ * Copyright 2016 Jeppe Boysen Vennekilde.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,11 +27,11 @@
 namespace GW2Integration\Events\Events;
 
 /**
- * Description of GW2AccountDataExpiredEvent
+ * Description of GW2AccountDataRefreshed
  *
- * @author jeppe
+ * @author Jeppe Boysen Vennekilde
  */
-class GW2AccountDataExpiredEvent extends Event{
+class GW2AccountDataRefreshedEvent extends Event{
     private $linkId;
     
     function __construct($linkId) {
@@ -43,7 +43,7 @@ class GW2AccountDataExpiredEvent extends Event{
     }
     
     public function __toString() {
-        $toString = "GW2AccountDataExpiredEvent {linkId: ".$this->linkId."}";
+        $toString = "GW2AccountDataRefreshedEvent {linkId: ".$this->linkId."}";
         return $toString;
     }
 }

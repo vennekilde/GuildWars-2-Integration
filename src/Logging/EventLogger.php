@@ -5,7 +5,9 @@ namespace GW2Integration\Logger;
 use GW2Integration\Events\EventListener;
 use GW2Integration\Events\EventManager;
 use GW2Integration\Events\Events\APISyncCompleted;
+use GW2Integration\Events\Events\GW2AccountDataExpiredEvent;
 use GW2Integration\Events\Events\UserServiceLinkEvent;
+use GW2Integration\Persistence\Helper\VerificationEventPersistence;
 
 /*
  * The MIT License
@@ -54,5 +56,17 @@ class EventLogger implements EventListener{
     public function onAPISyncCompleted(APISyncCompleted $event){
         global $logger;
         $logger->info($event);
+    }
+    
+    public function onGW2AccountDataExpiredEvent(GW2AccountDataExpiredEvent $event){
+        global $logger;
+        $logger->info($event);
+        VerificationEventPersistence::persistVerificationEvent($event->getLinkId(), VerificationEventPersistence::ACCESS_EXPIRED_EVENT, 1);
+    }
+    
+    public function onGW2AccountDataRefreshedEvent(GW2AccountDataRefreshedEvent $event){
+        global $logger;
+        $logger->info($event);
+        VerificationEventPersistence::persistVerificationEvent($event->getLinkId(), VerificationEventPersistence::ACCESS_EXPIRED_EVENT, 0);
     }
 }

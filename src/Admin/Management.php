@@ -327,45 +327,50 @@ require_once __DIR__ . "/RestrictAdminPanel.php";
                     <div class='primaryheading'>
                         <h5>Event Log</h5>
                         <p>Log of every event created by the Guild Wars 2 Integration</p>
-                        <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp table-td-ta-left" style="width: 100%">
-                            <thead>
-                                <tr>
-                                    <th class="mdl-data-table__cell--non-numeric">Link Id</th>
-                                    <th class="mdl-data-table__cell--non-numeric">Account Name</th>
+                        <form action='ManagementController.php' method="POST" name='event-log' class="verification-event-admin-form">
+                            <table id="verification-events" class="mdl-data-table mdl-js-data-table mdl-shadow--2dp table-td-ta-left compact-mdl-table" style="width: 100%">
+                                <thead>
+                                    <tr>
+                                        <th class="mdl-data-table__cell--non-numeric">Link Id</th>
+                                        <th class="mdl-data-table__cell--non-numeric">Account Name</th>
 
-                                    <?php
-                                    foreach ($gw2i_linkedServices AS $linkedService) {
-                                        echo '<th class="mdl-data-table__cell--non-numeric">' . $linkedService->getName() . '</th>';
-                                    }
-                                    ?>
+                                        <?php
+                                        foreach ($gw2i_linkedServices AS $linkedService) {
+                                            echo '<th class="mdl-data-table__cell--non-numeric">' . $linkedService->getName() . '</th>';
+                                        }
+                                        ?>
 
-                                    <th class="mdl-data-table__cell--non-numeric">Timestamp</th>
-                                    <th class="mdl-data-table__cell--non-numeric">Event Type</th>
-                                    <th class="mdl-data-table__cell--non-numeric">Value</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Not available</td>
-                                    <td>Not available</td>
-                                    <td>Not available</td>
-                                    <td>Not available</td>
-                                    <td>Not available</td>
-                                    <td>Not available</td>
-                                    <td>Not available</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <br />
-                        <center>
-                            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner">
+                                        <th class="mdl-data-table__cell--non-numeric">Timestamp</th>
+                                        <th class="mdl-data-table__cell--non-numeric">Event Type</th>
+                                        <th class="mdl-data-table__cell--non-numeric">Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="verification-events-tbody">
+                                    <tr>
+                                        <td>Not available</td>
+                                        <td>Not available</td>
+                                        <td>Not available</td>
+                                        <td>Not available</td>
+                                        <td>Not available</td>
+                                        <td>Not available</td>
+                                        <td>Not available</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br />
+                            <button name="update" type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner">
+                                Update
+                            </button>
+                            <button name="newer" type="submit" onclick="prevPage($('#ve-page-input'))" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner" style="margin-left: 10px;">
                                 Newer
                             </button> 
-                            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner">
+                            <button name="older" type="submit" onclick="nextPage($('#ve-page-input'))" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner" style="margin-left: 10px;">
                                 Older
                             </button> 
+                            <input id="ve-page-input" type="hidden" name="page" value="1" />
                             <div class="mdl-spinner mdl-js-spinner is-active spinner-button"></div>
-                        </center>
+                            <div class="response-div response-div-style"></div>
+                        </form>
                     </div>
                     <div class='secondaryheading'>
                         <h5>Detailed Log</h5>

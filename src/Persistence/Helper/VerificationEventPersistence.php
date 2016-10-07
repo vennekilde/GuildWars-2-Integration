@@ -28,6 +28,7 @@ namespace GW2Integration\Persistence\Helper;
 
 use GW2Integration\Entity\LinkedUser;
 use GW2Integration\Persistence\Persistence;
+use PDO;
 
 if (!defined('GW2Integration')) {
     die('Hacking attempt...');
@@ -38,6 +39,8 @@ if (!defined('GW2Integration')) {
  * @author Jeppe Boysen Vennekilde
  */
 class VerificationEventPersistence {
+    
+    const WORLD_MOVE_EVENT = 0; 
     
     /**
      * 
@@ -63,4 +66,49 @@ class VerificationEventPersistence {
         
         return $preparedStatement->execute($queryParams);
     }
+    
+    
+    /**
+     * 
+     * @global type $gw2i_db_prefix
+     * @param int[] $types
+     * @param int $newerThan in seconds
+     * @return array
+     */
+    public static function getVerificationEvents($types = null, $newerThan = null, $limit = 30, $offset = 0){
+        global $gw2i_db_prefix;
+        
+        if(isset($types)){
+            $inQuery = implode(',', array_fill(0, count($types), '?'));
+        }
+        
+        if(isset($types)){
+            $inQuery = implode(',', array_fill(0, count($types), '?'));
+            $preparedQueryString = '
+                SELECT * FROM '.$gw2i_db_prefix.'verification_log 
+                WHERE type IN('.$inQuery.')' . (isset($newerThan) ? ' AND timestamp >= NOW() - INTERVAL ? SECOND' : "").' ORDER BY timestamp ASC, rid ASC LIMIT ? OFFSET ?';
+        } else {
+            $inQuery = implode(',', array_fill(0, count($types), '?'));
+            $preparedQueryString = '
+                SELECT * FROM '.$gw2i_db_prefix.'verification_log 
+                ' . (isset($newerThan) ? 'WHERE timestamp >= NOW() - INTERVAL ? SECOND' : "").' ORDER BY timestamp DESC, rid ASC LIMIT ? OFFSET ?';
+        }
+        
+        $queryParams = $types;
+        
+        if(isset($newerThan)){
+            $queryParams[] = $newerThan;
+        }
+        
+        $queryParams[] = $limit;
+        $queryParams[] = $offset;
+        
+        $preparedStatement = Persistence::getDBEngine()->prepare($preparedQueryString);
+        
+        $preparedStatement->execute($queryParams);
+        
+        return $preparedStatement->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    
 }

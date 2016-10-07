@@ -131,6 +131,15 @@ THE SOFTWARE.
     margin-left: 6px;
     display: none;
 }
+
+.compact-mdl-table tr{
+    height: 10px !important;
+}
+.compact-mdl-table td{
+    height: 10px;
+    padding: 5px;
+}
+
 .gw2i-notification {
     background-color: green;
 }

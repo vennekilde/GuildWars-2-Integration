@@ -3,8 +3,6 @@
 use GW2Integration\API\APIBatchProcessor;
 use GW2Integration\API\APIKeyManager;
 use GW2Integration\API\APIKeyProcessor;
-use GW2Integration\Utils\GW2DataFieldConverter;
-use GW2Integration\Controller\LinkedUserController;
 use GW2Integration\Controller\ServiceSessionController;
 use GW2Integration\Entity\LinkedUser;
 use GW2Integration\Entity\UserServiceLink;
@@ -14,6 +12,8 @@ use GW2Integration\Persistence\Helper\GW2DataPersistence;
 use GW2Integration\Persistence\Helper\LinkingPersistencyHelper;
 use GW2Integration\Persistence\Helper\SettingsPersistencyHelper;
 use GW2Integration\Persistence\Helper\StatisticsPersistence;
+use GW2Integration\Persistence\Helper\VerificationEventPersistence;
+use GW2Integration\Utils\GW2DataFieldConverter;
 use function GuzzleHttp\json_encode;
 
 /* 
@@ -173,6 +173,16 @@ switch($form){
         } else {
             $result["error"] = "Missing Input";
         }
+        break;
+        
+        
+        
+    case "event-log":
+        $rowsPerPage = 30;
+        $offset = $rowsPerPage * ($formData["page"] - 1);
+        $events = VerificationEventPersistence::getVerificationEvents(null, null, $rowsPerPage, $offset);
+        $result["events"] = $events;
+            
         break;
         
         

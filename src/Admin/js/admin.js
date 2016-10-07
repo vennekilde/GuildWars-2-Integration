@@ -23,6 +23,12 @@
  */
 
 $(document).ready(function () {
+    //Add tag for determining button clicked when submitting a form
+    $("form button[type=submit]").click(function() {
+        $("button[type=submit]", $(this).parents("form")).removeAttr("clicked");
+        $(this).attr("clicked", "true");
+    });
+    
     //initialize ajax forms
     $('.default-admin-form').submit(function (ev) {
         form = $(this);
@@ -35,6 +41,7 @@ $(document).ready(function () {
         } else {
             data = "form=" + formName;
         }
+        
         console.log(data);
         startSpinner(form);
         $.ajax({
@@ -110,6 +117,74 @@ $(document).ready(function () {
         console.log(data);
         startSpinner(form);
         fetchStatisticsChart(form, data);
+    });
+
+    $('.verification-event-admin-form').submit(function (ev) {
+        form = $(this);
+        ev.preventDefault();
+
+        var data = form.serialize();
+        var formName = form.attr("name");
+        if (data) {
+            data += "&form=" + formName;
+        } else {
+            data = "form=" + formName;
+        }
+        
+        var submitElement = $("button[type=submit][clicked=true]");
+        if(submitElement !== undefined){
+            var name = submitElement.attr("name");
+            if (data) {
+                data += "&"+name;
+            } else {
+                data = name;
+            }
+        }
+        
+        console.log(data);
+        startSpinner(form);
+        
+        $.ajax({
+            type: form.attr('method'),
+            url: form.attr('action'),
+            data: data,
+            success: function (response) {
+                stopSpinner(form);
+                console.log(response);
+                console.log("success");
+                $("#verification-events-tbody").empty();
+                var json = JSON.parse(response)
+                var div = form.find(".response-div");
+                var html = "";
+                if (json["data"] !== false && json["data"]["events"] !== undefined) {
+                    var events = json["data"]["events"];
+                    for (var key in events) {
+                        console.log(events[key]);
+                        var entry = '\
+                        <tr>\
+                            <td class="mdl-data-table__cell--non-numeric">'+events[key]["link_id"]+'</td>\
+                            <td class="mdl-data-table__cell--non-numeric">Not Implemented</td>\
+                            <td class="mdl-data-table__cell--non-numeric">Not Implemented</td>\
+                            <td class="mdl-data-table__cell--non-numeric">Not Implemented</td>\
+                            <td class="mdl-data-table__cell--non-numeric">'+events[key]["timestamp"]+'</td>\
+                            <td class="mdl-data-table__cell--non-numeric">'+parseVerificationEventType(events[key]["event"])+'</td>\
+                            <td class="mdl-data-table__cell--non-numeric">'+parseVerificationEventData(events[key]["event"], events[key]["value"])+'</td>\
+                        </tr>';
+                        $("#verification-events-tbody").append(entry);
+                    }
+                } else {
+                    html = "No results found";
+                }
+                div.html(html);
+                div.show();
+                adjustHeight();
+            },
+            error: function (response) {
+                console.log("error");
+                console.log(response);
+                stopSpinner(form);
+            }
+        });
     });
 
     //Auto resize if within an IFrame
@@ -217,4 +292,33 @@ function fetchStatisticsChart(form, data) {
             stopSpinner(form);
         }
     });
+}
+
+function parseVerificationEventData(eventType, eventData){
+    var parsedData;
+    switch(eventType){
+        case 0:
+            var worlds = eventData.split(",");
+            fromWorld = (!worlds[0] || 0 === worlds[0].length) ? "" : getWorldNameFromId(worlds[0]);
+            toWorld = getWorldNameFromId(worlds[1]);
+            parsedData = fromWorld + " -> "+toWorld;
+            break;
+        default:
+            parsedData = eventData;
+            break;
+    }
+    return parsedData;
+}
+
+function parseVerificationEventType(eventType){
+    var parsedEvent;
+    switch(eventType){
+        case 0:
+            parsedEvent = "World Moved";
+            break;
+        default:
+            parsedEvent = eventType;
+            break;
+    }
+    return parsedEvent;
 }

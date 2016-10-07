@@ -165,13 +165,14 @@ $(document).ready(function () {
                             <td class="mdl-data-table__cell--non-numeric">'+events[key]["link_id"]+'</td>\
                             <td class="mdl-data-table__cell--non-numeric">'+(events[key]["username"] !== null ? events[key]["username"] : "Not linked")+'</td>';
                         
+                        serviceNames = json["data"]["services"];
                         $.each(json["data"]["services"], function(serviceId){
                             var displayName = (events[key]["services"] !== undefined && events[key]["services"][serviceId] !== undefined) ? events[key]["services"][serviceId] : "Not linked";
                             entry += '<td class="mdl-data-table__cell--non-numeric">'+displayName+'</td>';
                         });
                         
                         entry += '<td class="mdl-data-table__cell--non-numeric">'+events[key]["timestamp"]+'</td>\
-                            <td class="mdl-data-table__cell--non-numeric">'+parseVerificationEventType(events[key]["event"])+'</td>\
+                            <td class="mdl-data-table__cell--non-numeric">'+parseVerificationEventType(events[key]["event"], events[key]["value"])+'</td>\
                             <td class="mdl-data-table__cell--non-numeric">'+parseVerificationEventData(events[key]["event"], events[key]["value"])+'</td>\
                         </tr>';
                         $("#verification-events-tbody").append(entry);
@@ -315,6 +316,28 @@ function parseVerificationEventData(eventType, eventData){
             toWorld = getWorldNameFromId(worlds[1]);
             parsedData = fromWorld + " -> "+toWorld;
             break;
+        case 1:
+            if(eventData === 0){
+                parsedData = "Revoked";
+            } else if(eventData === 1){
+                parsedData = "Granted";
+            } else {
+                parsedData = eventData;
+            }
+            break;
+        case 2:
+            if(eventData === 0){
+                parsedData = "Refreshed";
+            } else if(eventData === 1){
+                parsedData = "Expired";
+            } else {
+                parsedData = eventData;
+            }
+            break;
+        case 3:
+            var split = eventData.split(",");
+            parsedData = "Group Id: "+split[1];
+            break;
         default:
             parsedData = eventData;
             break;
@@ -322,11 +345,21 @@ function parseVerificationEventData(eventType, eventData){
     return parsedData;
 }
 
-function parseVerificationEventType(eventType){
+function parseVerificationEventType(eventType, eventData){
     var parsedEvent;
     switch(eventType){
         case 0:
             parsedEvent = "World Moved";
+            break;
+        case 1:
+            parsedEvent = "Temporary Access";
+            break;
+        case 2:
+            parsedEvent = "GW2 Data";
+            break;
+        case 3:
+            var split = eventData.split(",");
+            parsedEvent = serviceNames[split[0]] + " Group "+(split[2] === "1" ? "Added" : "Removed");
             break;
         default:
             parsedEvent = eventType;

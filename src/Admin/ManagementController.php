@@ -203,7 +203,12 @@ switch($form){
             }
         }
         
-        $result["services"] = array_keys($gw2i_linkedServices);
+        $serviceList = array();
+        foreach($gw2i_linkedServices as $serviceId => $service){
+            $serviceList[$serviceId] = $service->getName();
+        }
+        
+        $result["services"] = $serviceList;
         $result["events"] = $events;
             
         break;

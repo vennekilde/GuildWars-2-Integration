@@ -32,6 +32,7 @@ use GW2Integration\Events\Events\APISyncCompleted;
 use GW2Integration\Events\Events\UserServiceLinkEvent;
 use GW2Integration\LinkedServices\SMF\SimpleMachinesForum;
 use GW2Integration\Modules\Verification\AbstractVerificationModule;
+use GW2Integration\Persistence\Helper\VerificationEventPersistence;
 use GW2Integration\Persistence\Persistence;
 use PDO;
  
@@ -165,7 +166,7 @@ class SimpleMachinesForumVerification extends AbstractVerificationModule{
         for($i = 0; $i < count($members); $i++){
             $userId = $members[$i];
             $linkId = $linkIds[$i];
-            //StatisticsAndLoggingPersistenceHelper::persistVerificationEvent($linkId, 1, $groupId.",1");
+            VerificationEventPersistence::persistVerificationEvent($linkId, VerificationEventPersistence::SERVICE_GROUP_EVENT, $this->getServiceId().",".$groupId.",1");
             $logger->info("Added user \"$userId\" with link-id \"$linkId\" to SMF User Group $groupId");
         }
     }
@@ -239,7 +240,7 @@ class SimpleMachinesForumVerification extends AbstractVerificationModule{
             foreach($groups AS $groupId){
                 $userId = $members[$i];
                 $linkId = $linkIds[$i];
-                //StatisticsAndLoggingPersistenceHelper::persistVerificationEvent($linkId, 1, $groupId.",0");
+                VerificationEventPersistence::persistVerificationEvent($linkId, VerificationEventPersistence::SERVICE_GROUP_EVENT, $this->getServiceId().",".$groupId.",0");
                 $logger->info("Removed user \"$userId\" with link-id \"$linkId\" from SMF User Group $groupId");
             }
         }

@@ -196,16 +196,24 @@ $(document).ready(function () {
         adjustHeight();
     });
     
-    //Retrieve the latest log
-    $("#fetch-latest-log-btn").click();
     
-    var fetchedOnce = false;
+    var fetchedOnceTab6 = false;
     $("#tab6-link").on("click" ,function(){
         //Retrieve charts
-        if(!fetchedOnce){
+        if(!fetchedOnceTab6){
             $("#update-world-dist-btn").click();
             $("#update-api-stats-btn").click();
-            fetchedOnce = true;
+            fetchedOnceTab6 = true;
+        }
+    });
+    var fetchedOnceTab5 = false;
+    $("#tab5-link").on("click" ,function(){
+        //Retrieve charts
+        if(!fetchedOnceTab5){
+            //Retrieve the latest log
+            $("#fetch-latest-log-btn").click();
+            $("#update-verification-events-btn").click();
+            fetchedOnceTab5 = true;
         }
     });
 });

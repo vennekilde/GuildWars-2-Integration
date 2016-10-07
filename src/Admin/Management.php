@@ -358,7 +358,7 @@ require_once __DIR__ . "/RestrictAdminPanel.php";
                                 </tbody>
                             </table>
                             <br />
-                            <button name="update" type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner">
+                            <button id="update-verification-events-btn" name="update" type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner">
                                 Update
                             </button>
                             <button name="newer" type="submit" onclick="prevPage($('#ve-page-input'))" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner" style="margin-left: 10px;">

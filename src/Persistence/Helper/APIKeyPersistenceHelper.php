@@ -116,7 +116,7 @@ class APIKeyPersistenceHelper {
                 SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_EXPIRATION_TIME)
             ));
             
-            if($prevAPIData !== false && isset($prevAPIData)){
+            if($pq->rowCount() > 0){
                 $event = new GW2AccountDataRefreshedEvent($linkId);
                 EventManager::fireEvent($event);
             }
@@ -172,13 +172,13 @@ class APIKeyPersistenceHelper {
         if($checkIfExpired){
             $pqs = 'SELECT * FROM '.$gw2i_db_prefix.'api_keys WHERE api_key = ? AND last_success <= last_attempted_fetch - INTERVAL ? SECOND';
             $pq = Persistence::getDBEngine()->prepare($pqs);
-            $isExpired = $pq->execute(array(
+            $expiredData = $pq->execute(array(
                 $apiKey,
                 SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_EXPIRATION_TIME)
             ));
             
-            if($isExpired !== false && isset($isExpired)){
-                $event = new GW2AccountDataExpiredEvent($isExpired["link_id"]);
+            if($pq->rowCount() > 0){
+                $event = new GW2AccountDataExpiredEvent($expiredData["link_id"]);
                 EventManager::fireEvent($event);
             }
         }

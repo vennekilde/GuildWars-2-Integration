@@ -109,7 +109,7 @@ class APIKeyPersistenceHelper {
         $linkId = LinkingPersistencyHelper::determineLinkedUserId($linkedUser);
         
         if($checkIfAccessRegained){
-            $pqs = 'SELECT * FROM '.$gw2i_db_prefix.'api_key WHERE link_id = ? AND last_success <= last_attempted_fetch - INTERVAL ? SECOND';
+            $pqs = 'SELECT * FROM '.$gw2i_db_prefix.'api_keys WHERE link_id = ? AND last_success <= last_attempted_fetch - INTERVAL ? SECOND';
             $pq = Persistence::getDBEngine()->prepare($pqs);
             $prevAPIData = $pq->execute(array(
                 $linkId,

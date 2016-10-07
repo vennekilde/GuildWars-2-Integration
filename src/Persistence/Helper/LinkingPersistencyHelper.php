@@ -243,6 +243,25 @@ class LinkingPersistencyHelper {
         return $result;
     }
     
+    /**
+     * 
+     * @param int[] $linkIds
+     */
+    public static function getServiceLinksForLinkedIds($linkIds){
+        global $gw2i_db_prefix;
+        
+        $inQuery = implode(',', array_fill(0, count($linkIds), '?'));
+        
+        $preparedQueryString = 'SELECT * FROM '.$gw2i_db_prefix.'user_service_links WHERE link_id IN('.$inQuery.')';
+        
+        $values = $linkIds;
+        
+        $preparedStatement = Persistence::getDBEngine()->prepare($preparedQueryString);
+        $preparedStatement->execute($values);
+        $result = $preparedStatement->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+    
     public static function getLinkEventsFromNewLink(UserServiceLink $userServiceLink){
         $affectedLinks = static::getAffectedLinksFromNewLink($userServiceLink);
         $events = array();

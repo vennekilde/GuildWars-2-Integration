@@ -181,6 +181,29 @@ switch($form){
         $rowsPerPage = 30;
         $offset = $rowsPerPage * ($formData["page"] - 1);
         $events = VerificationEventPersistence::getVerificationEvents(null, null, $rowsPerPage, $offset);
+        
+        $linkIds = array();
+        foreach($events AS $event){
+            $linkIds[] = $event["link_id"];
+        }
+        $serviceLinksForLinkedIds = LinkingPersistencyHelper::getServiceLinksForLinkedIds($linkIds);
+        
+        global $gw2i_linkedServices;
+        foreach($events as $key => $event){
+            foreach($serviceLinksForLinkedIds as $serviceLink){
+                if($serviceLink["link_id"] == $event["link_id"]){
+                    $serviceId = $serviceLink["service_id"];
+                    $userId = $serviceLink["service_user_id"];
+                    $displayName = $serviceLink["service_display_name"];
+                    if(!isset($events[$key]["services"])){
+                        $events[$key]["services"] = array();
+                    }
+                    $events[$key]["services"][$serviceId] = $displayName . " ($userId)";
+                }
+            }
+        }
+        
+        $result["services"] = array_keys($gw2i_linkedServices);
         $result["events"] = $events;
             
         break;

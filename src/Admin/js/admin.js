@@ -162,11 +162,14 @@ $(document).ready(function () {
                         console.log(events[key]);
                         var entry = '\
                         <tr>\
-                            <td class="mdl-data-table__cell--non-numeric">'+events[key]["link_id"]+'</td>\
-                            <td class="mdl-data-table__cell--non-numeric">Not Implemented</td>\
-                            <td class="mdl-data-table__cell--non-numeric">Not Implemented</td>\
-                            <td class="mdl-data-table__cell--non-numeric">Not Implemented</td>\
-                            <td class="mdl-data-table__cell--non-numeric">'+events[key]["timestamp"]+'</td>\
+                            <td class="mdl-data-table__cell--non-numeric">'+events[key]["link_id"]+'</td>';
+                        
+                        $.each(json["data"]["services"], function(serviceId){
+                            var displayName = (events[key]["services"] !== undefined && events[key]["services"][serviceId] !== undefined) ? events[key]["services"][serviceId] : "Not linked";
+                            entry += '<td class="mdl-data-table__cell--non-numeric">'+displayName+'</td>';
+                        });
+                        
+                        entry += '<td class="mdl-data-table__cell--non-numeric">'+events[key]["timestamp"]+'</td>\
                             <td class="mdl-data-table__cell--non-numeric">'+parseVerificationEventType(events[key]["event"])+'</td>\
                             <td class="mdl-data-table__cell--non-numeric">'+parseVerificationEventData(events[key]["event"], events[key]["value"])+'</td>\
                         </tr>';

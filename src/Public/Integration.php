@@ -89,7 +89,7 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                         <?php
                             foreach($gw2i_linkedServices AS $linkedService){
 
-                                $isAvailable = $linkedService->canDetermineLinkDuringSetup() ? true : isset($linkedUser->getPrimaryUserServiceLinks()[$linkedService->getServiceId()]);
+                                $isAvailable = $linkedService->canDetermineLinkDuringSetup() ? true : (isset($linkedUser) && isset($linkedUser->getPrimaryUserServiceLinks()[$linkedService->getServiceId()]));
 
                                 echo'<div class="linked-service-container"><label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="checkbox-'.$linkedService->getServiceId().'">
                                         <input type="checkbox" id="checkbox-'.$linkedService->getServiceId().'" class="mdl-checkbox__input" '.($isAvailable ? "checked" : "disabled").'>

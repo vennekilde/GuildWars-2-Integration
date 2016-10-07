@@ -159,7 +159,6 @@ $(document).ready(function () {
                 if (json["data"] !== false && json["data"]["events"] !== undefined) {
                     var events = json["data"]["events"];
                     for (var key in events) {
-                        console.log(events[key]);
                         var entry = '\
                         <tr>\
                             <td class="mdl-data-table__cell--non-numeric">'+events[key]["link_id"]+'</td>\

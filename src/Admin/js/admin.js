@@ -54,9 +54,11 @@ $(document).ready(function () {
                         html += "<h5 style='text-transform: uppercase'>" + key.replace(/\-/g, " ") + "</h5>";
                         if (typeof data[key] === 'object') {
                             html += JSON.stringify(data[key], null, 4);
+                        } else if(data[key] === false) {
+                            html += "Not available";
                         } else {
                             var str = data[key].replace(/\</g, "&lt;");
-                            html = str.replace(/\>/g, "&gt;");
+                            html += str.replace(/\>/g, "&gt;");
                         }
                     }
                 } else {

@@ -166,7 +166,7 @@ class SimpleMachinesForumVerification extends AbstractVerificationModule{
         for($i = 0; $i < count($members); $i++){
             $userId = $members[$i];
             $linkId = $linkIds[$i];
-            VerificationEventPersistence::persistVerificationEvent($linkId, VerificationEventPersistence::SERVICE_GROUP_EVENT, $this->getServiceId().",".$groupId.",1");
+            VerificationEventPersistence::persistVerificationEvent($linkId, VerificationEventPersistence::SERVICE_GROUP_EVENT, SimpleMachinesForum::serviceId.",".$groupId.",1");
             $logger->info("Added user \"$userId\" with link-id \"$linkId\" to SMF User Group $groupId");
         }
     }

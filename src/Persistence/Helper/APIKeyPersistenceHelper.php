@@ -73,7 +73,7 @@ class APIKeyPersistenceHelper {
         
         $apiKeys->execute($queryParams);
         
-        return $apiKeys;
+        return $apiKeys->fetchAll(PDO::FETCH_ASSOC);
     }
     
     public static function getAPIKey($linkedUser, $ignoreExpired = true){
@@ -111,7 +111,7 @@ class APIKeyPersistenceHelper {
         if($checkIfAccessRegained){
             $pqs = 'SELECT * FROM '.$gw2i_db_prefix.'api_keys WHERE link_id = ? AND last_success <= last_attempted_fetch - INTERVAL ? SECOND';
             $pq = Persistence::getDBEngine()->prepare($pqs);
-            $prevAPIData = $pq->execute(array(
+            $pq->execute(array(
                 $linkId,
                 SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_EXPIRATION_TIME)
             ));
@@ -120,6 +120,7 @@ class APIKeyPersistenceHelper {
                 $event = new GW2AccountDataRefreshedEvent($linkId);
                 EventManager::fireEvent($event);
             }
+            $pq->closeCursor();
         }
         
         $preparedQueryString = '
@@ -172,12 +173,14 @@ class APIKeyPersistenceHelper {
         if($checkIfExpired){
             $pqs = 'SELECT * FROM '.$gw2i_db_prefix.'api_keys WHERE api_key = ? AND last_success <= last_attempted_fetch - INTERVAL ? SECOND';
             $pq = Persistence::getDBEngine()->prepare($pqs);
-            $expiredData = $pq->execute(array(
+            $pq->execute(array(
                 $apiKey,
                 SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_EXPIRATION_TIME)
             ));
             
             if($pq->rowCount() > 0){
+                $expiredData = $pq->fetch(PDO::FETCH_ASSOC);
+                $pq->closeCursor();
                 $event = new GW2AccountDataExpiredEvent($expiredData["link_id"]);
                 EventManager::fireEvent($event);
             }
@@ -244,7 +247,7 @@ class APIKeyPersistenceHelper {
 
         $apiKeys->execute($queryParams);
         
-        return $apiKeys;
+        return $apiKeys->fetchAll(PDO::FETCH_ASSOC);
     }
     
     public static function cleanupDatabase(){

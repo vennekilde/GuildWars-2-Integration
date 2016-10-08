@@ -359,6 +359,28 @@ require_once __DIR__ . "/RestrictAdminPanel.php";
                                 </tbody>
                             </table>
                             <br />
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                <input class="mdl-textfield__input" type="text" name="search-user-id" id="ve-search-user-id">
+                                <label class="mdl-textfield__label" for="ve-search-user-id">User Identification</label>
+                            </div>
+                            <br />
+                            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="ve-checkbox-link-id">
+                                <input type="radio" name="search-service" id="ve-checkbox-link-id" class="mdl-radio__button" value="link-id">
+                                <span class="mdl-radio__label">Universal User Id</span>
+                            </label>
+                            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="ve-checkbox-account-name">
+                                <input type="radio" name="search-service" id="ve-checkbox-account-name" class="mdl-radio__button" value="account-name">
+                                <span class="mdl-radio__label">Account Name</span>
+                            </label>
+                            <?php
+                                foreach ($gw2i_linkedServices AS $linkedService) {
+                                    echo'   <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="ve-checkbox-' . $linkedService->getServiceId() . '">
+                                                <input type="radio" name="search-service" id="ve-checkbox-' . $linkedService->getServiceId() . '" class="mdl-radio__button" name="options" value="' . $linkedService->getServiceId() . '">
+                                                <span class="mdl-radio__label">' . $linkedService->getName() . '</span>
+                                            </label>';
+                                }
+                            ?>
+                            <br /><br />
                             <button id="update-verification-events-btn" name="update" type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner">
                                 Update
                             </button>

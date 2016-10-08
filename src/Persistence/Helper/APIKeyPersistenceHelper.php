@@ -120,7 +120,7 @@ class APIKeyPersistenceHelper {
                 $event = new GW2AccountDataRefreshedEvent($linkId);
                 EventManager::fireEvent($event);
             }
-            $pq->closeCursor();
+            unset($pq);
         }
         
         $preparedQueryString = '
@@ -180,7 +180,7 @@ class APIKeyPersistenceHelper {
             
             if($pq->rowCount() > 0){
                 $expiredData = $pq->fetch(PDO::FETCH_ASSOC);
-                $pq->closeCursor();
+                unset($pq);
                 $event = new GW2AccountDataExpiredEvent($expiredData["link_id"]);
                 EventManager::fireEvent($event);
             }

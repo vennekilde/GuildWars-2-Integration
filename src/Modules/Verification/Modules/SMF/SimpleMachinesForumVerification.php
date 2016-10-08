@@ -86,7 +86,7 @@ class SimpleMachinesForumVerification extends AbstractVerificationModule{
         $pq->execute(array($userId));
         
         $result = $pq->fetchAll(PDO::FETCH_NUM);
-        $pq->closeCursor();
+        unset($pq);
         
         if(is_array($result)){
             $incorrectGroupingsLinkIds = array();
@@ -99,7 +99,7 @@ class SimpleMachinesForumVerification extends AbstractVerificationModule{
 
             foreach($incorrectGroupingsMemberIds AS $groupId => $memberIds){
                 $linkIds = array_values($incorrectGroupingsLinkIds[$groupId]);
-                $this->removeUsersFromForumUserGroup($linkIds, $memberIds, array($groupId));
+                static::removeUsersFromForumUserGroup($linkIds, $memberIds, array($groupId));
             }
         }
     }
@@ -111,7 +111,7 @@ class SimpleMachinesForumVerification extends AbstractVerificationModule{
         $pq->execute(array($userId));
         
         $result = $pq->fetchAll(PDO::FETCH_NUM);
-        $pq->closeCursor();
+        unset($pq);
         
         if(is_array($result)){
             $missingGroupingsLinkIds = array();
@@ -123,7 +123,7 @@ class SimpleMachinesForumVerification extends AbstractVerificationModule{
 
             foreach($missingGroupingsMemberIds AS $groupId => $memberIds){
                 $linkIds = array_values($missingGroupingsLinkIds[$groupId]);
-                $this->addUsersToForumUserGroup($linkIds, $memberIds, $groupId);
+                static::addUsersToForumUserGroup($linkIds, $memberIds, $groupId);
             }
         }
     }

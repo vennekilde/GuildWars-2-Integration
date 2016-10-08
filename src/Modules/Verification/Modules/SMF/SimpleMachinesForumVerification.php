@@ -86,7 +86,7 @@ class SimpleMachinesForumVerification extends AbstractVerificationModule{
         $pq->execute(array($userId));
         
         $result = $pq->fetchAll(PDO::FETCH_NUM);
-        
+        $pq->closeCursor();
         if(is_array($result)){
             $incorrectGroupingsLinkIds = array();
             $incorrectGroupingsMemberIds = array();
@@ -110,6 +110,7 @@ class SimpleMachinesForumVerification extends AbstractVerificationModule{
         $pq->execute(array($userId));
         
         $result = $pq->fetchAll(PDO::FETCH_NUM);
+        $pq->closeCursor();
         
         if(is_array($result)){
             $missingGroupingsLinkIds = array();

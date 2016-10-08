@@ -240,7 +240,7 @@ class SimpleMachinesForumVerification extends AbstractVerificationModule{
             foreach($groups AS $groupId){
                 $userId = $members[$i];
                 $linkId = $linkIds[$i];
-                VerificationEventPersistence::persistVerificationEvent($linkId, VerificationEventPersistence::SERVICE_GROUP_EVENT, $this->getServiceId().",".$groupId.",0");
+                VerificationEventPersistence::persistVerificationEvent($linkId, VerificationEventPersistence::SERVICE_GROUP_EVENT, SimpleMachinesForum::serviceId.",".$groupId.",0");
                 $logger->info("Removed user \"$userId\" with link-id \"$linkId\" from SMF User Group $groupId");
             }
         }

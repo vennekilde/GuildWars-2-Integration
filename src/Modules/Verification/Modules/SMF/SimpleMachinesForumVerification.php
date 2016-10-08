@@ -163,8 +163,6 @@ class SimpleMachinesForumVerification extends AbstractVerificationModule{
                 'id_group_string_extend' => ',' . $groupId,
             )
         );
-        //Cleanup
-         $smcFunc['db_free_result']($request);
          
         //Logging
         for($i = 0; $i < count($members); $i++){
@@ -196,7 +194,7 @@ class SimpleMachinesForumVerification extends AbstractVerificationModule{
          
         // Taken from Subs-Membergroups.php line 372
         // First, reset those who have this as their primary group - this is the easy one.
-        $request = $smcFunc['db_query']('', '
+        $smcFunc['db_query']('', '
             UPDATE {db_prefix}members
             SET id_group = {int:regular_member}
             WHERE id_group IN ({array_int:group_list})
@@ -207,8 +205,6 @@ class SimpleMachinesForumVerification extends AbstractVerificationModule{
                 'regular_member' => 0,
             )
         );
-        //Cleanup
-         $smcFunc['db_free_result']($request);
 
         // Those who have it as part of their additional group must be updated the long way... sadly.
         $request = $smcFunc['db_query']('', '
@@ -230,7 +226,7 @@ class SimpleMachinesForumVerification extends AbstractVerificationModule{
         $smcFunc['db_free_result']($request);
 
         foreach ($updates as $additional_groups => $memberArray){
-            $request = $smcFunc['db_query']('', '
+            $smcFunc['db_query']('', '
                 UPDATE {db_prefix}members
                 SET additional_groups = {string:additional_groups}
                 WHERE id_member IN ({array_int:member_list})',
@@ -239,8 +235,6 @@ class SimpleMachinesForumVerification extends AbstractVerificationModule{
                     'additional_groups' => implode(',', array_diff(explode(',', $additional_groups), $groups)),
                 )
             );
-            //Cleanup
-             $smcFunc['db_free_result']($request);
         }
          
         //Logging

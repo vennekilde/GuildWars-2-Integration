@@ -218,9 +218,10 @@ class APIKeyPersistenceHelper {
     public static function updateTemporaryAccessLastFetch(){
         global $gw2i_db_prefix;
         $queryParams = array(
+            SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_EXPIRATION_TIME),
             SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_EXPIRATION_TIME)
         );
-        $preparedQueryString = 'UPDATE '.$gw2i_db_prefix.'api_keys SET last_attempted_fetch = NOW() WHERE api_key_permissions = "'.VerificationController::TEMPORARY_API_KEY_PERMISSIONS.'" AND last_success <= last_attempted_fetch - INTERVAL ? SECOND';
+        $preparedQueryString = 'UPDATE '.$gw2i_db_prefix.'api_keys SET last_attempted_fetch = NOW() WHERE api_key_permissions = "'.VerificationController::TEMPORARY_API_KEY_PERMISSIONS.'" AND last_success <= NOW() - INTERVAL ? SECOND AND last_success > last_attempted_fetch - INTERVAL ? SECOND';
         
         $preparedStatement = Persistence::getDBEngine()->prepare($preparedQueryString);
 

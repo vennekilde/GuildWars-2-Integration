@@ -130,8 +130,6 @@ class VerificationController {
 
     /**
      * 
-     * @global type $gw2i_home_world
-     * @global type $gw2i_linked_worlds
      * @param LinkedUser $linkedUser
      * @param type $extensiveAccountData
      * @param boolean $fetchServiceLinks
@@ -145,7 +143,6 @@ class VerificationController {
         }
         //Make sure data was actually provided
         if ($extensiveAccountData !== false && $extensiveAccountData !== null) {
-            global $gw2i_home_world, $gw2i_linked_worlds;
             
             //Determine if access is temporary
             $temporary = $extensiveAccountData["api_key_name"] === self::TEMPORARY_API_KEY_NAME;
@@ -164,7 +161,7 @@ class VerificationController {
                 $result = new VerificationStatus(VerificationStatus::ACCESS_DENIED_EXPIRED);
                 
             //Home world access
-            } else if ($gw2i_home_world == $extensiveAccountData["a_world"]) {
+            } else if (SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::HOME_WORLD) == $extensiveAccountData["a_world"]) {
                 if ($temporary) {
                     $result = new VerificationStatus(VerificationStatus::ACCESS_GRANTED_HOME_WORLD_TEMPORARY);
                     $result->setExpires($expiresIn);
@@ -173,7 +170,7 @@ class VerificationController {
                 }
 
                 //Linked world access
-            } else if (in_array($extensiveAccountData["a_world"], $gw2i_linked_worlds)) {
+            } else if (in_array($extensiveAccountData["a_world"], explode (",", SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::LINKED_WORLDS)))) {
                 if ($temporary) {
                     $result = new VerificationStatus(VerificationStatus::ACCESS_GRANTED_LIMKED_WORLD_TEMPORARY);
                     $result->setExpires($expiresIn);

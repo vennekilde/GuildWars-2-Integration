@@ -48,6 +48,9 @@ class SettingsPersistencyHelper {
     const STRICT_API_KEY_NAME = "strict_api_key_name";
     const API_KEY_NAME_PREFIX = "api_key_name_prefix";
     const ACCOUNT_LEVEL_REQUIREMENT = "account_level_requirement";
+    const SETUP_WEB_PATH = "setup_web_path";
+    const HOME_WORLD = "home_world";
+    const LINKED_WORLDS = "linked_words";
     
     
     public static $visibleSettings = array(
@@ -61,6 +64,13 @@ class SettingsPersistencyHelper {
             self::API_KEY_NAME_PREFIX,
             self::ACCOUNT_LEVEL_REQUIREMENT,
             self::TEMPORARY_ACCESS_EXPIRATION
+        ),
+        "WvW" => array(
+            self::HOME_WORLD,
+            self::LINKED_WORLDS
+        ),
+        "MISC" => array(
+            self::SETUP_WEB_PATH
         )
     );
     

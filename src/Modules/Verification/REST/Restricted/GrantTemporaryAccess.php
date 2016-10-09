@@ -4,6 +4,7 @@ require __DIR__.'/../../../../REST/RestrictedRESTHelper.php';
 
 use GW2Integration\Entity\LinkedUser;
 use GW2Integration\Modules\Verification\VerificationController;
+use GW2Integration\Persistence\Helper\SettingsPersistencyHelper;
 use function GuzzleHttp\json_encode;
 
 /* 
@@ -20,11 +21,12 @@ if(isset($_REQUEST["world"])){
     $world = $_REQUEST["world"];
 } else if(isset($_REQUEST["accesstype"])) {
     if($_REQUEST["accesstype"] === "HOME_SERVER"){
-        global $gw2i_home_world;
-        $world = $gw2i_home_world;
+        $world = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::HOME_WORLD);
     } else if($_REQUEST["accesstype"] === "LINKED_SERVER"){
-        global $gw2i_linked_worlds;
-        $world = $gw2i_linked_worlds[0];
+        $linked_worlds = explode(",", SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::LINKED_WORLDS));
+        if(!empty($linked_worlds)){
+            $world = $linked_worlds[0];
+        }
     }
 }
 if(isset($_REQUEST["user-id"]) && isset($_REQUEST["service-id"]) && (isset($world))){

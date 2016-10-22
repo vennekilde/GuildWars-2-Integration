@@ -123,7 +123,7 @@ class VerificationController {
         LinkingPersistencyHelper::removeAttributeFromAllUserLinks($linkedUser, "tempExpired");
         
         $logger->info($linkedUser->compactString() . " Has been granted temporary access as world $world");
-        if(strtotime($accountData["last_success"]) <= strtotime($accountData["last_attempted_fetch"]) - SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_EXPIRATION_TIME)){
+        if(isset($accountData["last_success"]) && strtotime($accountData["last_success"]) <= strtotime($accountData["last_attempted_fetch"]) - SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_EXPIRATION_TIME)){
             VerificationEventPersistence::persistVerificationEvent($linkedUser, VerificationEventPersistence::TEMPORARY_ACCESS_EVENT, 1);
         }
     }

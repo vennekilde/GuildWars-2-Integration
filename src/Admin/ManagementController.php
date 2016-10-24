@@ -128,13 +128,18 @@ switch($form){
     
     case "gen-user-session":
         if(isset($formData["gen-session-user-id"]) && isset($formData["gen-session-user-ip"]) && isset($formData["gen-service"])) {
+            
+            $baseURL = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::SETUP_WEB_PATH);
+            
             $sessionHash = ServiceSessionController::createServiceSession(
                     $formData["gen-session-user-id"], 
                     $formData["gen-service"], 
                     $formData["gen-session-user-ip"], 
                     null, 
                     isset($formData["is-primary"]));
-            $result["session-url"] = $sessionHash;
+            
+            $url = $baseURL . (parse_url($baseURL, PHP_URL_QUERY) ? '&' : '?') . 'ls-sessions='.$sessionHash;
+            $result["session-url"] = $url;
         } else {
             $result["error"] = "Missing Input";
         }

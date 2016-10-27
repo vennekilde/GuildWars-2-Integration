@@ -5,7 +5,6 @@ use GW2Integration\Persistence\Helper\SettingsPersistencyHelper;
 use GW2Integration\REST\RESTHelper;
 
 require_once __DIR__ . "/RestrictAdminPanel.php";
-
 ?>
 
 <!-- Material Icons -->
@@ -278,6 +277,11 @@ require_once __DIR__ . "/RestrictAdminPanel.php";
                             <label class="mdl-textfield__label" for="ban-attr-value">User Attribute</label>
                         </div>
                         <br />
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable" style="width: 100%">
+                            <textarea class="mdl-textfield__input" type="text" rows= "1" id="ban-reason-value" ></textarea>
+                            <label class="mdl-textfield__label" for="ban-reason-value">Reason</label>
+                        </div>
+                        <br />
 
                         <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="option-gw2-account">
                             <input type="radio" id="option-gw2-account" class="mdl-radio__button" name="options" value="gw2-account">
@@ -373,12 +377,12 @@ require_once __DIR__ . "/RestrictAdminPanel.php";
                                 <span class="mdl-radio__label">Account Name</span>
                             </label>
                             <?php
-                                foreach ($gw2i_linkedServices AS $linkedService) {
-                                    echo'   <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="ve-checkbox-' . $linkedService->getServiceId() . '">
+                            foreach ($gw2i_linkedServices AS $linkedService) {
+                                echo'   <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="ve-checkbox-' . $linkedService->getServiceId() . '">
                                                 <input type="radio" name="search-service" id="ve-checkbox-' . $linkedService->getServiceId() . '" class="mdl-radio__button" name="options" value="' . $linkedService->getServiceId() . '">
                                                 <span class="mdl-radio__label">' . $linkedService->getName() . '</span>
                                             </label>';
-                                }
+                            }
                             ?>
                             <br /><br />
                             <button id="update-verification-events-btn" name="update" type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner">
@@ -437,7 +441,7 @@ require_once __DIR__ . "/RestrictAdminPanel.php";
                     <div class='secondaryheading'>
                         <h5>API Statistics</h5>
                         <p>Errors are to be expected, due to people deleting their API key, however spikes in api errors usually indicate that there is a problem with the GW2 API<br />
-                        Successes and errors should be seen in relation to each other, as the amount of keys processed very from time to time</p>
+                            Successes and errors should be seen in relation to each other, as the amount of keys processed very from time to time</p>
                         <form action='ManagementController.php' method="POST" name='get-statistics-api-calls' class="statistics-admin-form">
                             <div class="chart_div"></div>
                             <button id='update-api-stats-btn' class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner">
@@ -466,22 +470,22 @@ require_once __DIR__ . "/RestrictAdminPanel.php";
                         <form action='ManagementController.php' method="POST" name='update-settings' class="default-admin-form">
                             <?php
                             $settings = SettingsPersistencyHelper::getAllSetting();
-                            
+
                             $displaySettings = SettingsPersistencyHelper::$visibleSettings;
                             $settingCategorys = array_keys($displaySettings);
                             //Sort
-                            for($i = 1; $i < count($settingCategorys); $i++) {
+                            for ($i = 1; $i < count($settingCategorys); $i++) {
                                 $cat = $settingCategorys[$i];
-                                if(count($displaySettings[$cat]) > count($displaySettings[$settingCategorys[0]])){
+                                if (count($displaySettings[$cat]) > count($displaySettings[$settingCategorys[0]])) {
                                     $array = $displaySettings[$cat];
                                     unset($displaySettings[$cat]);
                                     $displaySettings = array_merge(array($cat => $array), $displaySettings);
                                 }
                             }
-                            
+
                             foreach ($displaySettings AS $key => $settingCategory) {
-                                echo '<div class="settings-cat"><h5>'.$key.'</h5>';
-                                foreach($settingCategory AS $settingName){
+                                echo '<div class="settings-cat"><h5>' . $key . '</h5>';
+                                foreach ($settingCategory AS $settingName) {
                                     $settingValue = isset($settings[$settingName]) ? $settings[$settingName] : "";
                                     echo '  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                                                     <input class="mdl-textfield__input" type="text" id="setting-' . $settingName . '" value="' . $settingValue . '" name="' . $settingName . '">

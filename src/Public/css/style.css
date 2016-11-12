@@ -26,6 +26,18 @@ THE SOFTWARE.
     Author     : Jeppe Boysen Vennekilde
 */
 
+@font-face {
+    font-family: 'GW2';
+    src: url('../font/GWTwoFont1p1-webfont.eot');
+    src: url('../font/GWTwoFont1p1-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../font/GWTwoFont1p1-webfont.woff2') format('woff2'),
+         url('../font/GWTwoFont1p1-webfont.woff') format('woff'),
+         url('../font/GWTwoFont1p1-webfont.ttf') format('truetype'),
+         url('../font/GWTwoFont1p1-webfont.svg#gwtwofont_version_1.1regular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
 .mdl-stepper {
     max-width: none;
     box-shadow: none;

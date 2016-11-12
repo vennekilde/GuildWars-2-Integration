@@ -27,6 +27,16 @@ $( document ).ready(function() {
         $( ".resizeable" ).resizable();
     }
     
+    $('.mdl-layout').on('mdl-componentupgraded', function(e) {
+        if ($(e.target).hasClass('mdl-layout')) {
+            adjustHeight();
+        }
+    });
+    
+    setTimeout(function(){
+        adjustHeight();
+    }, 100);
+    
     //Resize content if inside iframe, when switching tab
     $('.mdl-tabs__tab').on('click',function(){
         setTimeout(function(){
@@ -46,7 +56,13 @@ function generateAjaxPostData(){
 }
 function adjustHeight(){
     if(parent.AdjustIframeHeight !== undefined){
-        parent.AdjustIframeHeight(document.getElementById("gw2i-container").scrollHeight);
+        var newHeight = document.getElementById("gw2i-container").scrollHeight;
+        console.log(newHeight);
+//        if(newHeight <= 0) {
+//            newHeight = $(".mdl-layout__tab-panel.is-active").outerHeight() + 120;
+//            console.log(newHeight);
+//        }
+        parent.AdjustIframeHeight(newHeight + 10);
     }
 }
 function getParameterByName(name, url) {

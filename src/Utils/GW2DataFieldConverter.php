@@ -87,7 +87,7 @@ class GW2DataFieldConverter {
     );
     
     public static function getWorldNameById($worldId){
-        return static::$world_names[$worldId];
+        return isset(static::$world_names[$worldId]) ? static::$world_names[$worldId] : "Unknown world id: "+$worldId;
     }
     
     /**

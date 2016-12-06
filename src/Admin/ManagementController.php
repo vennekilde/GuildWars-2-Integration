@@ -347,34 +347,47 @@ switch($form){
             $roundedIndex = 0;
             $lastRowDate = null;
             $keysPerRun = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEYS_PER_RUN);
+            $hasNormalAPICallRun = false;
             for($i = 1; $i < count($graphData); $i++){
                 $time = strtotime($graphData[$i][0]);
                 $roundedTime = ceil($time / 300) * 300;
                 $date = date("Y-m-d H:i:s", $roundedTime);
                 
-                if($lastRowDate != $date){
+                $successes = $graphData[$i][$typeToIndex[StatisticsPersistence::API_SUCCESS]];
+                $errors = $graphData[$i][$typeToIndex[StatisticsPersistence::API_ERRORS]];
+                
+                if($lastRowDate != $date || ($successes + $errors >= $keysPerRun && $hasNormalAPICallRun)){
+                    if($lastRowDate == $date){
+                        //$test = array($lastRowDate, $date);
+                        $skimmedGraphData[$roundedIndex][0] = date("Y-m-d H:i:s", $time - 1);
+                        $lastRowDate = $skimmedGraphData[$roundedIndex][0];
+//                            $test[2] = $lastRowDate;
+//                            print_r($test);
+                    }
                     $skimmedGraphData[] = array_merge(array($date), array_slice($graphData[$i], 1));
                     $roundedIndex++;
                     $lastRowDate = $date;
+                    $hasNormalAPICallRun = false;
                 } else {
                     $totalNOld = $skimmedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::API_SUCCESS]];
                     $skimmedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::API_SUCCESS]] 
-                            += $graphData[$i][$typeToIndex[StatisticsPersistence::API_SUCCESS]];
-                    
+                            += $successes;
+
                     $totalNOld += $skimmedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::API_ERRORS]];
                     $skimmedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::API_ERRORS]] 
                             += $graphData[$i][$typeToIndex[StatisticsPersistence::API_ERRORS]];
-                    
-                    $totalNNew = $graphData[$i][$typeToIndex[StatisticsPersistence::API_SUCCESS]] 
-                            + $graphData[$i][$typeToIndex[StatisticsPersistence::API_ERRORS]];
-                    
+
+                    $totalNNew = $successes + $errors;
+
                     //Calculate new average
                     $weightOld = $totalNOld / ($totalNOld + $totalNNew);
                     $weightNew = $totalNNew / ($totalNOld + $totalNNew);
                     $skimmedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::AVERAGE_TIME_PER_KEY]] 
                             = ($weightOld * $skimmedGraphData[$roundedIndex][$typeToIndex[StatisticsPersistence::AVERAGE_TIME_PER_KEY]])
                             + ($weightNew * $graphData[$i][$typeToIndex[StatisticsPersistence::AVERAGE_TIME_PER_KEY]]);
-                    
+                }
+                if($successes + $errors >= $keysPerRun){
+                    $hasNormalAPICallRun = true;
                 }
             }
             $graphData = $skimmedGraphData;

@@ -2,7 +2,6 @@
 
 use GW2Integration\Persistence\Helper\ServicePersistencyHelper;
 use GW2Integration\Persistence\Helper\SettingsPersistencyHelper;
-use GW2Integration\REST\RESTHelper;
 
 require_once __DIR__ . "/RestrictAdminPanel.php";
 ?>

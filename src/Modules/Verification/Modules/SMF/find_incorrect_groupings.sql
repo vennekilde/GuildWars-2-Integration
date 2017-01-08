@@ -16,32 +16,25 @@ BEGIN
             m.id_group = w.group_id 
             OR FIND_IN_SET(w.group_id, m.additional_groups) != 0
         )
-    WHERE l.service_id = 0 AND (userId IS NULL OR userId = m.id_member) AND ((
-        /* Check if user already has group */
-        m.id_group = w.group_id
-        /* Check if user is actually allowed to have the group*/
+    WHERE l.service_id = 0 AND (userId IS NULL OR userId = m.id_member) 
         AND (
-                l.link_id IS NULL                                          /* Check if linking exists */
-                OR b.b_username IS NOT NULL                                /* Check if banned */
-                OR k.last_success < k.last_attempted_fetch - INTERVAL expirationTime SECOND /* Check if expired */
-                OR l.is_primary != w.is_primary                            /* Check if link priority is wrong */
-                /* Check if the user world is wrong */
-        )					
-    ) OR (
-        /* Check if user has group as secondary group */
-        FIND_IN_SET(w.group_id, m.additional_groups) != 0  
-        /* Check if user is actually allowed to have the group*/         
-        AND (
-                l.link_id IS NULL                                          /* Check if linking exists */
-                OR b.b_username IS NOT NULL                                /* Check if banned */
-                OR k.last_success < k.last_attempted_fetch - INTERVAL expirationTime SECOND /* Check if expired */
-                OR l.is_primary != w.is_primary                            /* Check if link priority is wrong */
-        )		
-    /* Ensure there isn't 2 worlds who should be linked with the same group) */
-    )) AND (
-        SELECT EXISTS(SELECT 1 FROM gw2integration_world_to_service_group w2 
-        WHERE a.a_world = w2.world AND w.group_id = w2.group_id AND l.is_primary = w2.is_primary AND w2.service_id = 0) = 0
-    )
+            /* Check if user already has group */
+            m.id_group = w.group_id	
+            /* Check if user has group as secondary group */			
+            OR FIND_IN_SET(w.group_id, m.additional_groups) != 0  
+        ) AND (	
+        	 /* Check if user is actually allowed to have the group*/
+            l.link_id IS NULL                                          /* Check if linking exists */
+        	OR b.b_username IS NOT NULL                                /* Check if banned */
+       		OR k.last_success < k.last_attempted_fetch - INTERVAL expirationTime SECOND /* Check if expired */
+        	OR l.is_primary != w.is_primary                            /* Check if link priority is wrong */
+            /* Ensure there isn't 2 worlds who should be linked with the same group) */
+            OR (
+                SELECT EXISTS(SELECT 1 FROM gw2integration_world_to_service_group w2 
+                WHERE a.a_world = w2.world AND w.group_id = w2.group_id AND l.is_primary = w2.is_primary AND w2.service_id = 0) = 0
+            )
+        ) 
+    
 
      ORDER BY w.group_id ASC;
 END $$

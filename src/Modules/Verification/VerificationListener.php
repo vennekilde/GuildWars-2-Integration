@@ -26,6 +26,7 @@
 
 namespace GW2Integration\Modules\Verification;
 
+use GW2Integration\Entity\LinkedUser;
 use GW2Integration\Events\EventListener;
 use GW2Integration\Events\Events\GW2DataPrePersistEvent;
 use GW2Integration\Exceptions\UnableToDetermineLinkId;
@@ -41,33 +42,35 @@ class VerificationListener implements EventListener{
     public function onGW2DataPrePersistEvent(GW2DataPrePersistEvent $event){
         if($event->getEndpoint() == "v2/account"){
             $linkedUser = $event->getLinkedUser();
-            try{
-                $oldData = GW2DataPersistence::getAccountData($linkedUser);
-            } catch(UnableToDetermineLinkId $ex){
-                $oldData = array(
-                    "a_world" => null
-                );
-            }
-            $newData = $event->getData();
-            
-            $oldWorld = $oldData["a_world"];
-            $newWorld = $newData[":a_world"];
-            if($oldData["a_world"] != $newData[":a_world"]){
-                //Since this is handled pre-persist, the user might not have been assigned a link-id yet
-                //Instead register a method that will be ran when the user recieves a
-                //link-id. Will run instantly if link-id is already assigned
-                $listenerMethod = function() use($linkedUser, $oldWorld, $newWorld){
-                    global $logger;
-                    VerificationEventPersistence::persistVerificationEvent($linkedUser, 0, $oldWorld . "," . $newWorld);
-                    
-                    $logger->info($linkedUser->compactString()." has changed world from ".(empty($oldWorld) ? "NO PREVIOUSE WORLD" : $oldWorld)." to $newWorld");
+            if($linkedUser instanceof LinkedUser){
+                try{
+                    $oldData = GW2DataPersistence::getAccountData($linkedUser);
+                } catch(UnableToDetermineLinkId $ex){
+                    $oldData = array(
+                        "a_world" => null
+                    );
+                }
+                $newData = $event->getData();
 
-                    foreach(ModuleLoader::getVerificationModules() AS $verificationModule){
-                        $verificationModule->handleUserWorldChanged($linkedUser, $oldWorld, $newWorld);
-                    }
-                };
-                    
-                $linkedUser->addOnLinkedIdSetListener($listenerMethod);
+                $oldWorld = $oldData["a_world"];
+                $newWorld = $newData[":a_world"];
+                if($oldData["a_world"] != $newData[":a_world"]){
+                    //Since this is handled pre-persist, the user might not have been assigned a link-id yet
+                    //Instead register a method that will be ran when the user recieves a
+                    //link-id. Will run instantly if link-id is already assigned
+                    $listenerMethod = function() use($linkedUser, $oldWorld, $newWorld){
+                        global $logger;
+                        VerificationEventPersistence::persistVerificationEvent($linkedUser, 0, $oldWorld . "," . $newWorld);
+
+                        $logger->info($linkedUser->compactString()." has changed world from ".(empty($oldWorld) ? "NO PREVIOUSE WORLD" : $oldWorld)." to $newWorld");
+
+                        foreach(ModuleLoader::getVerificationModules() AS $verificationModule){
+                            $verificationModule->handleUserWorldChanged($linkedUser, $oldWorld, $newWorld);
+                        }
+                    };
+
+                    $linkedUser->addOnLinkedIdSetListener($listenerMethod);
+                }
             }
         }
     }

@@ -35,10 +35,6 @@ use MainServiceConflictException;
 
 require_once __DIR__ . "/../Source.php";
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 class RESTHelper{
     /**
      * Get linked users from the request params
@@ -51,14 +47,18 @@ class RESTHelper{
         if(isset($_REQUEST["user-ids"]) && isset($_REQUEST["service-id"])){
             $userIds = explode(",", $_REQUEST["user-ids"]);
             foreach ($userIds AS $userInfo){
-                $userInfoArray = explode(':', $userInfo, 2);
+                $userInfoArray = explode(':', $userInfo, 3);
                 $linkedUser = new LinkedUser();
                 $linkedUser->fetchServiceUserId = $userInfoArray[0];
                 $linkedUser->fetchServiceId = $_REQUEST["service-id"];
                 if(isset($userInfoArray[1])){
                     $linkedUser->fetchServiceDisplayName = $userInfoArray[1];
                 }
-                $linkedUsers[$userInfoArray[0]] = $linkedUser;
+                $isOnline = false;
+                if(isset($userInfoArray[2])){
+                    $isOnline = $userInfoArray[2] == 1;
+                }
+                $linkedUsers[$userInfoArray[0]] = array($linkedUser, $isOnline);
             }
         }
         return $linkedUsers;

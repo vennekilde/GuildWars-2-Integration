@@ -38,11 +38,17 @@ $response = array();
 
 $linkedUsers = RestrictedRESTHelper::getLinkedUsersFromParamsUnsafe();
 $useEnumsIds = isset($_REQUEST["enum-ids"]);
-foreach($linkedUsers AS $id => $linkedUser){
+foreach($linkedUsers AS $id => $linkedUserWithOnlineStatus){
     try{
+        $linkedUser = $linkedUserWithOnlineStatus[0];
         $response[$id] = processAccountData($linkedUser, GW2DataPersistence::getExtensiveAccountData($linkedUser), $useEnumsIds);
         if(!empty($linkedUser->fetchServiceDisplayName)){
             LinkingPersistencyHelper::setDisplayName($linkedUser->fetchServiceUserId, $linkedUser->fetchServiceId, $linkedUser->fetchServiceDisplayName);
+        }
+        
+        //Check if is online
+        if($linkedUserWithOnlineStatus[1]){
+            
         }
     } catch(UnableToDetermineLinkId $ex){
         if($useEnumsIds){

@@ -47,7 +47,7 @@ class StatisticsPersistence {
     const TEMPORARY_ACCESS = 6;
     const TEMPORARY_ACCESS_EXPIRED = 7;
     const API_SUCCESS = 8;
-    
+    const USER_ONLINE = 9;
     /**
      * 
      * @global type $gw2i_db_prefix

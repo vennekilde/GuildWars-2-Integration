@@ -1,0 +1,173 @@
+/*
+The MIT License
+
+Copyright 2016 Jeppe Boysen Vennekilde.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+/* 
+    Created on : 04-10-2016, 00:33:32
+    Author     : Jeppe Boysen Vennekilde
+*/
+.mdl-layout__tab-bar {
+    height: 48px;
+}
+.dark-theme {
+    color: #DDD;
+}
+.mdl-tabs__panel{
+    padding: 0px 10px;
+}
+
+.card-with-bar {
+    position: relative;
+}
+
+.card-with-bar .background {
+    padding: 15px 0px;
+}
+
+.card-with-bar .mdl-layout__header-row,
+.card-with-bar .mdl-layout__header{
+    height: 40px;
+    min-height: 40px;
+}
+
+.card-with-bar .mdl-layout-title {
+    font-size: 16px;
+}
+                
+#gw2i-guild-pages{
+    /*text-align: center;*/
+}
+
+#gw2i-guild-pages .mdl-layout__header-row{
+    padding-left: 10px;
+}
+.guild_card {
+    width: 140px;
+    display: inline-block;
+    margin: 10px;
+    min-height: initial;
+    cursor: pointer;
+    text-decoration: none;
+    background-color: white;
+}
+
+.dark-theme .guild_card {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+.guild_emblem_card {
+    background-repeat: no-repeat;
+    background-size: 150px;
+    background-position: -5px -5px;
+    padding: 0px;
+    min-height: 170px;
+}
+.guild_name_card {
+    color: white;
+    background: rgba(0, 0, 0, 0.46);
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+}
+.guild_desc_card {
+    height: 60px;
+}
+.guild_cat_title {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.48);
+    padding-left: 10px;
+}
+
+.dark-theme .guild_cat_title{
+    color: #DDD;
+}
+.guild_page_name {
+    float: left;
+}
+.guild_page_right_panel {
+    width: 250px;
+    float: right;
+    text-align: right;
+    padding-bottom: 10px;
+    padding-left: 10px;
+}
+.dark-theme .guild_page_title {
+    color: #DDD;
+}
+
+.dark-theme .mdl-tabs.is-upgraded .mdl-tabs__tab.is-active {
+    color: rgba(255,255,255,.87);
+}
+.dark-theme .mdl-tabs__tab {
+    color: rgba(255,255,255,.54);
+}
+.dark-theme .mdl-tabs__tab-bar {
+    border-bottom: 1px solid #1b1b1b;
+}
+.dark-theme table {
+    color: #DDD;
+    background: transparent;
+}
+.dark-theme .mdl-data-table tbody tr:hover{
+    background-color: rgba(256, 256, 256, 0.1);
+}
+.dark-theme .mdl-data-table td {
+    border-top: 1px solid rgba(255,255,255,.12);
+    border-bottom: 1px solid rgba(255,255,255,.12);
+}
+.dark-theme .mdl-data-table th{
+    color: #999;
+}
+.guild_page_right_panel a{
+    display: block;
+    padding: 2px 0px;
+}
+.guild_page_right_panel button {    
+    width: calc(100% - 20px);
+    margin: 0px 10px;
+}
+.guild_page_emblem {
+    width: 250px;
+    height: 250px;
+    background-size: contain;
+}
+.guild_page_description {
+    white-space: pre-wrap;
+}
+
+.guild_page_help {
+    position: absolute;
+    top: 9px;
+    right: 0;
+}
+
+/* Fix for youtube iframe size */
+iframe {
+    width: 100%;
+    max-width: 560px;
+}
+
+.help_list li{
+    padding-top: 8px;
+}
+
+.help_list > li{
+    padding-top: 20px;
+}

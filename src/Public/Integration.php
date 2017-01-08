@@ -161,6 +161,12 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                                     Characters
                                 </span>
                             </li>
+                            <li style="padding: 0px 16px">
+                                <div class="information-container">
+                                    <i class="material-icons" style="margin-right: 16px;">info_outline</i>
+                                    If you are a Guild leader and want a guild page, it is recommended to add the "guilds" permission
+                                </div>
+                            </li>
                         </ul>
                         <div id="api-key-input-field" class="mdl-textfield mdl-js-textfield" style="width: 100%">
                             <label class="mdl-textfield__label" for="api-key-input">Enter your API Key</label>
@@ -218,6 +224,25 @@ $linkedUser = RESTHelper::getLinkedUserFromParams();
                         <tr id="default-service-entry">
                             <td class="mdl-data-table__cell--non-numeric">There are currently no services to link with</td>
                             <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class='primaryheading'>
+                <h5>Guilds</h5>
+                <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp table-td-ta-left" style="width: 100%">
+                    <thead>
+                        <tr>
+                            <th class="mdl-data-table__cell--non-numeric">Guild</th>
+                            <th class="mdl-data-table__cell--non-numeric">Rank</th>
+                            <th class="mdl-data-table__cell--non-numeric">Member Since</th>
+                        </tr>
+                    </thead>
+                    <tbody id="guild-memberships-tbody">
+                        <tr id="default-guild-membership-entry">
+                            <td>None</td>
                             <td></td>
                             <td></td>
                         </tr>

@@ -57,6 +57,7 @@ function fetchLinkedUserAndData(){
             parseLinkedUserServices();
             parseLinkedUserSecondaryLinks();
             parseLinkedUserData();
+            fetchGuildMemberships();
             if(linkedUser["link_id"] !== undefined){
                 switchTab();
                 retrieveAPIKeyName();
@@ -259,4 +260,56 @@ function deleteSecondaryLink(userId, serviceId){
             });
         }
     });
+}
+
+function fetchGuildMemberships(userId, serviceId){
+    var toast = document.querySelector('#snackbar-stepper-error');
+    if (!toast)
+        return false;
+    
+    var data = generateAjaxPostData();
+    data["service-id"] = serviceId;
+    data["user-id"] = userId;
+    $.ajax({
+        type: "POST",
+        url: webPath + "/REST/User/GetGuildsForUser.php",
+        data: data,
+        success: function (e) {
+            console.log(e);
+            response = JSON.parse(e);
+            if(response["data"] !== undefined){
+                parseGuildMembershipsData(response["data"]);
+            }
+        },
+        error: function (e) {
+            console.log(e);
+        }
+    });
+}
+
+function parseGuildMembershipsData(guildMemberships){
+    var hideDefault = false;
+    $(".guild-membership-entry").remove();
+    $.each(guildMemberships, function(index, guildMembership) {
+        var guildUUID = guildMembership["g_uuid"];
+        var guildName = guildMembership["g_name"];
+        var guildTag = guildMembership["g_tag"];
+        var rank = guildMembership["g_rank"];
+        var memberSince = guildMembership["g_member_since"];
+        var entry = '\
+            <tr id="guild-membership-'+guildUUID+'" class="guild-membership-entry">\
+                <td class="mdl-data-table__cell--non-numeric">['+guildTag+'] '+guildName+'</td>\
+                <td class="mdl-data-table__cell--non-numeric">'+(rank !== null ? rank : '')+'</td>\
+                <td class="mdl-data-table__cell--non-numeric">'+(memberSince !== null ? memberSince : '')+'</td>\
+            </tr>';
+        $("#guild-memberships-tbody").append(entry);
+        hideDefault = true;
+    });
+
+    if(hideDefault){
+        $("#default-guild-membership-entry").hide();
+    } else {
+        $("#default-guild-membership-entry").show();
+    }
+    adjustHeight();
 }

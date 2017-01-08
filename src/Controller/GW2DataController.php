@@ -26,13 +26,16 @@
 
 namespace GW2Integration\Controller;
 
+use DateTime;
 use GW2Integration\API\GW2APICommunicator;
 use GW2Integration\Entity\LinkedUser;
-use GW2Integration\Entity\UserServiceLink;
+use GW2Integration\Entity\LinkIdHolder;
 use GW2Integration\Exceptions\GW2APIException;
+use GW2Integration\Exceptions\UnableToDetermineLinkId;
 use GW2Integration\Persistence\Helper\GW2DataPersistence;
 use GW2Integration\Persistence\Helper\LinkingPersistencyHelper;
 use GW2Treasures\GW2Api\GW2Api;
+use GW2Treasures\GW2Api\V2\Endpoint\Guild\Exception\GuildLeaderRequiredException;
 
 /**
  * Description of GW2DataController
@@ -76,7 +79,7 @@ class GW2DataController {
      * @param string $apiKey
      * @return boolean
      */
-    function resyncCharactersEndpoint($linkedUser, $apiKey) {
+    public static function resyncCharactersEndpoint($linkedUser, $apiKey) {
         //Get data from Account endpoint
         $json = (array)static::$gw2API->account($apiKey)->get();
 
@@ -88,6 +91,55 @@ class GW2DataController {
         return true;
     }
     
+    /**
+     * 
+     * @param LinkedUser $linkedUser
+     * @param string $apiKey
+     * @return boolean
+     */
+    public static function resyncGuildLeaderMembersEndpoint($linkedUser, $apiKey) {
+        //Get data from guild members endpoint
+        $guildMemberships = GW2DataPersistence::getGuildMemberships($linkedUser);
+        foreach($guildMemberships AS $guildMembership){
+            try{
+                $guildUUID = $guildMembership["g_uuid"];
+                $jsonRanks = (array)static::$gw2API->guild()->ranks($apiKey, $guildUUID)->get();
+                foreach($jsonRanks AS $guildRanks){
+                    print_r($guildRanks);
+                    GW2DataPersistence::persistGuildRanks($guildUUID, $guildRanks->id, $guildRanks->order, $guildRanks->permissions, $guildRanks->icon);
+                }
+                
+                $json = (array)static::$gw2API->guild()->members($apiKey, $guildUUID)->get();
+                $rosterLinkIds = array();
+                foreach($json AS $guildMembershipDetails){
+                    try{
+                        $linkId = LinkingPersistencyHelper::determineLinkedUserId($guildMembershipDetails->name);
+                    } catch (UnableToDetermineLinkId $ex) {
+                        //Create a new dummy user
+                        $accountData["id"] = $guildMembershipDetails->name;
+                        $accountData["name"] = $guildMembershipDetails->name;
+                        $accountData["world"] = -1;
+                        $date = new DateTime();
+                        $accountData["created"] = $date->getTimestamp();
+                        $accountData["access"] = -1;
+                        $accountData["commander"] = 0;
+                        $idHolder = new LinkIdHolder();
+                        GW2DataPersistence::persistAccountData($idHolder, $accountData, true);
+                        $linkId = $idHolder->getLinkedId();
+                    }
+                    $rosterLinkIds[] = $linkId;
+                    GW2DataPersistence::persistGuildMembershipWithRank(
+                            $linkId, 
+                            $guildUUID, 
+                            $guildMembershipDetails->rank, 
+                            $guildMembershipDetails->joined);
+                }
+                
+                GW2DataPersistence::deleteGuildMembershipNotInList($guildUUID, $rosterLinkIds);
+            } catch(GuildLeaderRequiredException $e){}
+        }
+        return true;
+    }
     
     public static function fetchGuildsData($guildIds, $checkLastSynched = true){
         $guildsAlreadySynched = GW2DataPersistence::getGuildsAlreadySynched($guildIds, $checkLastSynched);

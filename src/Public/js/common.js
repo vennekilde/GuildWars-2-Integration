@@ -22,42 +22,50 @@
  * THE SOFTWARE.
  */
 
-$( document ).ready(function() {
-    if (typeof jQuery.ui !== 'undefined'){
-        $( ".resizeable" ).resizable();
+$(document).ready(function () {
+    if (typeof jQuery.ui !== 'undefined') {
+        $(".resizeable").resizable();
     }
-    
-    $('.mdl-layout').on('mdl-componentupgraded', function(e) {
+
+    $('.mdl-layout').on('mdl-componentupgraded', function (e) {
         if ($(e.target).hasClass('mdl-layout')) {
             adjustHeight();
         }
     });
-    
-    setTimeout(function(){
+
+    setTimeout(function () {
         adjustHeight();
     }, 100);
-    
+
     //Resize content if inside iframe, when switching tab
-    $('.mdl-tabs__tab').on('click',function(){
-        setTimeout(function(){
+    $('.mdl-tabs__tab').on('click', function () {
+        setTimeout(function () {
             adjustHeight();
         }, 50);
-     });
+    });
+
+    $('body').on('mousedown', '.sceditor-grip', function(event) {
+        console.log("test1");
+        $(document).bind('mousemove', adjustHeight);
+    });
+
+    $(document).mouseup(function (e) {
+        $(document).unbind('mousemove', adjustHeight);
+    });
 })
 
-function generateAjaxPostData(){
+function generateAjaxPostData() {
     var data = {};
     var sessions = getParameterByName("ls-sessions");
-    if(sessions !== undefined){
+    if (sessions !== undefined) {
         data["ls-sessions"] = sessions;
     }
-    
+
     return data;
 }
-function adjustHeight(){
-    if(parent.AdjustIframeHeight !== undefined){
+function adjustHeight() {
+    if (parent.AdjustIframeHeight !== undefined) {
         var newHeight = document.getElementById("gw2i-container").scrollHeight;
-        console.log(newHeight);
 //        if(newHeight <= 0) {
 //            newHeight = $(".mdl-layout__tab-panel.is-active").outerHeight() + 120;
 //            console.log(newHeight);
@@ -80,8 +88,8 @@ function getParameterByName(name, url) {
 
 function setCookie(cname, cvalue, exseconds) {
     var d = new Date();
-    d.setTime(d.getTime() + (exseconds*1000));
-    var expires = "expires="+ d.toUTCString();
+    d.setTime(d.getTime() + (exseconds * 1000));
+    var expires = "expires=" + d.toUTCString();
     document.cookie = cname + "=" + cvalue + "; " + expires;
 }
 
@@ -91,17 +99,17 @@ function decodeEntities(encodedString) {
     return textArea.value;
 }
 
-function mergeObjects(obj1,obj2){
+function mergeObjects(obj1, obj2) {
     return jQuery.extend(true, obj1, obj2);
 }
 
 
-function scrollToBottom(container){
+function scrollToBottom(container) {
     $(container).scrollTop($(container)[0].scrollHeight);
 }
 
-function addNotitification(msg, type){
-    $("#gw2i-notification-container").append('<div class="alert-box '+type+'">'+msg+'</div>');
+function addNotitification(msg, type) {
+    $("#gw2i-notification-container").append('<div class="alert-box ' + type + '">' + msg + '</div>');
 }
 
 function getAccessLabelFromAccessId(accessId) {
@@ -123,19 +131,36 @@ function getWorldNameFromId(worldId) {
     return world_names[worldId];
 }
 
-function nextPage($inputCounter){
+function nextPage($inputCounter) {
     console.log($inputCounter);
     test = $inputCounter;
     var page = parseInt($inputCounter.val());
     page++;
     $inputCounter.val(page);
 }
-function prevPage($inputCounter){
+function prevPage($inputCounter) {
     var page = parseInt($inputCounter.val());
-    if(page > 1){
+    if (page > 1) {
         page--;
         $inputCounter.val(page);
     }
+}
+
+function replaceTagName(id, replacementTag){
+    // Replace all a tags with the type of replacementTag
+    $(id).each(function() {
+        var outer = this.outerHTML;
+
+        // Replace opening tag
+        var regex = new RegExp('<' + this.tagName, 'i');
+        var newTag = outer.replace(regex, '<' + replacementTag);
+
+        // Replace closing tag
+        regex = new RegExp('</' + this.tagName, 'i');
+        newTag = newTag.replace(regex, '</' + replacementTag);
+
+        $(this).replaceWith(newTag);
+    });
 }
 
 //Pre-saved list of server names to avoid contacting the GW2 api each time to fetch

@@ -73,18 +73,19 @@ class APIKeyProcessor {
         //True if successful in fetching updated data from the api
         $success = false;
         try {
-
             if($fireAPISyncCompletedEvent){
                 //Time started in MS
                 $timeStarted = microtime(true) * 1000; 
             }
-            
             foreach($permissions as $permission){
                 $result = false;
                 try{
                     switch($permission){
                         case "account":
                             $result = GW2DataController::resyncAccountEndpoint($linkedUser, $apiKey);
+                            break;
+                        case "guilds":
+                            $result = GW2DataController::resyncGuildLeaderMembersEndpoint($linkedUser, $apiKey);
                             break;
                     }
 
@@ -114,6 +115,7 @@ class APIKeyProcessor {
             }
         } catch(Exception $e){
             APIKeyPersistenceHelper::updateLastAPIKeyAttemptedFetch($apiKey);
+            $logger->error(get_class($e) . ": " . $e->getMessage(), $e->getTrace());
             throw $e;
         }
         return $success;

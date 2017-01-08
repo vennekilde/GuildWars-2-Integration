@@ -38,6 +38,15 @@ THE SOFTWARE.
     font-style: normal;
 }
 
+.bbcode-editor {
+    width: 100%;
+    min-height: 250px;
+}
+
+.sceditor-container iframe {
+    max-width: 100% !important;
+}
+
 .mdl-stepper {
     max-width: none;
     box-shadow: none;
@@ -242,4 +251,8 @@ THE SOFTWARE.
     display: inline-block;
     padding: 0px 35px 0px 0px;
     vertical-align: top;
+}
+
+.dark-theme .mdl-button {
+    color: white;
 }

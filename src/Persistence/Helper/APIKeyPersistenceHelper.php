@@ -85,7 +85,7 @@ class APIKeyPersistenceHelper {
             $linkId
         );
         
-        if($ignoreExpired){
+        if(!$ignoreExpired){
             $preparedQueryString .= " AND last_success > last_attempted_fetch - INTERVAL ? SECOND";
             $queryParams[] = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_EXPIRATION_TIME);
         }
@@ -94,7 +94,8 @@ class APIKeyPersistenceHelper {
 
         $preparedStatement->execute($queryParams);
         
-        return $preparedStatement->fetch(PDO::FETCH_ASSOC);
+        $result = $preparedStatement->fetch(PDO::FETCH_ASSOC);
+        return $result;
     }
     
     /**

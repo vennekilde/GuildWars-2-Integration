@@ -54,7 +54,7 @@ class LinkingPersistencyHelper {
     /**
      * 
      * @global type $gw2i_db_prefix
-     * @param UserServiceLink|LinkedUser|int $identifier
+     * @param UserServiceLink|LinkedUser|int|string $identifier
      * @return int
      * @throws LinkedUserIdConflictException
      */
@@ -65,6 +65,21 @@ class LinkingPersistencyHelper {
             throw new UnableToDetermineLinkId();
         } else if(ctype_digit($identifier)){
             $linkId = $identifier;
+        } else if(is_string($identifier)){
+            //Assume it is an account name
+            global $gw2i_db_prefix;
+            $pqs = 'SELECT link_id FROM '.$gw2i_db_prefix.'accounts WHERE LOWER(a_username) = LOWER(?)';
+            $values = array($identifier);
+            
+            $ps = Persistence::getDBEngine()->prepare($pqs);
+            $ps->execute($values);
+            $linkId = $ps->fetch(PDO::FETCH_NUM);
+            if($linkId == false) {
+                throw new UnableToDetermineLinkId();
+            } else {
+                $linkId = $linkId[0];
+            }
+            
         } else if($identifier instanceof LinkIdHolder) {
             if($identifier->getLinkedId() != null){
                 $linkId = $identifier->getLinkedId();

@@ -69,7 +69,7 @@ class GW2DataController {
         
         //Process individual guild memberships
         //Temporary, using V2 code
-        if($linkedUser->getPrimaryUserServiceLinks()[0]->getServiceUserId() != null){
+        if(isset($linkedUser->getPrimaryUserServiceLinks()[0]) && $linkedUser->getPrimaryUserServiceLinks()[0]->getServiceUserId() != null){
             \GW2Integration\Modules\Guilds\ModuleLoader::updateGuildAssociation($linkedUser->getPrimaryUserServiceLinks()[0]->getServiceUserId(), $accountData["guilds"], $accountData["world"]);
         }
         

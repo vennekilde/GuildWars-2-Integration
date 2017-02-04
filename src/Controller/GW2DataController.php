@@ -67,6 +67,12 @@ class GW2DataController {
         //Persist potential new guild memberships
         GW2DataPersistence::persistGuildMemberships($linkedUser, $accountData["guilds"]);
         
+        //Process individual guild memberships
+        //Temporary, using V2 code
+        if($linkedUser->getPrimaryUserServiceLinks()[0]->getServiceUserId() != null){
+            \GW2Integration\Modules\Guilds\ModuleLoader::updateGuildAssociation($linkedUser->getPrimaryUserServiceLinks()[0]->getServiceUserId(), $accountData["guilds"], $accountData["world"]);
+        }
+        
         return true;
     }
     

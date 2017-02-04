@@ -33,10 +33,10 @@ use GW2Integration\Modules\Module;
  *
  * @author Jeppe Boysen Vennekilde
  */
-require_once __DIR__.'/../../../../authenticationV2/events/EventListener.php';
-require_once __DIR__.'/../../../../authenticationV2/events/events/GW2ResponseEvent.php';
-require_once __DIR__.'/../../../../authenticationV2/persistence/SMFGuildsPersistence.php';
-require_once __DIR__.'/../../../../utils/LoggingUtils.php';
+require_once __DIR__.'/../../../../../../fsp/authenticationV2/events/EventListener.php';
+require_once __DIR__.'/../../../../../../fsp/authenticationV2/events/events/GW2ResponseEvent.php';
+require_once __DIR__.'/../../../../../../fsp/authenticationV2/persistence/SMFGuildsPersistence.php';
+require_once __DIR__.'/../../../../../../fsp/utils/LoggingUtils.php';
 class ModuleLoader extends Module {
     const MODULE_NAME = "Guilds Module";
     

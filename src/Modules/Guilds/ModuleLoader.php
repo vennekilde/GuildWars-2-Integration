@@ -51,7 +51,9 @@ class ModuleLoader extends Module {
     //TEMPORARY V2 CODE
     public static function updateGuildAssociation($userId, $guildIds, $world) {
         if($userId > 0){
+            ob_start();
             \SMFGuildsPersistence::persistUserGuildsInfo($userId, $guildIds, $world);
+            ob_end_clean();
         }
     }
 }

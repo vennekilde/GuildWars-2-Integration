@@ -79,7 +79,7 @@ class GW2DataPersistence {
         $linkId = LinkingPersistencyHelper::determineLinkedUserId($linkedUser);
         
         $preparedQueryString = 
-                'SELECT a.*, k.*, b.b_ban_id, b.b_reason AS ban_reason, b.b_banned_by, b.b_timestamp AS ban_timestamp, b.b_username '
+                'SELECT a.*, k.*, b.b_ban_id, b.b_reason, b.b_banned_by, b.b_timestamp, b.b_username '
                 . 'FROM '.$gw2i_db_prefix.'accounts a '
                 . 'INNER JOIN '.$gw2i_db_prefix.'api_keys k ON a.link_id = k.link_id '
                 . 'LEFT JOIN '.$gw2i_db_prefix.'banned_accounts b ON UPPER(a.a_username) = UPPER(b.b_username)'

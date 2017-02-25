@@ -69,24 +69,26 @@ class RefreshLinkedServers implements EventListener{
                             SettingsPersistencyHelper::LINKED_WORLDS
                         ));
                 
-                foreach($persistedLinkedWorlds AS $world){
-                    if(!in_array($world, $linkedWorlds)){
-                        //Remove old link
-                        $this->removeLink($world);
+                if(!empty(array_diff($linkedWorlds, $persistedLinkedWorlds))){
+                    foreach($persistedLinkedWorlds AS $world){
+                        if(!in_array($world, $linkedWorlds)){
+                            //Remove old link
+                            $this->removeLink($world);
+                        }
                     }
-                }
-                
-                foreach($linkedWorlds AS $world){
-                    if(!in_array($world, $persistedLinkedWorlds)){
-                        //Add new link
-                        $this->addLink($world);
+
+                    foreach($linkedWorlds AS $world){
+                        if(!in_array($world, $persistedLinkedWorlds)){
+                            //Add new link
+                            $this->addLink($world);
+                        }
                     }
+
+                    $linkedWorldsStr = implode(",", $linkedWorlds);
+                    SettingsPersistencyHelper::persistSetting(
+                            SettingsPersistencyHelper::LINKED_WORLDS, $linkedWorldsStr);
+                    $logger->info("Updated linked worlds to " . $linkedWorldsStr);
                 }
-                
-                $linkedWorldsStr = implode(",", $linkedWorlds);
-                SettingsPersistencyHelper::persistSetting(
-                        SettingsPersistencyHelper::LINKED_WORLDS, $linkedWorldsStr);
-                $logger->info("Updated linked worlds to " . $linkedWorldsStr);
             }
         } catch(Exception $e){
             $logger->error($e->getMessage(), $e->getTrace());

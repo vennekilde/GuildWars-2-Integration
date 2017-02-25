@@ -28,10 +28,10 @@
 
 RENAME TABLE gw2integration_api_statistics TO gw2integration_statistics;
 ALTER TABLE gw2integration_statistics ADD data INT(11);
-ALTER TABLE `gw2integration_statistics` CHANGE `value` `statistic` INT(11) NOT NULL;
+ALTER TABLE gw2integration_statistics CHANGE value statistic INT(11) NOT NULL;
 ALTER TABLE gw2integration_character_crafting ADD CONSTRAINT fk_c_came FOREIGN KEY (`c_name`) REFERENCES gw2integration_characters(`c_name`) ON DELETE CASCADE;
 ALTER TABLE gw2integration_guild_membership ADD CONSTRAINT fk_link_id FOREIGN KEY (`link_id`) REFERENCES gw2integration_accounts(`link_id`) ON DELETE CASCADE;
 ALTER TABLE gw2integration_characters ADD CONSTRAINT fk_link_id FOREIGN KEY (`link_id`) REFERENCES gw2integration_accounts(`link_id`) ON DELETE CASCADE;
 ALTER TABLE gw2integration_banned_accounts DROP FOREIGN KEY b_banned_by;
-
+ALTER TABLE gw2integration_banned_accounts CHANGE b_reason b_reason VARCHAR(255) NOT NULL;
 

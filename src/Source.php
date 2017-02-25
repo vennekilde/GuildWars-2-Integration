@@ -10,6 +10,7 @@ use GW2Integration\Modules\Verification\SMF\SimpleMachinesForumVerification;
 use GW2Integration\Modules\Verification\Teamspeak\TeamspeakVerification;
 use GW2Integration\Persistence\Helper\SettingsPersistencyHelper;
 use GW2Integration\Processes\Cleanup;
+use GW2Integration\Processes\RefreshLinkedServers;
 use Katzgrau\KLogger\Logger;
 use Psr\Log\LogLevel;
 
@@ -101,6 +102,7 @@ foreach($gw2i_modules as $module) {
 $statistics = new StatisticsLogger();
 $eventLogger = new EventLogger();
 $cleanupProcess = new Cleanup();
+$linkedWorldRefreshProcess = new RefreshLinkedServers();
 
 //Retrieve hashing salt
 $hashingSalt = SettingsPersistencyHelper::getSetting("salt");

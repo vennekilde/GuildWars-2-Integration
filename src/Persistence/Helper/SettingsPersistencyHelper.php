@@ -51,6 +51,9 @@ class SettingsPersistencyHelper {
     const SETUP_WEB_PATH = "setup_web_path";
     const HOME_WORLD = "home_world";
     const LINKED_WORLDS = "linked_words";
+    const SMF_LINKED_WORLD_TEMP_GROUP_PRIMARY = "smf_linked_world_temp_group_primary";
+    const TEAMSPEAK_LINKED_WORLD_TEMP_GROUP_PRIMARY = "teamspeak_linked_world_temp_group_primary";
+    const TEAMSPEAK_LINKED_WORLD_TEMP_GROUP_SECONDARY = "teamspeak_linked_world_temp_group_secondary";
     
     
     public static $visibleSettings = array(

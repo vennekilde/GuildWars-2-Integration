@@ -1,9 +1,13 @@
 <?php
 namespace GW2Integration\Processes;
 
+use Exception;
 use GW2Integration\Events\EventListener;
 use GW2Integration\Events\EventManager;
 use GW2Integration\Events\Events\APISyncCompleted;
+use GW2Integration\LinkedServices\SMF\SimpleMachinesForum;
+use GW2Integration\LinkedServices\Teamspeak\Teamspeak;
+use GW2Integration\Persistence\Helper\ServicePersistencyHelper;
 use GW2Integration\Persistence\Helper\SettingsPersistencyHelper;
 use GW2Treasures\GW2Api\GW2Api;
 
@@ -59,12 +63,81 @@ class RefreshLinkedServers implements EventListener{
             //Sanity check, if home world is not set, then the linked worlds will be wrong
             if(isset($homeWorldKey) && $homeWorldKey >= 0){
                 unset($linkedWorlds[$homeWorldKey]);
+                
+                $persistedLinkedWorlds = explode(",", 
+                        SettingsPersistencyHelper::getSetting(
+                            SettingsPersistencyHelper::LINKED_WORLDS
+                        ));
+                
+                foreach($persistedLinkedWorlds AS $world){
+                    if(!in_array($world, $linkedWorlds)){
+                        //Remove old link
+                        $this->removeLink($world);
+                    }
+                }
+                
+                foreach($linkedWorlds AS $world){
+                    if(!in_array($world, $persistedLinkedWorlds)){
+                        //Add new link
+                        $this->addLink($world);
+                    }
+                }
+                
                 $linkedWorldsStr = implode(",", $linkedWorlds);
-                SettingsPersistencyHelper::persistSetting(SettingsPersistencyHelper::LINKED_WORLDS, $linkedWorldsStr);
+                SettingsPersistencyHelper::persistSetting(
+                        SettingsPersistencyHelper::LINKED_WORLDS, $linkedWorldsStr);
                 $logger->info("Updated linked worlds to " . $linkedWorldsStr);
             }
-        } catch(\Exception $e){
+        } catch(Exception $e){
             $logger->error($e->getMessage(), $e->getTrace());
         }
+    }
+    
+    public function addLink($world){
+        global $logger;
+        $smfPGroup = SettingsPersistencyHelper::getSetting(
+                SettingsPersistencyHelper::SMF_LINKED_WORLD_TEMP_GROUP_PRIMARY);
+        $tsPGroup = SettingsPersistencyHelper::getSetting(
+                SettingsPersistencyHelper::TEAMSPEAK_LINKED_WORLD_TEMP_GROUP_PRIMARY);
+        $tsSGroup = SettingsPersistencyHelper::getSetting(
+                SettingsPersistencyHelper::TEAMSPEAK_LINKED_WORLD_TEMP_GROUP_SECONDARY);
+        
+        if(!empty($smfPGroup)){
+            ServicePersistencyHelper::persistWorldToGroupSettings(
+                    $world, SimpleMachinesForum::serviceId, 1, $smfPGroup);
+        }
+        if(!empty($tsPGroup)){
+            ServicePersistencyHelper::persistWorldToGroupSettings(
+                    $world, Teamspeak::serviceId, 1, $tsPGroup);
+        }
+        if(!empty($tsSGroup)){
+            ServicePersistencyHelper::persistWorldToGroupSettings(
+                    $world, Teamspeak::serviceId, 0, $tsSGroup);
+        }
+        $logger->info("Added linked world " . $world);
+    }
+    
+    public function removeLink($world){
+        global $logger;
+        $smfPGroup = SettingsPersistencyHelper::getSetting(
+                SettingsPersistencyHelper::SMF_LINKED_WORLD_TEMP_GROUP_PRIMARY);
+        $tsPGroup = SettingsPersistencyHelper::getSetting(
+                SettingsPersistencyHelper::TEAMSPEAK_LINKED_WORLD_TEMP_GROUP_PRIMARY);
+        $tsSGroup = SettingsPersistencyHelper::getSetting(
+                SettingsPersistencyHelper::TEAMSPEAK_LINKED_WORLD_TEMP_GROUP_SECONDARY);
+        
+        if(!empty($smfPGroup)){
+            ServicePersistencyHelper::removeWorldToGroupSettings(
+                    $world, SimpleMachinesForum::serviceId, 1, $smfPGroup);
+        }
+        if(!empty($tsPGroup)){
+            ServicePersistencyHelper::removeWorldToGroupSettings(
+                    $world, Teamspeak::serviceId, 1, $tsPGroup);
+        }
+        if(!empty($tsSGroup)){
+            ServicePersistencyHelper::removeWorldToGroupSettings(
+                    $world, Teamspeak::serviceId, 0, $tsSGroup);
+        }
+        $logger->info("Removed linked world " . $world);
     }
 }

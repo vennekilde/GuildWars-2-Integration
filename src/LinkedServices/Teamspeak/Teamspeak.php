@@ -51,7 +51,9 @@ class Teamspeak extends LinkedService{
             );
         
         SettingsPersistencyHelper::$visibleSettings["Teamspeak Settings"] = array(
-            SettingsPersistencyHelper::TEAMSPEAK_BOT_ADDRESS
+            SettingsPersistencyHelper::TEAMSPEAK_BOT_ADDRESS,
+            SettingsPersistencyHelper::TEAMSPEAK_LINKED_WORLD_TEMP_GROUP_PRIMARY,
+            SettingsPersistencyHelper::TEAMSPEAK_LINKED_WORLD_TEMP_GROUP_SECONDARY
         );
     }
     

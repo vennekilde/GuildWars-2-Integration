@@ -54,6 +54,10 @@ class SimpleMachinesForum extends LinkedService{
                 true,
                 false
             );
+        
+        SettingsPersistencyHelper::$visibleSettings["SMF Settings"] = array(
+            SettingsPersistencyHelper::SMF_LINKED_WORLD_TEMP_GROUP_PRIMARY,
+        );
     }
     
     /**

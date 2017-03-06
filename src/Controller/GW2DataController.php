@@ -28,11 +28,16 @@ namespace GW2Integration\Controller;
 
 use GW2Integration\API\GW2APICommunicator;
 use GW2Integration\Entity\LinkedUser;
-use GW2Integration\Entity\UserServiceLink;
 use GW2Integration\Exceptions\GW2APIException;
+use GW2Integration\Modules\Guilds\ModuleLoader;
+use GW2Integration\Persistence\GW2Schema;
 use GW2Integration\Persistence\Helper\GW2DataPersistence;
 use GW2Integration\Persistence\Helper\LinkingPersistencyHelper;
+use GW2Integration\Utils\GW2DataFieldConverter;
 use GW2Treasures\GW2Api\GW2Api;
+use Illuminate\Database\Capsule\Manager as Capsule;
+use function GuzzleHttp\json_decode;
+use function GuzzleHttp\json_encode;
 
 /**
  * Description of GW2DataController
@@ -70,7 +75,7 @@ class GW2DataController {
         //Process individual guild memberships
         //Temporary, using V2 code
         if(isset($linkedUser->getPrimaryUserServiceLinks()[0]) && $linkedUser->getPrimaryUserServiceLinks()[0]->getServiceUserId() != null){
-            \GW2Integration\Modules\Guilds\ModuleLoader::updateGuildAssociation($linkedUser->getPrimaryUserServiceLinks()[0]->getServiceUserId(), $accountData["guilds"], $accountData["world"]);
+            ModuleLoader::updateGuildAssociation($linkedUser->getPrimaryUserServiceLinks()[0]->getServiceUserId(), $accountData["guilds"], $accountData["world"]);
         }
         
         return true;
@@ -82,16 +87,84 @@ class GW2DataController {
      * @param string $apiKey
      * @return boolean
      */
-    function resyncCharactersEndpoint($linkedUser, $apiKey) {
+    public static function updateCharacters($linkedUser, $apiKey) {
         //Get data from Account endpoint
-        $json = (array)static::$gw2API->account($apiKey)->get();
+        //Quick and dirty stdObject to array conversion
+        $json = json_decode(json_encode(static::$gw2API->characters($apiKey)->all()), true);
 
+        $localCharacters = Capsule::table(GW2Schema::$characters->getTableName())->
+                where("link_id", LinkingPersistencyHelper::determineLinkedUserId($linkedUser))->get()->all();
+        
         foreach($json AS $character){
-            //\IPS\Session::i()->log(null,  'character : ' . json_encode($character));
-            GW2DataPersistence::persistCharacterData($linkedUser, $character);
-            GW2DataPersistence::persistCharacterCraftingProfessions($character["name"], $character["crafting"]);
+            $characterId = null;
+            $character["link_id"] = $linkedUser->getLinkedId();
+            $character["race"] = GW2DataFieldConverter::getRaceIdFromString($character["race"]);
+            $character["gender"] = GW2DataFieldConverter::getGenderIdFromString($character["gender"]);
+            $character["profession"] = GW2DataFieldConverter::getProfessionIdFromString($character["profession"]);
+            //Remove TZ to compare with stored datetimes
+            $character["created"] = str_replace("T", " ", $character["created"]);
+            $character["created"] = str_replace("Z", "", $character["created"]);
+            
+            foreach($localCharacters AS $key => $localCharacter){
+                if(     $localCharacter->created == $character["created"]
+                     && $localCharacter->race == $character["race"]
+                     && $localCharacter->profession == $character["profession"]
+                     && $localCharacter->level <= $character["level"]
+                     && $localCharacter->age <= $character["age"]
+                     && $localCharacter->deaths <= $character["deaths"]){
+                    
+                    $characterId = $localCharacter->id;
+                    //Don't need the character data in the array anymore, 
+                    //as it will just slow down the comparison
+                    unset($localCharacters[$key]);
+                    break;
+                }
+            }
+            $characterData = GW2Schema::getSupportedColumns($character, GW2Schema::$characters);
+            if(isset($characterId)){
+                Capsule::table(GW2Schema::$characters->getTableName())->where("id",$characterId)->update($characterData);
+            } else {
+                Capsule::table(GW2Schema::$characters->getTableName())->insert($characterData);
+                $characterId = Capsule::connection()->getPdo()->lastInsertId();
+            }
+            
+            //Persist each crafting profession
+            self::updateCharacterCrafting($characterId, $character["crafting"]);
+        }
+            
+        //If a character is still in the local array, it means the user is no
+        //longer owned by the player
+        foreach($localCharacters AS $localCharacter){
+            self::deleteCharacter($localCharacter->id);
         }
         return true;
+    }
+    
+    /**
+     * 
+     * @param type $characterId
+     * @param type $craftingDisciplines
+     * @return boolean
+     */
+    public static function updateCharacterCrafting($characterId, $craftingDisciplines) {
+        //Persist each crafting profession
+        foreach($craftingDisciplines AS $crafting){
+            $crafting = GW2Schema::getSupportedColumns(
+                    $crafting, GW2Schema::$characters_crafting);
+
+            $discipline = GW2DataFieldConverter::getCraftingDisciplineIdFromString($crafting["discipline"]);
+            unset($crafting["discipline"]);
+            Capsule::table(GW2Schema::$characters_crafting->getTableName())->
+                    updateOrInsert(array("id" => $characterId, "discipline" => $discipline), 
+                            $crafting);
+        }
+            
+        return true;
+    }
+    
+    public static function deleteCharacter($characterId){
+        Capsule::table(GW2Schema::$characters->getTableName())->where("id", $characterId)->delete();
+        Capsule::table(GW2Schema::$characters_crafting->getTableName())->where("id", $characterId)->delete();
     }
     
     

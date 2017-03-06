@@ -37,16 +37,17 @@ ALTER TABLE `gw2integration_characters` CHANGE `c_created` `created` TIMESTAMP N
 ALTER TABLE `gw2integration_characters` CHANGE `c_deaths` `deaths` INT(10) UNSIGNED NOT NULL DEFAULT '0';
 ALTER TABLE `gw2integration_characters` CHANGE `c_title` `title` INT(11) NULL DEFAULT NULL;
 
-ALTER TABLE `gw2integration_characters` ADD `id` INT(11) NOT NULL FIRST;
+ALTER TABLE `gw2integration_characters` ADD `id` INT(11) NOT NULL AUTO_INCREMENT FIRST;
 ALTER TABLE `gw2integration_characters` DROP PRIMARY KEY, ADD PRIMARY KEY(`id`);
 ALTER TABLE `gw2integration_characters` CHANGE `link_id` `link_id` INT(11) UNSIGNED NOT NULL;
 
 ALTER TABLE `gw2integration_character_crafting` ADD `id` INT(11) NOT NULL FIRST;
-ALTER TABLE `gw2integration_character_crafting` DROP PRIMARY KEY, ADD PRIMARY KEY(`id`, `discipline`);
 
 ALTER TABLE `gw2integration_character_crafting` DROP `c_name`;
 ALTER TABLE `gw2integration_character_crafting` CHANGE `cr_discipline` `discipline` TINYINT(3) UNSIGNED NOT NULL;
 ALTER TABLE `gw2integration_character_crafting` CHANGE `cr_rating` `rating` INT(10) UNSIGNED NOT NULL;
 ALTER TABLE `gw2integration_character_crafting` CHANGE `cr_active` `active` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0';
+ALTER TABLE `gw2integration_character_crafting` DROP PRIMARY KEY, ADD PRIMARY KEY(`id`, `discipline`);
 
 ALTER TABLE `gw2integration_guild_membership` CHANGE `link_id` `link_id` INT(11) UNSIGNED NOT NULL;
+ALTER TABLE `gw2integration_characters` CHANGE `guild` `guild` CHAR(36) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '';

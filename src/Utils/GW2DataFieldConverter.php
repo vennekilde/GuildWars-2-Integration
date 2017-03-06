@@ -32,6 +32,39 @@ namespace GW2Integration\Utils;
  * @author Jeppe Boysen Vennekilde
  */
 class GW2DataFieldConverter {
+    
+    const CRAFTING_DICIPLINES = array(
+        "armorsmith",
+        "artificer",
+        "chef",
+        "huntsman",
+        "jeweler",
+        "leatherworker",
+        "scribe",
+        "tailor",
+        "weaponsmith",
+    );
+    
+    public static $PROFESSION_NAMES = array(
+        "elementalist",
+        "mesmer",
+        "necromancer",
+        "engineer",
+        "thief",
+        "ranger",
+        "warrior",
+        "guardian",
+        "revenant"
+    );
+    
+    public static $RACE_NAMES = array(
+        "human",
+        "norn",
+        "asura",
+        "charr",
+        "sylvari",
+    );
+    
     public static $world_names = array(
         1001 => "Anvil Rock",
         1002 => "Borlis Pass",
@@ -87,7 +120,7 @@ class GW2DataFieldConverter {
     );
     
     public static function getWorldNameById($worldId){
-        return isset(static::$world_names[$worldId]) ? static::$world_names[$worldId] : "Unknown world id: "+$worldId;
+        return isset(self::$world_names[$worldId]) ? self::$world_names[$worldId] : "Unknown world id: "+$worldId;
     }
     
     /**
@@ -107,6 +140,51 @@ class GW2DataFieldConverter {
                 return 3;
         }
         return -1;
+    }
+    
+    
+    /**
+     * 
+     * @param string $string
+     * @return integer Description
+     */
+    public static function getRaceIdFromString($string){
+        return array_search(lcfirst($string), self::$RACE_NAMES);
+    }
+    
+    /**
+     * 
+     * @param string $string
+     * @return integer Description
+     */
+    public static function getGenderIdFromString($string){
+        return strcasecmp($string, "male") == 0 ? 0 : 1;
+    }
+    /**
+     * 
+     * @param string $string
+     * @return integer Description
+     */
+    public static function getProfessionIdFromString($string){
+        return array_search(lcfirst($string), self::$PROFESSION_NAMES);
+    }
+    
+    /**
+     * 
+     * @param string $professionId
+     * @return integer Description
+     */
+    public static function getProfessionName($professionId){
+        return isset(self::$PROFESSION_NAMES[$professionId]) ? ucfirst(self::$PROFESSION_NAMES[$professionId]) : "Unknown";
+    }
+    
+    /**
+     * 
+     * @param string $string
+     * @return integer Description
+     */
+    public static function getCraftingDisciplineIdFromString($string){
+        return array_search(lcfirst($string), self::CRAFTING_DICIPLINES);
     }
     
     

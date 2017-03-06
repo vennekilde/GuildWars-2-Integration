@@ -26,51 +26,91 @@
 
 namespace GW2Integration\Persistence;
 
+use Illuminate\Database\Capsule\Manager as Capsule;
 use PDO;
 
 if (!defined('GW2Integration')) {
     die('Hacking attempt...');
 }
+
 /**
  * Description of Persistence
  *
  * @author Jeppe Boysen Vennekilde
  */
-class Persistence{
+class Persistence {
+
     private static $instance = null;
+
     /**
      * 
      * @global Persistence $instance
      * @return Persistence
      */
-    public static function DB(){
-        if(static::$instance == null){
+    public static function DB() {
+        if (static::$instance == null) {
             static::$instance = new Persistence();
         }
         return static::$instance;
     }
-    
+
+    /**
+     *
+     * @var Capsule
+     */
+    private $capsule;
+
     /**
      *
      * @var PDO 
      */
     private $db;
-    
-    public function __construct(){
-        global $gw2i_db_engine, $gw2i_db_database, $gw2i_db_address, $gw2i_db_password, $gw2i_db_user; 
+
+    public function __construct() {
+        global $gw2i_db_engine, $gw2i_db_database, $gw2i_db_address, $gw2i_db_password, $gw2i_db_user, $gw2i_db_prefix;
         $this->db = new PDO(
-                $gw2i_db_engine.':host='.$gw2i_db_address.';dbname='.$gw2i_db_database.';charset=utf8mb4', $gw2i_db_user, $gw2i_db_password, 
-                array(
-                    PDO::ATTR_EMULATE_PREPARES => false, 
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
-                );
+                $gw2i_db_engine . ':host=' . $gw2i_db_address . ';dbname=' . $gw2i_db_database . ';charset=utf8mb4', $gw2i_db_user, $gw2i_db_password, array(
+            PDO::ATTR_EMULATE_PREPARES => false,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
+        );
+
+        $this->capsule = new Capsule();
+        $this->capsule->addConnection([
+            'driver' => $gw2i_db_engine,
+            'host' => $gw2i_db_address,
+            'database' => $gw2i_db_database,
+            'username' => $gw2i_db_user,
+            'password' => $gw2i_db_password,
+            'charset' => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix' => $gw2i_db_prefix,
+        ]);
+        
+        
+        // Set the event dispatcher used by Eloquent models... (optional)
+        //$this->capsule->setEventDispatcher(new Dispatcher(new Container()));
+
+        // Make this Capsule instance available globally via static methods... (optional)
+        $this->capsule->setAsGlobal();
+        
+        // Setup the Eloquent ORM... (optional; unless you've used setEventDispatcher())
+        $this->capsule->bootEloquent();
     }
-    
+
     /**
      * 
      * @return PDO
      */
-    public static function getDBEngine(){
+    public static function getDBEngine() {
         return static::DB()->db;
     }
+
+    /**
+     * 
+     * @return PDO
+     */
+    public static function getDBEngine2() {
+        return static::DB()->capsule;
+    }
+
 }

@@ -95,6 +95,10 @@ class GW2DataController {
         $localCharacters = Capsule::table(GW2Schema::$characters->getTableName())->
                 where("link_id", LinkingPersistencyHelper::determineLinkedUserId($linkedUser))->get()->all();
         
+        
+        //Infered & collected data combined into single data points
+        $accountDataExtended = array();
+        
         foreach($json AS $character){
             $characterId = null;
             $character["link_id"] = $linkedUser->getLinkedId();
@@ -127,9 +131,24 @@ class GW2DataController {
                 Capsule::table(GW2Schema::$characters->getTableName())->insert($characterData);
                 $characterId = Capsule::connection()->getPdo()->lastInsertId();
             }
+            if(empty($accountDataExtended)){
+                $accountDataExtended["deaths"] = $character["deaths"];
+                $accountDataExtended["playtime"] = $character["age"];
+            } else {
+                $accountDataExtended["deaths"] += $character["deaths"];
+                $accountDataExtended["playtime"] += $character["age"];
+            }
             
             //Persist each crafting profession
             self::updateCharacterCrafting($characterId, $character["crafting"]);
+        }
+        
+        if(!empty($accountDataExtended)){
+            Capsule::table(GW2Schema::$accountDataExtended->getTableName())->
+                    updateOrInsert(
+                            array("link_id" => $linkedUser->getLinkedId()),
+                            $accountDataExtended
+                    );
         }
             
         //If a character is still in the local array, it means the user is no

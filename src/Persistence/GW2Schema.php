@@ -37,6 +37,9 @@ class GW2Schema {
     public static $account;
     
     /** @var GW2Schema  */
+    public static $accountDataExtended;
+    
+    /** @var GW2Schema  */
     public static $characters;
     
     /** @var GW2Schema  */
@@ -65,6 +68,14 @@ class GW2Schema {
                 "daily_ap",
                 "monthly_ap",
                 "wvw_rank"
+            )
+        );
+        
+        self::$accountDataExtended = new GW2Schema("account_data_ext",
+            array(
+                "link_id",
+                "deaths",
+                "playtime"
             )
         );
         

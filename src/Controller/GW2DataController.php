@@ -194,6 +194,7 @@ class GW2DataController {
             if(!$isArray || !in_array($guildId, $guildsAlreadySynched)){
                 //Old V1 endpoint not supported by gw2treasures/gw2api, so used custom api communicator
                 try{
+                    $logger->info("refreshed $guildId");
                     $guildDetails = GW2APICommunicator::requestGuildDetails($guildId);
                     $json = $guildDetails->getJsonResponse();
                     GW2DataPersistence::persistGuildDetails($json);

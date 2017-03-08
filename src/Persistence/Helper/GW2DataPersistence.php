@@ -293,7 +293,7 @@ class GW2DataPersistence {
     public static function getGuildsAlreadySynched($guildIds, $checkLastSynched = true){
         global $gw2i_db_prefix, $gw2i_refresh_guild_data_interval;
         if($checkLastSynched){
-            $addonQuery = 'WHERE g_last_synched < NOW() - INTERVAL ? SECOND AND g_uuid IN("' . implode('","', $guildIds) . '")';
+            $addonQuery = 'WHERE g_last_synched > NOW() - INTERVAL ? SECOND AND g_uuid IN("' . implode('","', $guildIds) . '")';
             $params = array($gw2i_refresh_guild_data_interval);
         } else {
             $addonQuery = 'WHERE g_uuid IN("' . implode('","', $guildIds) . '")';
@@ -302,7 +302,7 @@ class GW2DataPersistence {
         $pqs = 'SELECT g_uuid FROM '.$gw2i_db_prefix.'guilds ' . $addonQuery;
         $ps = Persistence::getDBEngine()->prepare($pqs);
         $ps->execute($params);
-        $guildsAlreadySynched = $ps->fetch(PDO::FETCH_NUM);
+        $guildsAlreadySynched = $ps->fetchAll(PDO::FETCH_NUM);
         
         return $guildsAlreadySynched;
     }

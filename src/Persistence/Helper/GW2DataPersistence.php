@@ -314,12 +314,12 @@ class GW2DataPersistence {
     public static function persistGuildDetails($guildDetails){
         global $gw2i_db_prefix;
         
-        $pqs = 'INSERT INTO '.$gw2i_db_prefix.'guilds (g_uuid, g_name, g_tag) '
-                . 'VALUES(?, ?, ?) '
+        $pqs = 'INSERT INTO '.$gw2i_db_prefix.'guilds (g_uuid, g_name, g_tag, g_last_synched) '
+                . 'VALUES(?, ?, ?, CURRENT_TIMESTAMP) '
                 . 'ON DUPLICATE KEY UPDATE '
                     . 'g_name = VALUES(g_name), '
                     . 'g_tag  = VALUES(g_tag), '
-                    . 'g_last_synched  = CURRENT_TIMESTAMP';
+                    . 'g_last_synched  = VALUES(g_last_synched)';
         $params = array(
             $guildDetails["guild_id"], 
             $guildDetails["guild_name"],

@@ -302,7 +302,7 @@ class GW2DataPersistence {
         $pqs = 'SELECT g_uuid FROM '.$gw2i_db_prefix.'guilds ' . $addonQuery;
         $ps = Persistence::getDBEngine()->prepare($pqs);
         $ps->execute($params);
-        $guildsAlreadySynched = $ps->fetchAll(PDO::FETCH_NUM);
+        $guildsAlreadySynched = $ps->fetchAll(PDO::FETCH_COLUMN, 0);
         
         return $guildsAlreadySynched;
     }

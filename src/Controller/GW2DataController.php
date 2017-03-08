@@ -189,12 +189,20 @@ class GW2DataController {
     
     public static function fetchGuildsData($guildIds, $checkLastSynched = true){
         $guildsAlreadySynched = GW2DataPersistence::getGuildsAlreadySynched($guildIds, $checkLastSynched);
-        $isArray = is_array($guildsAlreadySynched);
+        if(!is_array($guildsAlreadySynched)){
+            return;
+        }
         foreach($guildIds AS $guildId){
-            if(!$isArray || !in_array($guildId, $guildsAlreadySynched)){
+            global $logger;
+            $logger->info($isArray);
+            $logger->info($guildId);
+            $logger->info(print_r($guildsAlreadySynched, true));
+            $key = array_search($guildId, $guildsAlreadySynched);
+            if(array_search($guildId, $key !== false)){
                 //Old V1 endpoint not supported by gw2treasures/gw2api, so used custom api communicator
                 try{
                     global $logger;
+                    $logger->info("test");
                     $guildDetails = GW2APICommunicator::requestGuildDetails($guildId);
                     $json = $guildDetails->getJsonResponse();
                     GW2DataPersistence::persistGuildDetails($json);
@@ -202,6 +210,9 @@ class GW2DataController {
                     global $logger;
                     $logger->error("Exception ".get_class($e) . ": " . $e->getMessage());
                 }
+            } else {
+                //Optimization, no need to check if the guildid is in the array anymore
+                unset($guildsAlreadySynched[$key]);
             }
         }
     }

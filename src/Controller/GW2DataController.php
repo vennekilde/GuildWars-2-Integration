@@ -193,16 +193,10 @@ class GW2DataController {
             return;
         }
         foreach($guildIds AS $guildId){
-            global $logger;
-            $logger->info($isArray);
-            $logger->info($guildId);
-            $logger->info(print_r($guildsAlreadySynched, true));
             $key = array_search($guildId, $guildsAlreadySynched);
-            if(array_search($guildId, $key !== false)){
+            if(array_search($guildId, $guildsAlreadySynched, $key !== false)){
                 //Old V1 endpoint not supported by gw2treasures/gw2api, so used custom api communicator
                 try{
-                    global $logger;
-                    $logger->info("test");
                     $guildDetails = GW2APICommunicator::requestGuildDetails($guildId);
                     $json = $guildDetails->getJsonResponse();
                     GW2DataPersistence::persistGuildDetails($json);

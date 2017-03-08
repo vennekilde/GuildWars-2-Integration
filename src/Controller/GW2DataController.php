@@ -194,7 +194,7 @@ class GW2DataController {
         }
         foreach($guildIds AS $guildId){
             $key = array_search($guildId, $guildsAlreadySynched);
-            if(array_search($guildId, $guildsAlreadySynched, $key !== false)){
+            if($key === false){
                 //Old V1 endpoint not supported by gw2treasures/gw2api, so used custom api communicator
                 try{
                     $guildDetails = GW2APICommunicator::requestGuildDetails($guildId);

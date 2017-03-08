@@ -293,7 +293,7 @@ class GW2DataPersistence {
     public static function getGuildsAlreadySynched($guildIds, $checkLastSynched = true){
         global $gw2i_db_prefix, $gw2i_refresh_guild_data_interval;
         if($checkLastSynched){
-            $addonQuery = 'WHERE g_last_synched > NOW() - INTERVAL ? SECOND AND g_uuid IN("' . implode('","', $guildIds) . '")';
+            $addonQuery = 'WHERE g_last_synched < NOW() - INTERVAL ? SECOND AND g_uuid IN("' . implode('","', $guildIds) . '")';
             $params = array($gw2i_refresh_guild_data_interval);
         } else {
             $addonQuery = 'WHERE g_uuid IN("' . implode('","', $guildIds) . '")';

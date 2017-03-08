@@ -29,7 +29,11 @@
 
 ALTER TABLE `gw2integration_characters` CHANGE `name` `name` VARCHAR(128) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '';
 
+<<<<<<< HEAD
 CREATE TABLE `gw2_integration_dev`.`gw2integration_account_data_ext` ( 
+=======
+CREATE TABLE `gw2integration_account_data_ext` ( 
+>>>>>>> fe8e31a9cd8e6ef1f65388cc4b259657fca0d5a2
     `link_id` INT(11) NOT NULL , 
     `deaths` INT NOT NULL , 
     `playtime` INT NOT NULL,

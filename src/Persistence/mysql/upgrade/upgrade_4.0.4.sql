@@ -1,7 +1,7 @@
 /* 
  * The MIT License
  *
- * Copyright 2016 Jeppe Boysen Vennekilde.
+ * Copyright 2017 Jeppe Boysen Vennekilde.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,15 +23,15 @@
  */
 /**
  * Author:  Jeppe Boysen Vennekilde
- * Created: 28-09-2016
+ * Created: Mar 8, 2017
  */
 
-RENAME TABLE gw2integration_api_statistics TO gw2integration_statistics;
-ALTER TABLE gw2integration_statistics ADD data INT(11);
-ALTER TABLE gw2integration_statistics CHANGE value statistic INT(11) NOT NULL;
-ALTER TABLE gw2integration_character_crafting ADD CONSTRAINT fk_c_came FOREIGN KEY (`c_name`) REFERENCES gw2integration_characters(`c_name`) ON DELETE CASCADE;
-ALTER TABLE gw2integration_guild_membership ADD CONSTRAINT fk_link_id FOREIGN KEY (`link_id`) REFERENCES gw2integration_accounts(`link_id`) ON DELETE CASCADE;
-ALTER TABLE gw2integration_characters ADD CONSTRAINT fk_link_id FOREIGN KEY (`link_id`) REFERENCES gw2integration_accounts(`link_id`) ON DELETE CASCADE;
-ALTER TABLE gw2integration_banned_accounts DROP FOREIGN KEY b_banned_by;
-ALTER TABLE gw2integration_banned_accounts CHANGE b_reason b_reason VARCHAR(255) NOT NULL;
 
+ALTER TABLE `gw2integration_characters` CHANGE `name` `name` VARCHAR(128) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '';
+
+CREATE TABLE `gw2integration_account_data_ext` ( 
+    `link_id` INT(11) NOT NULL , 
+    `deaths` INT NOT NULL , 
+    `playtime` INT NOT NULL,
+	PRIMARY KEY (link_id)
+)

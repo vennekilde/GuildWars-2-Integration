@@ -73,7 +73,7 @@ class AccountPersistenceHelper {
         }
         
         $preparedQueryString = 
-                'SELECT gw2_accounts.*, gw2_api_keys.*, gw2_banned_accounts.ban_id, gw2_banned_accounts.reason AS ban_reason, gw2_banned_accounts.banned_by, gw2_banned_accounts.timestamp AS ban_timestamp '
+                'SELECT gw2_accounts.*, gw2_api_keys.*, gw2_banned_accounts.ban_id, gw2_banned_accounts.reason, gw2_banned_accounts.banned_by, gw2_banned_accounts.timestamp '
                 . 'FROM gw2_accounts '
                 . 'INNER JOIN gw2_api_keys ON gw2_accounts.link_id = gw2_api_keys.link_id '
                 . 'LEFT JOIN gw2_banned_accounts ON UPPER(gw2_accounts.username) = UPPER(gw2_banned_accounts.username)'

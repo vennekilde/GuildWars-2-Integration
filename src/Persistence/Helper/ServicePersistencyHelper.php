@@ -57,4 +57,64 @@ class ServicePersistencyHelper {
         return $result;
     }
     
+    /**
+     * 
+     * @global \GW2Integration\Persistence\Helper\type $gw2i_db_prefix
+     * @param type $world
+     * @param type $serviceId
+     * @param type $groupId
+     * @param type $isPrimary
+     * @return type
+     */
+    public static function persistWorldToGroupSettings($world, $serviceId, $isPrimary, $groupId){
+        global $gw2i_db_prefix;
+        
+        $queryParams = array(
+            $world,
+            $serviceId,
+            $groupId,
+            $isPrimary
+        );
+        
+        $preparedQueryString = '
+            INSERT INTO '.$gw2i_db_prefix.'world_to_service_group (world, service_id, group_id, is_primary)
+                VALUES (?,?,?,?)
+            ON DUPLICATE KEY UPDATE 
+                group_id = VALUES(group_id)';
+        
+        $preparedStatement = Persistence::getDBEngine()->prepare($preparedQueryString);
+        $result = $preparedStatement->execute($queryParams);
+        return $result;
+    }
+    
+    /**
+     * 
+     * @global \GW2Integration\Persistence\Helper\type $gw2i_db_prefix
+     * @param type $world
+     * @param type $serviceId
+     * @param type $isPrimary
+     * @param type $groupId
+     * @return type
+     */
+    public static function removeWorldToGroupSettings($world, $serviceId, $isPrimary, $groupId = null){
+        global $gw2i_db_prefix;
+        
+        $queryParams = array(
+            $world,
+            $serviceId,
+            $isPrimary
+        );
+        if(isset($groupId)){
+            $queryParams[] = $groupId;
+        }
+        
+        $preparedQueryString = '
+            DELETE FROM '.$gw2i_db_prefix.'world_to_service_group '
+                . 'WHERE world = ? AND service_id = ? AND is_primary = ?' 
+                . (isset($groupId) ? ' AND group_id = ?' : '');
+        
+        $preparedStatement = Persistence::getDBEngine()->prepare($preparedQueryString);
+        $result = $preparedStatement->execute($queryParams);
+        return $result;
+    }
 }

@@ -88,6 +88,11 @@ class APIKeyProcessor {
                             $result = GW2DataController::resyncGuildLeaderMembersEndpoint($linkedUser, $apiKey);
                             break;
                     }
+                    switch($permission){
+                        case "characters":
+                            $result = GW2DataController::updateCharacters($linkedUser, $apiKey);
+                            break;
+                    }
 
                     if($result){
                         $success = true;

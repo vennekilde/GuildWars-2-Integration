@@ -8,12 +8,14 @@ use GW2Integration\Entity\LinkedUser;
 use GW2Integration\Entity\UserServiceLink;
 use GW2Integration\Exceptions\UnableToDetermineLinkId;
 use GW2Integration\Modules\Verification\VerificationController;
+use GW2Integration\Persistence\GW2Schema;
 use GW2Integration\Persistence\Helper\GW2DataPersistence;
 use GW2Integration\Persistence\Helper\LinkingPersistencyHelper;
 use GW2Integration\Persistence\Helper\SettingsPersistencyHelper;
 use GW2Integration\Persistence\Helper\StatisticsPersistence;
 use GW2Integration\Persistence\Helper\VerificationEventPersistence;
 use GW2Integration\Utils\GW2DataFieldConverter;
+use Illuminate\Database\Capsule\Manager;
 use function GuzzleHttp\json_encode;
 
 /* 
@@ -74,6 +76,7 @@ switch($form){
                 $result["links"] = LinkingPersistencyHelper::getServiceLinks($linkedUser);
                 $result["extensive-account"] = $extensiveAccountData;
                 $result["guilds"] = GW2DataPersistence::getGuildMembershipWithGuildsData($linkedUser);
+                $result["characters"] = Manager::table(GW2Schema::$characters->getTableName())->where("link_id", $linkedUser->getLinkedId())->get()->all();
                 
             } catch (UnableToDetermineLinkId $ex) {
                 $result = false;

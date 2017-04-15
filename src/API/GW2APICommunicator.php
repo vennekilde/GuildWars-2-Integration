@@ -107,7 +107,7 @@ class GW2APICommunicator {
                     throw new GW2APIKeyException($json["error"], $apiKey, $response, $http_status, 2);
                 }
             } else if($response === false){
-                throw new GW2APIKeyException('CURL Error: ' . curl_error($curl) . '. HTTP Code: '.$http_status, $apiKey, $response, $http_status, -1);
+                throw new GW2APIKeyException('CURL Error: ' . curl_error($curl) . '. for endpoint '.$endPoint.' HTTP Code: '.$http_status, $apiKey, $response, $http_status, -1);
             } else {
                 throw new GW2APIKeyException('HTTP Code: '.$http_status, $apiKey, $response, $http_status, -1);
             }

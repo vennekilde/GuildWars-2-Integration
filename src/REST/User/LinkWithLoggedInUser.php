@@ -28,7 +28,7 @@ namespace GW2Integration\REST\User;
 
 require __DIR__.'/../RESTHelper.php';
 
-use GW2Integration\Entity\LinkedUser;
+use GW2Integration\Entity\UserServiceLink;
 use GW2Integration\Exceptions\UnableToDetermineLinkId;
 use GW2Integration\Persistence\Helper\LinkingPersistencyHelper;
 use GW2Integration\REST\RESTHelper;
@@ -51,7 +51,7 @@ if(isset($serviceId) && isset($gw2i_linkedServices[$serviceId])){
         $response["result"] = $userUserviceLink;
         
         try{
-            $userServiceLink = new GW2Integration\Entity\UserServiceLink(
+            $userServiceLink = new UserServiceLink(
                         $serviceId, 
                         $response["result"][0], 
                         $isPrimary,

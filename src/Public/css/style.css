@@ -253,6 +253,6 @@ THE SOFTWARE.
     vertical-align: top;
 }
 
-.dark-theme .mdl-button {
-    color: white;
+.gray-background {
+    background-color: rgba(45, 122, 201, 0.12);
 }

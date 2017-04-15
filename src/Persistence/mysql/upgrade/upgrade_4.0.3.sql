@@ -23,32 +23,31 @@
  */
 /**
  * Author:  Jeppe Boysen Vennekilde
- * Created: 12-11-2016
+ * Created: 28-09-2016
  */
 
-ALTER TABLE gw2integration_accounts CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
-ALTER TABLE gw2integration_api_keys CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
-ALTER TABLE gw2integration_banned_accounts CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
-ALTER TABLE gw2integration_characters CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
-ALTER TABLE gw2integration_character_crafting CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
-ALTER TABLE gw2integration_guilds CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
-ALTER TABLE gw2integration_guild_membership CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
-ALTER TABLE gw2integration_integration_settings CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
-ALTER TABLE gw2integration_linked_user_sessions CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
-ALTER TABLE gw2integration_statistics CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
-ALTER TABLE gw2integration_user_service_links CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
-ALTER TABLE gw2integration_verification_log CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
-ALTER TABLE gw2integration_world_to_service_group CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE `gw2integration_characters` CHANGE `c_name` `name` VARCHAR(128) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '';
+ALTER TABLE `gw2integration_characters` CHANGE `c_race` `race` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';
+ALTER TABLE `gw2integration_characters` CHANGE `c_gender` `gender` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';
+ALTER TABLE `gw2integration_characters` CHANGE `c_profession` `profession` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';
+ALTER TABLE `gw2integration_characters` CHANGE `c_level` `level` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0';
+ALTER TABLE `gw2integration_characters` CHANGE `g_uuid` `guild` CHAR(36) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '';
+ALTER TABLE `gw2integration_characters` CHANGE `c_age` `age` INT(10) UNSIGNED NOT NULL DEFAULT '0';
+ALTER TABLE `gw2integration_characters` CHANGE `c_created` `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE `gw2integration_characters` CHANGE `c_deaths` `deaths` INT(10) UNSIGNED NOT NULL DEFAULT '0';
+ALTER TABLE `gw2integration_characters` CHANGE `c_title` `title` INT(11) NULL DEFAULT NULL;
 
-ALTER TABLE gw2integration_guild_membership ADD g_rank VARCHAR(64) NULL AFTER g_representing;
-ALTER TABLE gw2integration_guild_membership ADD g_member_since TIMESTAMP NULL AFTER g_rank;
+ALTER TABLE `gw2integration_characters` ADD `id` INT(11) NOT NULL AUTO_INCREMENT FIRST;
+ALTER TABLE `gw2integration_characters` DROP PRIMARY KEY, ADD PRIMARY KEY(`id`);
+ALTER TABLE `gw2integration_characters` CHANGE `link_id` `link_id` INT(11) UNSIGNED NOT NULL;
 
-CREATE TABLE `gw2integration_guild_ranks` (
-    `g_uuid` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
-    `gr_name` varchar(32) COLLATE utf8_general_ci NOT NULL,
-    `gr_order` int(11) NOT NULL,
-    `gr_permissions` varchar(1024) NOT NULL,
-    `gr_icon` varchar(1024) NOT NULL,
-    PRIMARY KEY (`g_uuid`,`gr_name`),
-    FOREIGN KEY (`g_uuid`) REFERENCES gw2integration_guilds.g_uuid  ON DELETE CASCADE
-);
+ALTER TABLE `gw2integration_character_crafting` ADD `id` INT(11) NOT NULL FIRST;
+
+ALTER TABLE `gw2integration_character_crafting` DROP `c_name`;
+ALTER TABLE `gw2integration_character_crafting` CHANGE `cr_discipline` `discipline` TINYINT(3) UNSIGNED NOT NULL;
+ALTER TABLE `gw2integration_character_crafting` CHANGE `cr_rating` `rating` INT(10) UNSIGNED NOT NULL;
+ALTER TABLE `gw2integration_character_crafting` CHANGE `cr_active` `active` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0';
+ALTER TABLE `gw2integration_character_crafting` DROP PRIMARY KEY, ADD PRIMARY KEY(`id`, `discipline`);
+
+ALTER TABLE `gw2integration_guild_membership` CHANGE `link_id` `link_id` INT(11) UNSIGNED NOT NULL;
+ALTER TABLE `gw2integration_characters` CHANGE `guild` `guild` CHAR(36) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '';

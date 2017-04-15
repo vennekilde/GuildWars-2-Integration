@@ -1,7 +1,7 @@
 {
     "name": "vennekilde/gw2integration",
     "description": "Description of project GW2 Website API Integration.",
-    "version": "4.0.3",
+    "version": "4.0.4",
     "authors": [
         {
             "name": "Jeppe Boysen Vennekilde",
@@ -9,9 +9,9 @@
         }
     ],
     "require": {
-        "gw2treasures/gw2api": "^2.4",
+        "gw2treasures/gw2api": "3.2.0",
         "katzgrau/klogger": "dev-master",
-        "golonka/bbcodeparser": "^2.2"
+        "illuminate/database": "5.4.*"
     },
     "autoload": {
         "psr-4": {

@@ -33,6 +33,7 @@ use GW2Integration\Events\EventManager;
 use GW2Integration\Events\Events\UserServiceLinkCreated;
 use GW2Integration\Events\Events\UserServiceLinkRemoved;
 use GW2Integration\Events\Events\UserServiceLinkUpdated;
+use GW2Integration\Exceptions\CannotChangeServiceLink;
 use GW2Integration\Exceptions\LinkedUserIdConflictException;
 use GW2Integration\Exceptions\UnableToDetermineLinkId;
 use GW2Integration\Persistence\Persistence;
@@ -299,6 +300,12 @@ class LinkingPersistencyHelper {
                             $affectedLink["link_id"])
                         );
             } else {
+                global $gw2i_linkedServices;
+                $service = $gw2i_linkedServices[$affectedLink["service_id"]];
+                if(!$service->allowReLinking()){
+                    throw new CannotChangeServiceLink($service->getName());
+                }
+                
                 //If the link isn't the same link, then the affected link is removed
                 $events[] = new UserServiceLinkRemoved(
                         new UserServiceLink(

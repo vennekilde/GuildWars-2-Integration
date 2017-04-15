@@ -52,6 +52,7 @@ class SimpleMachinesForum extends LinkedService{
                 "You should not be able to see this message, unless an error happened, contact an admin",
                 true,
                 true,
+                false,
                 false
             );
         

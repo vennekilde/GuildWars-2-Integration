@@ -40,8 +40,9 @@ abstract class LinkedService {
     private $canDetermineLinkDuringSetup;
     private $canCheckGroupId;
     private $hasConfigPage;
+    private $allowReLinking;
     
-    public function __construct($serviceId, $name, $description, $linkNotAvailable, $canDetermineLinkDuringSetup, $canCheckGroupId, $hasConfigPage) {
+    public function __construct($serviceId, $name, $description, $linkNotAvailable, $canDetermineLinkDuringSetup, $canCheckGroupId, $hasConfigPage, $allowReLinking) {
         $this->serviceId = $serviceId;
         $this->name = $name;
         $this->description = $description;
@@ -49,6 +50,7 @@ abstract class LinkedService {
         $this->canDetermineLinkDuringSetup = $canDetermineLinkDuringSetup;
         $this->canCheckGroupId = $canCheckGroupId;
         $this->hasConfigPage = $hasConfigPage;
+        $this->allowReLinking = $allowReLinking;
     }
     
     public abstract function getAvailableUserServiceLink();
@@ -71,6 +73,10 @@ abstract class LinkedService {
     
     public function canDetermineLinkDuringSetup(){
         return $this->canDetermineLinkDuringSetup;
+    }
+    
+    public function allowReLinking(){
+        return $this->allowReLinking;
     }
     
     /**

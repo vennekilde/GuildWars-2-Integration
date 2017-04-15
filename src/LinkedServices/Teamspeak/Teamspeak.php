@@ -47,6 +47,7 @@ class Teamspeak extends LinkedService{
                 "Connect to the Teamspeak server to recieve a unique link that will make this option available",
                 false,
                 false,
+                true,
                 true
             );
         

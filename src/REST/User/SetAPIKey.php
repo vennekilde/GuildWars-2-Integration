@@ -38,6 +38,7 @@ use Exception;
 use GW2Integration\API\APIKeyManager;
 use GW2Integration\Exceptions\AccountAlreadyLinked;
 use GW2Integration\Exceptions\AccountUsernameBanned;
+use GW2Integration\Exceptions\CannotChangeServiceLink;
 use GW2Integration\Exceptions\InvalidAPIKeyFormatException;
 use GW2Integration\Exceptions\InvalidAPIKeyNameException;
 use GW2Integration\Exceptions\MissingRequiredAPIKeyPermissions;
@@ -87,7 +88,8 @@ try {
         } else if(
                 $e instanceof AccountAlreadyLinked 
                 || $e instanceof AccountUsernameBanned 
-                || $e instanceof RequirementsNotMetException){
+                || $e instanceof RequirementsNotMetException
+                || $e instanceof CannotChangeServiceLink){
             $logger->info($baseErrorMsg . $e->getMessage());
         } else {
             //Could not add API key for what ever reason

@@ -469,19 +469,9 @@ require_once __DIR__ . "/RestrictAdminPanel.php";
                         <form action='ManagementController.php' method="POST" name='update-settings' class="default-admin-form">
                             <?php
                             $settings = SettingsPersistencyHelper::getAllSetting();
-
                             $displaySettings = SettingsPersistencyHelper::$visibleSettings;
-                            $settingCategorys = array_keys($displaySettings);
-                            //Sort
-                            for ($i = 1; $i < count($settingCategorys); $i++) {
-                                $cat = $settingCategorys[$i];
-                                if (count($displaySettings[$cat]) > count($displaySettings[$settingCategorys[0]])) {
-                                    $array = $displaySettings[$cat];
-                                    unset($displaySettings[$cat]);
-                                    $displaySettings = array_merge(array($cat => $array), $displaySettings);
-                                }
-                            }
-
+                            array_multisort(array_map('count', $displaySettings), SORT_DESC, $displaySettings);
+                            
                             foreach ($displaySettings AS $key => $settingCategory) {
                                 echo '<div class="settings-cat"><h5>' . $key . '</h5>';
                                 foreach ($settingCategory AS $settingName) {

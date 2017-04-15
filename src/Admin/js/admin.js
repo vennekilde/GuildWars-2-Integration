@@ -158,10 +158,17 @@ $(document).ready(function () {
                 var html = "";
                 if (json["data"] !== false && json["data"]["events"] !== undefined) {
                     var events = json["data"]["events"];
+                    var lastLinkId = null;
+                    var useGray = true;
                     for (var key in events) {
+                        var linkId = events[key]["link_id"];
+                        if(linkId !== lastLinkId){
+                            useGray = !useGray;
+                            lastLinkId = linkId;
+                        }
                         var entry = '\
-                        <tr>\
-                            <td class="mdl-data-table__cell--non-numeric">'+events[key]["link_id"]+'</td>\
+                        <tr'+(useGray ? ' class="gray-background"' : "")+'>\
+                            <td class="mdl-data-table__cell--non-numeric">'+linkId+'</td>\
                             <td class="mdl-data-table__cell--non-numeric">'+(events[key]["username"] !== null ? events[key]["username"] : "Not linked")+'</td>';
                         
                         serviceNames = json["data"]["services"];

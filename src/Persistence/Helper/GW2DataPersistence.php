@@ -79,7 +79,7 @@ class GW2DataPersistence {
         $linkId = LinkingPersistencyHelper::determineLinkedUserId($linkedUser);
         
         $preparedQueryString = 
-                'SELECT a.*, k.*, b.b_ban_id, b.b_reason AS ban_reason, b.b_banned_by, b.b_timestamp AS ban_timestamp, b.b_username '
+                'SELECT a.*, k.*, b.b_ban_id, b.b_reason, b.b_banned_by, b.b_timestamp, b.b_username '
                 . 'FROM '.$gw2i_db_prefix.'accounts a '
                 . 'INNER JOIN '.$gw2i_db_prefix.'api_keys k ON a.link_id = k.link_id '
                 . 'LEFT JOIN '.$gw2i_db_prefix.'banned_accounts b ON UPPER(a.a_username) = UPPER(b.b_username)'
@@ -302,7 +302,7 @@ class GW2DataPersistence {
         $pqs = 'SELECT g_uuid FROM '.$gw2i_db_prefix.'guilds ' . $addonQuery;
         $ps = Persistence::getDBEngine()->prepare($pqs);
         $ps->execute($params);
-        $guildsAlreadySynched = $ps->fetch(PDO::FETCH_NUM);
+        $guildsAlreadySynched = $ps->fetchAll(PDO::FETCH_COLUMN, 0);
         
         return $guildsAlreadySynched;
     }
@@ -314,11 +314,12 @@ class GW2DataPersistence {
     public static function persistGuildDetails($guildDetails){
         global $gw2i_db_prefix;
         
-        $pqs = 'INSERT INTO '.$gw2i_db_prefix.'guilds (g_uuid, g_name, g_tag) '
-                . 'VALUES(?, ?, ?) '
+        $pqs = 'INSERT INTO '.$gw2i_db_prefix.'guilds (g_uuid, g_name, g_tag, g_last_synched) '
+                . 'VALUES(?, ?, ?, CURRENT_TIMESTAMP) '
                 . 'ON DUPLICATE KEY UPDATE '
                     . 'g_name = VALUES(g_name), '
-                    . 'g_tag  = VALUES(g_tag)';
+                    . 'g_tag  = VALUES(g_tag), '
+                    . 'g_last_synched  = VALUES(g_last_synched)';
         $params = array(
             $guildDetails["guild_id"], 
             $guildDetails["guild_name"],
@@ -326,100 +327,5 @@ class GW2DataPersistence {
         );
         $ps = Persistence::getDBEngine()->prepare($pqs);
         $ps->execute($params);
-    }
-    
-    /**
-     * 
-     * @param array $values
-     */
-    public static function persistCharacterData($linkedUser, $character){
-        global $gw2i_db_prefix;
-        $linkId = LinkingPersistencyHelper::determineLinkedUserId($linkedUser);
-        
-        
-        $values = array(
-            'link_id'      => $linkId,
-            'c_name'       => $character["name"],
-            'c_race'       => $this->getRaceIdFromString($character["race"]),
-            'c_gender'     => $this->getGenderIdFromString($character["gender"]),
-            'c_profession' => $this->getProfessionIdFromString($character["profession"]),
-            'c_level'      => $character["level"],
-            'c_age'        => $character["age"],
-            'c_created'    => $character["created"],
-            'c_deaths'     => $character["deaths"]
-        );
-        if(isset($character["title"])){
-            $values['g_uuid'] = $character["guild"];
-        }
-        if(isset($character["title"])){
-            $values['c_title'] = $character["title"];
-        }
-        
-        $pqs = 'INSERT INTO '.$gw2i_db_prefix.'gw2integration_characters (g_uuid, g_name, g_tag) '
-                . 'VALUES(?, ?, ?) '
-                . 'ON DUPLICATE KEY UPDATE '
-                    . 'g_name = VALUES(g_name), '
-                    . 'g_tag  = VALUES(g_tag)';
-		\IPS\Db::i()->replace( 'gw2integration_characters', $values, array("c_name"));
-    }
-    
-    public static function deleteCharacterData($userId){
-        \IPS\Db::i()->query( 'DELETE c, cr FROM gw2integration_characters c 
-            INNER JOIN gw2integration_character_crafting cr ON c.c_name = cr.c_name
-            WHERE c.u_id = '.intval($userId));
-    }
-    
-    public static function getCharactersData($userId){
-        $dbPrefix = \IPS\Db::i()->prefix;
-        return \IPS\Db::i()->query(
-                'SELECT * '
-                . 'FROM '.$dbPrefix.'gw2integration_characters AS c '
-                . 'LEFT JOIN '.$dbPrefix.'gw2integration_guilds AS g on g.g_uuid = c.g_uuid '
-                . 'WHERE c.u_id = '.intval($userId).' ORDER BY c_age DESC'
-            );
-    }
-    
-    public static function getCharacterData($characterName){
-        try{
-            $dbPrefix = \IPS\Db::i()->prefix;
-            return \IPS\Db::i()->query(
-                    'SELECT * '
-                    . 'FROM '.$dbPrefix.'gw2integration_characters AS c '
-                    . 'LEFT JOIN '.$dbPrefix.'gw2integration_guilds AS g on g.g_uuid = c.g_uuid '
-                    . 'WHERE c.c_name = '.addslashes($characterName).' LIMIT 1'
-                );
-        } catch (UnderflowException $e){
-            $result = null;
-        }
-        return $result;
-    }
-    /**
-     * 
-     * @param string $characterName
-     * @param arrau $craftingProfessionValues
-     */
-    public static function persistCharacterCraftingProfessions($characterName, $craftingProfessionValues){
-        foreach($craftingProfessionValues AS $craftingProfessionData){
-            //\IPS\Session::i()->log(null,  "craftingProfessionValues: " . json_encode($craftingProfessionData));
-            $values = array(
-                "c_name" => $characterName,
-                "cr_discipline" => $this->getCraftingProfIdFromString($craftingProfessionData["discipline"]),
-                "cr_rating" => $craftingProfessionData["rating"],
-                "cr_active" => $craftingProfessionData["active"],
-            );
-            $this->persistCharacterCraftingProfession($values);
-        }
-    }
-    
-    /**
-     * 
-     * @param array $values
-     */
-    public static function persistCharacterCraftingProfession($values){
-        \IPS\Db::i()->replace( 'gw2integration_character_crafting', $values, array("c_name"));
-    }
-    
-    public static function getCharacterCraftingProfessions($characterName){
-        return \IPS\Db::i()->select('*', 'gw2integration_character_crafting', array("c_name = ?",$characterName));
     }
 }

@@ -243,3 +243,7 @@ THE SOFTWARE.
     padding: 0px 35px 0px 0px;
     vertical-align: top;
 }
+
+.gray-background {
+    background-color: rgba(45, 122, 201, 0.12);
+}

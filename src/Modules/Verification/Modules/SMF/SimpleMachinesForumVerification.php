@@ -268,8 +268,10 @@ class SimpleMachinesForumVerification extends AbstractVerificationModule{
                 if($linkIds != null){
                     $linkId = $linkIds[$i];
                     VerificationEventPersistence::persistVerificationEvent($linkId, VerificationEventPersistence::SERVICE_GROUP_EVENT, SimpleMachinesForum::serviceId.",".$groupId.",0");
+                    $logger->info("Removed user \"$userId\" with link-id \"$linkId\" from SMF User Group $groupId");
+                } else {
+                    $logger->info("Removed user \"$userId\" who is not linked from SMF User Group $groupId");
                 }
-                $logger->info("Removed user \"$userId\" with link-id \"$linkId\" from SMF User Group $groupId");
             }
         }
     }

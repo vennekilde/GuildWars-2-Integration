@@ -76,6 +76,7 @@ class SimpleMachinesForumVerification extends AbstractVerificationModule{
     
     public function refreshAccess($userId = null){
         $this->removeIncorrectGroupings($userId);
+        $this->removeGroupsFromNoLongerValidatedUsers($userId);
         $this->addMissingGroupings($userId);
     }
     
@@ -100,6 +101,29 @@ class SimpleMachinesForumVerification extends AbstractVerificationModule{
             foreach($incorrectGroupingsMemberIds AS $groupId => $memberIds){
                 $linkIds = array_values($incorrectGroupingsLinkIds[$groupId]);
                 static::removeUsersFromForumUserGroup($linkIds, $memberIds, array($groupId));
+            }
+        }
+    }
+    
+    
+    public function removeGroupsFromNoLongerValidatedUsers($userId = null){
+        global $gw2i_db_prefix;
+        $pq = Persistence::getDBEngine()->prepare('CALL '.$gw2i_db_prefix.'smf_find_not_linked_members(?)');
+        
+        $pq->execute(array($userId));
+        
+        $result = $pq->fetchAll(PDO::FETCH_NUM);
+        unset($pq);
+        
+        if(is_array($result)){
+            $incorrectGroupingsMemberIds = array();
+            
+            foreach($result AS $incorrectGrouping){
+                $incorrectGroupingsMemberIds[$incorrectGrouping[1]][] = $incorrectGrouping[0];
+            }
+
+            foreach($incorrectGroupingsMemberIds AS $groupId => $memberIds){
+                static::removeUsersFromForumUserGroup(null, $memberIds, array($groupId));
             }
         }
     }
@@ -182,7 +206,7 @@ class SimpleMachinesForumVerification extends AbstractVerificationModule{
         //global
         global $smcFunc, $logger;
          
-        if(!is_array($linkIds)){
+        if(!is_array($linkIds) && $linkIds != NULL){
             $linkIds = array($linkIds);
         }
         if(!is_array($members)){
@@ -241,8 +265,10 @@ class SimpleMachinesForumVerification extends AbstractVerificationModule{
         for($i = 0; $i < count($members); $i++){
             foreach($groups AS $groupId){
                 $userId = $members[$i];
-                $linkId = $linkIds[$i];
-                VerificationEventPersistence::persistVerificationEvent($linkId, VerificationEventPersistence::SERVICE_GROUP_EVENT, SimpleMachinesForum::serviceId.",".$groupId.",0");
+                if($linkIds != null){
+                    $linkId = $linkIds[$i];
+                    VerificationEventPersistence::persistVerificationEvent($linkId, VerificationEventPersistence::SERVICE_GROUP_EVENT, SimpleMachinesForum::serviceId.",".$groupId.",0");
+                }
                 $logger->info("Removed user \"$userId\" with link-id \"$linkId\" from SMF User Group $groupId");
             }
         }

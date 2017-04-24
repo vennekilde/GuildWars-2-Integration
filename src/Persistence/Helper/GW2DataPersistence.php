@@ -148,7 +148,8 @@ class GW2DataPersistence {
                 a_fractal_level = VALUES(a_fractal_level),
                 a_daily_ap = VALUES(a_daily_ap),
                 a_monthly_ap = VALUES(a_monthly_ap),
-                a_wvw_rank = VALUES(a_wvw_rank)';
+                a_wvw_rank = VALUES(a_wvw_rank)
+            LIMIT 1';
         
         $values = array(
             ':a_uuid'       => $accountData["id"],

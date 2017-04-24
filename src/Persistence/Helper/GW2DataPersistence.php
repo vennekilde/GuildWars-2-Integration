@@ -320,7 +320,8 @@ class GW2DataPersistence {
                 . 'ON DUPLICATE KEY UPDATE '
                     . 'g_name = VALUES(g_name), '
                     . 'g_tag  = VALUES(g_tag), '
-                    . 'g_last_synched  = VALUES(g_last_synched)';
+                    . 'g_last_synched  = VALUES(g_last_synched) '
+                . 'LIMIT 1';
         $params = array(
             $guildDetails["guild_id"], 
             $guildDetails["guild_name"],

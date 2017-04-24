@@ -144,11 +144,15 @@ class GW2DataController {
         }
         
         if(!empty($accountDataExtended)){
-            Capsule::table(GW2Schema::$accountDataExtended->getTableName())->
-                    updateOrInsert(
-                            array("link_id" => $linkedUser->getLinkedId()),
-                            $accountDataExtended
-                    );
+            
+            //Update or insert
+            $table = Capsule::table(GW2Schema::$accountDataExtended->getTableName());
+            $attributes = array("link_id" => $linkedUser->getLinkedId());
+            if (! $table->where($attributes)->exists()) {
+                $table->insert(array_merge($attributes, $accountDataExtended));
+            } else {
+                $table->update($accountDataExtended);
+            }
         }
             
         //If a character is still in the local array, it means the user is no

@@ -173,9 +173,15 @@ class GW2DataController {
 
             $discipline = GW2DataFieldConverter::getCraftingDisciplineIdFromString($crafting["discipline"]);
             unset($crafting["discipline"]);
-            Capsule::table(GW2Schema::$characters_crafting->getTableName())->
-                    updateOrInsert(array("id" => $characterId, "discipline" => $discipline), 
-                            $crafting);
+            
+            //Update or insert
+            $table = Capsule::table(GW2Schema::$characters_crafting->getTableName());
+            $attributes = array("id" => $characterId, "discipline" => $discipline);
+            if (! $table->where($attributes)->exists()) {
+                $table->insert(array_merge($attributes, $crafting));
+            } else {
+                $table->update($crafting);
+            }
         }
             
         return true;

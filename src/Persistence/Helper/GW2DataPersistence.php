@@ -138,9 +138,6 @@ class GW2DataPersistence {
             INSERT INTO '.$gw2i_db_prefix.'accounts (' . (isset($linkId) ? "link_id," : "") . 'a_uuid, a_username, a_world, a_created, a_access, a_commander, a_fractal_level, a_daily_ap, a_monthly_ap, a_wvw_rank)
                 VALUES(' . (isset($linkId) ? ($linkId . ", ") : "") . ':a_uuid, :a_username, :a_world, :a_created, :a_access, :a_commander, :a_fractal_level, :a_daily_ap, :a_monthly_ap, :a_wvw_rank)
             ON DUPLICATE KEY UPDATE 
-                link_id = LAST_INSERT_ID(link_id),
-                a_uuid = VALUES(a_uuid),
-                a_username = VALUES(a_username),
                 a_world = VALUES(a_world),
                 a_created = VALUES(a_created),
                 a_access = VALUES(a_access),
@@ -148,8 +145,7 @@ class GW2DataPersistence {
                 a_fractal_level = VALUES(a_fractal_level),
                 a_daily_ap = VALUES(a_daily_ap),
                 a_monthly_ap = VALUES(a_monthly_ap),
-                a_wvw_rank = VALUES(a_wvw_rank)
-            LIMIT 1';
+                a_wvw_rank = VALUES(a_wvw_rank)';
         
         $values = array(
             ':a_uuid'       => $accountData["id"],
@@ -318,10 +314,8 @@ class GW2DataPersistence {
         $pqs = 'INSERT INTO '.$gw2i_db_prefix.'guilds (g_uuid, g_name, g_tag, g_last_synched) '
                 . 'VALUES(?, ?, ?, CURRENT_TIMESTAMP) '
                 . 'ON DUPLICATE KEY UPDATE '
-                    . 'g_name = VALUES(g_name), '
                     . 'g_tag  = VALUES(g_tag), '
-                    . 'g_last_synched  = VALUES(g_last_synched) '
-                . 'LIMIT 1';
+                    . 'g_last_synched  = VALUES(g_last_synched) ';
         $params = array(
             $guildDetails["guild_id"], 
             $guildDetails["guild_name"],

@@ -51,7 +51,7 @@ class APIBatchProcessor {
      * @global type $logger
      * @return LinkedUser[]
      */
-    public function process($keysToProcess = 0){
+    public function process($keysToProcess = 0, $maxProccessorTime = null){
         APIKeyManager::analyzeAnetAPI();
         
         global $logger;
@@ -60,6 +60,9 @@ class APIBatchProcessor {
         
         if(empty($keysToProcess)){
             $keysToProcess = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEYS_PER_RUN);
+        }
+        if($maxProccessorTime == null){
+            $maxProccessorTime = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEYS_BATCH_MAX_PROCESS_TIME);
         }
         
         $apiKeysQuery = APIKeyPersistenceHelper::queryAPIKeys(0, $keysToProcess);
@@ -81,6 +84,11 @@ class APIBatchProcessor {
             } catch(Exception $e){
                 $logger->error($e->getMessage(), $e);
                 $errors++;
+            }
+            //Time running in MS
+            $runningTime = microtime(true) * 1000 - $timeStarted;
+            if($runningTime > $maxProccessorTime){
+                break;
             }
         }
         

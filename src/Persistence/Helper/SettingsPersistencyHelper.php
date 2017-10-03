@@ -54,12 +54,14 @@ class SettingsPersistencyHelper {
     const SMF_LINKED_WORLD_TEMP_GROUP_PRIMARY = "smf_linked_world_temp_group_primary";
     const TEAMSPEAK_LINKED_WORLD_TEMP_GROUP_PRIMARY = "teamspeak_linked_world_temp_group_primary";
     const TEAMSPEAK_LINKED_WORLD_TEMP_GROUP_SECONDARY = "teamspeak_linked_world_temp_group_secondary";
+    const API_KEYS_BATCH_MAX_PROCESS_TIME = "api_keys_batch_max_process_time";
     
     
     public static $visibleSettings = array(
         "API Settings" => array(
             self::API_KEY_EXPIRATION_TIME,
             self::API_KEYS_PER_RUN,
+            self::API_KEYS_BATCH_MAX_PROCESS_TIME,
             self::DEBUG_API_KEY,
         ),
         "Access Settings" => array(

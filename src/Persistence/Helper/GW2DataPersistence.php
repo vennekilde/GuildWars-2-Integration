@@ -127,9 +127,9 @@ class GW2DataPersistence {
     public static function persistAccountData($linkedUser, $accountData, $createNewIfNotExists = false){
         global $gw2i_db_prefix, $logger;
         try{
+            $logger->info("TEST!!!");
             $linkId = LinkingPersistencyHelper::determineLinkedUserId($linkedUser);
             
-            $logger->info($linkId);
         }catch (UnableToDetermineLinkId $e){
             if(!$createNewIfNotExists){
                 throw $e;

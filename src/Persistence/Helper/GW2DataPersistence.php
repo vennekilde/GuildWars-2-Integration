@@ -127,7 +127,6 @@ class GW2DataPersistence {
     public static function persistAccountData($linkedUser, $accountData, $createNewIfNotExists = false){
         global $gw2i_db_prefix, $logger;
         try{
-            $logger->info("TEST!!!");
             $linkId = LinkingPersistencyHelper::determineLinkedUserId($linkedUser);
             
         }catch (UnableToDetermineLinkId $e){
@@ -207,7 +206,8 @@ class GW2DataPersistence {
      * @param array $guilds
      */
     public static function persistGuildMemberships($linkedUser, $guilds){
-        global $gw2i_db_prefix;
+        global $gw2i_db_prefix, $logger;
+        $logger->info(print_r($linkedUser, true));
         $linkId = LinkingPersistencyHelper::determineLinkedUserId($linkedUser);
         
         //Remove no longer valid guild memberships

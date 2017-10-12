@@ -128,10 +128,13 @@ class GW2DataPersistence {
         global $gw2i_db_prefix, $logger;
         try{
             $linkId = LinkingPersistencyHelper::determineLinkedUserId($linkedUser);
-            
         }catch (UnableToDetermineLinkId $e){
             if(!$createNewIfNotExists){
                 throw $e;
+            }
+            $accountLinkId = LinkingPersistencyHelper::getLinkIdFromAccountName($accountData["name"]);
+            if(isset($accountLinkId)){
+                throw new AccountAlreadyLinked($accountData["name"], $e->getMessage());
             }
         }
         
@@ -207,7 +210,6 @@ class GW2DataPersistence {
      */
     public static function persistGuildMemberships($linkedUser, $guilds){
         global $gw2i_db_prefix, $logger;
-        $logger->info(print_r($linkedUser, true));
         $linkId = LinkingPersistencyHelper::determineLinkedUserId($linkedUser);
         
         //Remove no longer valid guild memberships

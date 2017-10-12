@@ -95,9 +95,13 @@ class APIKeyManager {
             $charactersData = (array)static::$api->characters($apiKey)->all();
             static::hasCharacterInRequiredLevel($charactersData);
         }
+        //Get data from Account endpoint
+        $accountData = (array)static::$gw2API->account($apiKey)->get();
+        
+        
         
         //Account data
-        $success1 = GW2DataController::resyncAccountEndpoint($linkedUser, $apiKey, true);
+        $success1 = GW2DataController::resyncAccountEndpoint($linkedUser, $apiKey, true, $accountData);
         //Token info
         $success2 = GW2TokenInfoController::processTokenInfo($linkedUser, $apiKey, $tokenInfo);
         

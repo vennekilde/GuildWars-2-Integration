@@ -62,9 +62,11 @@ class GW2DataController {
      * @param string $apiKey
      * @param boolean $createNewIfNotExists
      */
-    public static function resyncAccountEndpoint($linkedUser, $apiKey, $createNewIfNotExists = false) {
-        //Get data from Account endpoint
-        $accountData = (array)static::$gw2API->account($apiKey)->get();
+    public static function resyncAccountEndpoint($linkedUser, $apiKey, $createNewIfNotExists = false, $accountData = null) {
+        if(!isset($accountData)){
+            //Get data from Account endpoint
+            $accountData = (array)static::$gw2API->account($apiKey)->get();
+        }
         
         //Persist new account data
         GW2DataPersistence::persistAccountData($linkedUser, $accountData, $createNewIfNotExists);

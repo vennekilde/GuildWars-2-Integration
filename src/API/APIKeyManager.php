@@ -96,7 +96,7 @@ class APIKeyManager {
             static::hasCharacterInRequiredLevel($charactersData);
         }
         //Get data from Account endpoint
-        $accountData = (array)static::$gw2API->account($apiKey)->get();
+        $accountData = (array)static::$api->account($apiKey)->get();
         
         
         

@@ -156,7 +156,7 @@ class GW2DataPersistence {
             ':a_username'   => $accountData["name"],
             ':a_world'      => $accountData["world"],
             ':a_created'    => $accountData["created"],
-            ':a_access'     => GW2DataFieldConverter::getAccountAccessIdFromString($accountData["access"]),
+            ':a_access'     => implode(",", GW2DataFieldConverter::getAccountAccessIds($accountData["access"])),
             ':a_commander'  => $accountData["commander"] == "1",
         );
         

@@ -24,11 +24,11 @@
 
 $(document).ready(function () {
     //Add tag for determining button clicked when submitting a form
-    $("form button[type=submit]").click(function() {
+    $("form button[type=submit]").click(function () {
         $("button[type=submit]", $(this).parents("form")).removeAttr("clicked");
         $(this).attr("clicked", "true");
     });
-    
+
     //initialize ajax forms
     $('.default-admin-form').submit(function (ev) {
         form = $(this);
@@ -41,7 +41,7 @@ $(document).ready(function () {
         } else {
             data = "form=" + formName;
         }
-        
+
         console.log(data);
         startSpinner(form);
         $.ajax({
@@ -61,7 +61,7 @@ $(document).ready(function () {
                         html += "<h5 style='text-transform: uppercase'>" + key.replace(/\-/g, " ") + "</h5>";
                         if (typeof data[key] === 'object') {
                             html += JSON.stringify(data[key], null, 4);
-                        } else if(data[key] === false) {
+                        } else if (data[key] === false) {
                             html += "Not available";
                         } else {
                             var str = data[key].replace(/\</g, "&lt;");
@@ -99,10 +99,10 @@ $(document).ready(function () {
         retrieveLog(form, data);
     });
 
-    $('.statistics-admin-form').each(function(){
+    $('.statistics-admin-form').each(function () {
         google.charts.load('upcoming', {packages: ['line']});
     });
-    
+
     $('.statistics-admin-form').submit(function (ev) {
         form = $(this);
         ev.preventDefault();
@@ -130,20 +130,20 @@ $(document).ready(function () {
         } else {
             data = "form=" + formName;
         }
-        
+
         var submitElement = $("button[type=submit][clicked=true]");
-        if(submitElement !== undefined){
+        if (submitElement !== undefined) {
             var name = submitElement.attr("name");
             if (data) {
-                data += "&"+name;
+                data += "&" + name;
             } else {
                 data = name;
             }
         }
-        
+
         console.log(data);
         startSpinner(form);
-        
+
         $.ajax({
             type: form.attr('method'),
             url: form.attr('action'),
@@ -162,24 +162,24 @@ $(document).ready(function () {
                     var useGray = true;
                     for (var key in events) {
                         var linkId = events[key]["link_id"];
-                        if(linkId !== lastLinkId){
+                        if (linkId !== lastLinkId) {
                             useGray = !useGray;
                             lastLinkId = linkId;
                         }
                         var entry = '\
-                        <tr'+(useGray ? ' class="gray-background"' : "")+'>\
-                            <td class="mdl-data-table__cell--non-numeric">'+linkId+'</td>\
-                            <td class="mdl-data-table__cell--non-numeric">'+(events[key]["username"] !== null ? events[key]["username"] : "Not linked")+'</td>';
-                        
+                        <tr' + (useGray ? ' class="gray-background"' : "") + '>\
+                            <td class="mdl-data-table__cell--non-numeric">' + linkId + '</td>\
+                            <td class="mdl-data-table__cell--non-numeric">' + (events[key]["username"] !== null ? events[key]["username"] : "Not linked") + '</td>';
+
                         serviceNames = json["data"]["services"];
-                        $.each(json["data"]["services"], function(serviceId){
+                        $.each(json["data"]["services"], function (serviceId) {
                             var displayName = (events[key]["services"] !== undefined && events[key]["services"][serviceId] !== undefined) ? events[key]["services"][serviceId] : "Not linked";
-                            entry += '<td class="mdl-data-table__cell--non-numeric">'+displayName+'</td>';
+                            entry += '<td class="mdl-data-table__cell--non-numeric">' + displayName + '</td>';
                         });
-                        
-                        entry += '<td class="mdl-data-table__cell--non-numeric">'+events[key]["timestamp"]+'</td>\
-                            <td class="mdl-data-table__cell--non-numeric">'+parseVerificationEventType(events[key]["event"], events[key]["value"])+'</td>\
-                            <td class="mdl-data-table__cell--non-numeric">'+parseVerificationEventData(events[key]["event"], events[key]["value"])+'</td>\
+
+                        entry += '<td class="mdl-data-table__cell--non-numeric">' + events[key]["timestamp"] + '</td>\
+                            <td class="mdl-data-table__cell--non-numeric">' + parseVerificationEventType(events[key]["event"], events[key]["value"]) + '</td>\
+                            <td class="mdl-data-table__cell--non-numeric">' + parseVerificationEventData(events[key]["event"], events[key]["value"]) + '</td>\
                         </tr>';
                         $("#verification-events-tbody").append(entry);
                     }
@@ -202,21 +202,21 @@ $(document).ready(function () {
     $(".detailed-log").bind('resize', function () {
         adjustHeight();
     });
-    
-    
+
+
     var fetchedOnceTab6 = false;
-    $("#tab6-link").on("click" ,function(){
+    $("#tab6-link").on("click", function () {
         //Retrieve charts
-        if(!fetchedOnceTab6){
+        if (!fetchedOnceTab6) {
             $("#update-world-dist-btn").click();
             $("#update-api-stats-btn").click();
             fetchedOnceTab6 = true;
         }
     });
     var fetchedOnceTab5 = false;
-    $("#tab5-link").on("click" ,function(){
+    $("#tab5-link").on("click", function () {
         //Retrieve charts
-        if(!fetchedOnceTab5){
+        if (!fetchedOnceTab5) {
             //Retrieve the latest log
             $("#fetch-latest-log-btn").click();
             $("#update-verification-events-btn").click();
@@ -273,34 +273,107 @@ function fetchStatisticsChart(form, data) {
         success: function (response) {
             console.log(response);
             var json = JSON.parse(response)
-            if(json["data"]["chart"] !== undefined){
-                var chart = json["data"]["chart"];
-                for(var i = 1; i < chart.length; i++){
-                    chart[i][0] = new Date(chart[i][0]);
-                }
-                console.log(chart);
-                var data = google.visualization.arrayToDataTable(chart);
-
-                var options = {
-                    interpolateNulls: true,
-                    height: 500,
-                    vAxis : {
-                        format: "decimal"
-                    },
-                    hAxis: {
-                      format: 'yy-MM-dd HH:mm:ss'
-                    },
-                    backgroundColor: { fill:'transparent' }
-                };
-
-                if(json["data"]["options"] !== undefined){
-                    options = mergeObjects(options, json["data"]["options"]);
-                }
-                var chart = new google.charts.Line(form.find(".chart_div").get(0));
-                google.visualization.events.addListener(chart, 'ready', function(){
-                    stopSpinner(form);
+            if (json["data"]["chart"] !== undefined) {
+                var series = [];
+                $.each(json["data"]["chart"], function (i1, value) {
+                    var self = this;
+                    $.each(value, function (i2, data) {
+                        if (i1 === 0) {
+                            if (i2 === 0) {
+                                return;
+                            }
+                            series.push({
+                                type: "line",
+                                name: data,
+                                data: [],
+                                yAxis: data.startsWith("[T]") ? 1 : 0
+                            });
+                        } else {
+                            if (i2 === 0) {
+                                self.date = new Date(data).getTime();
+                            } else {
+                                series[i2 - 1]["data"].push([
+                                    self.date,
+                                    data
+                                ]);
+                            }
+                        }
+                    });
                 });
-                chart.draw(data, google.charts.Line.convertOptions(options));
+                console.log(series);
+                Highcharts.stockChart(form.find(".chart_div").get(0), {
+                    yAxis: [{
+                            type: 'logarithmic',
+                            minorTickInterval: 0.1,
+                            title: {
+                                text: 'API Verified Users Per World'
+                            },
+                            labels: {
+                                formatter: function () {
+                                    return "";
+                                }
+                            },
+                            height: 800,
+                            lineWidth: 2
+                        }, {
+                            title: {
+                                text: 'Temporary Users Per World'
+                            },
+                            labels: {
+                                formatter: function () {
+                                    return "";
+                                }
+                            },
+                            top: 750,
+                            height: 200,
+                            offset: 0,
+                            lineWidth: 2
+                        }],
+                    xAsis: {
+                        ordinal: false
+                    },
+                    tooltip: {
+                        crosshairs: true,
+                        borderWidth: 0,
+                        padding: 1,
+                        shadow: false,
+                        useHTML: true,
+                        style: {
+                            padding: 0
+                        }
+                    },
+
+                    series: series
+                });
+                stopSpinner(form);
+
+//                var chart = json["data"]["chart"];
+//                for(var i = 1; i < chart.length; i++){
+//                    chart[i][0] = new Date(chart[i][0]);
+//                }
+//                console.log(chart);
+//                var data = google.visualization.arrayToDataTable(chart);
+//
+//                var options = {
+//                    interpolateNulls: true,
+//                    height: 500,
+//                    vAxis : {
+//                        format: "decimal"
+//                    },
+//                    hAxis: {
+//                      format: 'yy-MM-dd HH:mm:ss'
+//                    },
+//                    backgroundColor: { fill:'transparent' }
+//                };
+//
+//                if(json["data"]["options"] !== undefined){
+//                    options = mergeObjects(options, json["data"]["options"]);
+//                }
+//                var chart = new google.charts.Line(form.find(".chart_div").get(0));
+//                google.visualization.events.addListener(chart, 'ready', function(){
+//                    stopSpinner(form);
+//                });
+//                chart.draw(data, google.charts.Line.convertOptions(options));
 
                 adjustHeight();
             }
@@ -313,28 +386,28 @@ function fetchStatisticsChart(form, data) {
     });
 }
 
-function parseVerificationEventData(eventType, eventData){
+function parseVerificationEventData(eventType, eventData) {
     var parsedData;
-    switch(eventType){
+    switch (eventType) {
         case 0:
             var worlds = eventData.split(",");
             fromWorld = (!worlds[0] || 0 === worlds[0].length) ? "" : getWorldNameFromId(worlds[0]);
             toWorld = getWorldNameFromId(worlds[1]);
-            parsedData = fromWorld + " -> "+toWorld;
+            parsedData = fromWorld + " -> " + toWorld;
             break;
         case 1:
-            if(eventData === 0){
+            if (eventData === 0) {
                 parsedData = "Revoked";
-            } else if(eventData === 1){
+            } else if (eventData === 1) {
                 parsedData = "Granted";
             } else {
                 parsedData = eventData;
             }
             break;
         case 2:
-            if(eventData === 0){
+            if (eventData === 0) {
                 parsedData = "Refreshed";
-            } else if(eventData === 1){
+            } else if (eventData === 1) {
                 parsedData = "Expired";
             } else {
                 parsedData = eventData;
@@ -342,7 +415,7 @@ function parseVerificationEventData(eventType, eventData){
             break;
         case 3:
             var split = eventData.split(",");
-            parsedData = "Group Id: "+split[1];
+            parsedData = "Group Id: " + split[1];
             break;
         default:
             parsedData = eventData;
@@ -351,9 +424,9 @@ function parseVerificationEventData(eventType, eventData){
     return parsedData;
 }
 
-function parseVerificationEventType(eventType, eventData){
+function parseVerificationEventType(eventType, eventData) {
     var parsedEvent;
-    switch(eventType){
+    switch (eventType) {
         case 0:
             parsedEvent = "World Moved";
             break;
@@ -365,7 +438,7 @@ function parseVerificationEventType(eventType, eventData){
             break;
         case 3:
             var split = eventData.split(",");
-            parsedEvent = serviceNames[split[0]] + " Group "+(split[2] === "1" ? "Added" : "Removed");
+            parsedEvent = serviceNames[split[0]] + " Group " + (split[2] === "1" ? "Added" : "Removed");
             break;
         default:
             parsedEvent = eventType;

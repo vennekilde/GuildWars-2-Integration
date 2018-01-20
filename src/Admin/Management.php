@@ -25,6 +25,8 @@ require_once __DIR__ . "/RestrictAdminPanel.php";
 <script src="https://malsup.github.io/jquery.form.js"></script> 
 <!-- Google Chart -->
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<!-- Highstock -->
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
 
 <!-- Custom CSS -->
 <link rel="stylesheet" href="../Public/css/style.css">
@@ -429,7 +431,7 @@ require_once __DIR__ . "/RestrictAdminPanel.php";
                         <h5>World Distribution</h5>
                         <p>See how world distrubution for the linked members evolv over time</p>
                         <form action='ManagementController.php' method="POST" name='get-statistics-world-distribution' class="statistics-admin-form">
-                            <div class="chart_div"></div>
+                            <div class="chart_div" style="height: 1000px"></div>
                             <button id='update-world-dist-btn' class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner">
                                 Update
                             </button>

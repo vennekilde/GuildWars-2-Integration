@@ -203,7 +203,8 @@ function parseLinkedUserData(){
         if (linkedUser["data"]["a_username"] !== null) {
             $(".account-name").html(linkedUser["data"]["a_username"]);
             $(".gw2-world").html(getWorldNameFromId(linkedUser["data"]["a_world"]));
-            $(".gw2-access").html(getAccessLabelFromAccessId(linkedUser["data"]["a_access"]));
+            var accessIds = getAccessLabelsFromAccessIds(linkedUser["data"]["a_access"].split(","))
+            $(".gw2-access").html(accessIds.join(", "));
             $(".account-name").html(linkedUser["data"]["a_username"]);
             $(".account-name-icon").html("done");
         } else {

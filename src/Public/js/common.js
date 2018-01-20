@@ -104,19 +104,33 @@ function addNotitification(msg, type){
     $("#gw2i-notification-container").append('<div class="alert-box '+type+'">'+msg+'</div>');
 }
 
-function getAccessLabelFromAccessId(accessId) {
-    switch (accessId) {
-        case '0':
-            return "GuildWars2";
-        case '1':
-            return "Heart of Thorns";
-        case '2':
-            return "Play For Free";
-        case '3':
-            return "None";
-        case '-1':
-            return "Temporary";
+function getAccessLabelsFromAccessIds(accessIds) {
+    var accessList = [];
+    var index = accessIds.indexOf("0");
+    if(index >= 0){
+        accessList.push("GuildWars2");
     }
+    index = accessIds.indexOf("1");
+    if(index >= 0){
+        accessList.push("Heart of Thorns");
+    }
+    index = accessIds.indexOf("2");
+    if(index >= 0){
+        accessList.push("Play For Free");
+    }
+    index = accessIds.indexOf("3");
+    if(index >= 0){
+        accessList.push("None");
+    }
+    index = accessIds.indexOf("4");
+    if(index >= 0){
+        accessList.push("Path Of Fire");
+    }
+    index = accessIds.indexOf("-1");
+    if(index >= 0){
+        accessList.push("Temporary");
+    }
+    return accessList;
 }
 
 function getWorldNameFromId(worldId) {

@@ -27,5 +27,14 @@
  */
 
 
-ALTER TABLE `gw2_integration_live`.`gw2integration_statistics` ADD INDEX (`rid`, `type`);
-ALTER TABLE `gw2_integration_live`.`gw2integration_statistics` ADD INDEX (`type`, `data`);
+ALTER TABLE `gw2integration_characters` CHANGE `name` `name` VARCHAR(128) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '';
+
+CREATE TABLE `gw2integration_account_data_ext` ( 
+    `link_id` INT(11) NOT NULL , 
+    `deaths` INT NOT NULL , 
+    `playtime` INT NOT NULL,
+	PRIMARY KEY (link_id)
+)ALTER TABLE `gw2_integration_live`.`gw2integration_statistics` ADD UNIQUE (`rid`, `type`);
+
+ALTER TABLE `gw2_integration_live`.`gw2integration_accounts` 
+CHANGE COLUMN `a_access` `a_access` VARCHAR(32) NOT NULL DEFAULT '-1' ;

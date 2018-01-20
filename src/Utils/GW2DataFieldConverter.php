@@ -125,21 +125,29 @@ class GW2DataFieldConverter {
     
     /**
      * Convert an account access type field to an integer
-     * @param string $string
+     * @param array $accessList
      * @return integer Description
      */
-    public static function getAccountAccessIdFromString($string){
-        switch($string){
-            case "GuildWars2":
-                return 0;
-            case "HeartOfThorns":
-                return 1;
-            case "PlayForFree":
-                return 2;
-            case "None":
-                return 3;
-        }
-        return -1;
+    public static function getAccountAccessIds(array $accessList){
+        $accessIdsList = array_map(
+            function($str) {
+                switch($str){
+                    case "GuildWars2":
+                        return 0;
+                    case "HeartOfThorns":
+                        return 1;
+                    case "PlayForFree":
+                        return 2;
+                    case "PathOfFire":
+                        return 4;
+                    case "None":
+                        return 3;
+                }
+                return -1;
+            },
+            $accessList
+        );
+        return $accessIdsList;
     }
     
     

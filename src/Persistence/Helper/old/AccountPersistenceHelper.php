@@ -28,6 +28,7 @@ namespace GW2Integration\Persistence\Helper;
 
 use GW2Integration\Entity\LinkedUser;
 use GW2Integration\Persistence\Persistence;
+use GW2Integration\Utils\GW2DataFieldConverter;
 use PDO;
 
 if (!defined('GW2Integration')) {
@@ -116,7 +117,7 @@ class AccountPersistenceHelper {
             $accountData["name"],
             $accountData["world"],
             $accountData["created"],
-            static::parseAccessString($accountData["access"]),
+            implode(",", GW2DataFieldConverter::getAccountAccessIds($accountData["access"])),
             isset($accountData["commander"]) ? $accountData["commander"] : 0,
             isset($accountData["fractal_level"]) ? $accountData["fractal_level"] : 0,
             isset($accountData["daily_ap"]) ? $accountData["daily_ap"] : 0,
@@ -133,19 +134,5 @@ class AccountPersistenceHelper {
         }
         
         return $result;
-    }
-    
-    public static function parseAccessString($accessString){
-        switch($accessString){
-            case "GuildWars2":
-                return 0;
-            case "HeartOfThorns":
-                return 1;
-            case "PlayForFree":
-                return 2;
-            case "None":
-                return 3;
-        }
-        return -1;
     }
 }

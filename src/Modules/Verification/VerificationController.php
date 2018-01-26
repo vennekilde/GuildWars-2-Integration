@@ -91,7 +91,7 @@ class VerificationController {
             $accountData["created"] = $date->getTimestamp();
         }
         if (!isset($accountData["access"])) {
-            $accountData["access"] = -1;
+            $accountData["access"] = array(-1);
         }
         if (!isset($accountData["commander"])) {
             $accountData["commander"] = 0;

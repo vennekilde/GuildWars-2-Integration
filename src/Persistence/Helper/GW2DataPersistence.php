@@ -151,12 +151,20 @@ class GW2DataPersistence {
                 a_monthly_ap = VALUES(a_monthly_ap),
                 a_wvw_rank = VALUES(a_wvw_rank)';
         
+        if(is_array($accountData["access"])){
+            if(is_numeric($accountData["access"])){
+                $accountData["access"] = implode(",", $accountData["access"]);
+            } else {
+                $accountData["access"] = implode(",", GW2DataFieldConverter::getAccountAccessIds($accountData["access"]));
+            }
+        }
+        
         $values = array(
             ':a_uuid'       => $accountData["id"],
             ':a_username'   => $accountData["name"],
             ':a_world'      => $accountData["world"],
             ':a_created'    => $accountData["created"],
-            ':a_access'     => implode(",", GW2DataFieldConverter::getAccountAccessIds($accountData["access"])),
+            ':a_access'     => $accountData["access"],
             ':a_commander'  => $accountData["commander"] == "1",
         );
         

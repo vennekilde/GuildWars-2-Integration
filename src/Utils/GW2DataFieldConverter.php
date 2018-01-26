@@ -128,7 +128,12 @@ class GW2DataFieldConverter {
      * @param array $accessList
      * @return integer Description
      */
-    public static function getAccountAccessIds(array $accessList){
+    public static function getAccountAccessIds($accessList){
+        if(is_int($accessList)){
+            $accessList = array($accessList);
+        } else if(is_string($accessList)){
+            $accessList = explode(",", $accessList);
+        }
         $accessIdsList = array_map(
             function($str) {
                 switch($str){

@@ -468,10 +468,12 @@ class LinkingPersistencyHelper {
         $response = $preparedStatement->fetchAll(PDO::FETCH_ASSOC);
         
         foreach($response AS $linkData){
-            $json = json_decode($linkData["attributes"], true);
-            if(isset($json[$attributeName])){
-                unset($json[$attributeName]);
-                static::setAttributes($linkData["service_user_id"], $linkData["service_id"], json_encode($json));
+            if(!empty($linkData["attributes"])){
+                $json = json_decode($linkData["attributes"], true);
+                if(isset($json[$attributeName])){
+                    unset($json[$attributeName]);
+                    static::setAttributes($linkData["service_user_id"], $linkData["service_id"], json_encode($json));
+                }
             }
         }
     }

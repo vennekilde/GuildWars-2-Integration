@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
-namespace GW2Integration\LinkedServices\Teamspeak;
+namespace GW2Integration\LinkedServices\Discord;
 
 use Exception;
 use GW2Integration\Entity\UserServiceLink;
@@ -32,29 +32,29 @@ use GW2Integration\LinkedServices\LinkedService;
 use GW2Integration\Persistence\Helper\SettingsPersistencyHelper;
 
 /**
- * Description of Teamspeak
+ * Description of Discord
  *
  * @author Jeppe Boysen Vennekilde
  */
-class Teamspeak extends LinkedService{
-    const serviceId = 1;
+class Discord extends LinkedService{
+    const serviceId = 2;
     
     function __construct() {
         parent::__construct(
                 static::serviceId, 
-                "Teamspeak", 
-                "Link your GuildWars 2 account with the Teamspeak server", 
-                "Connect to the Teamspeak server and read the instructions",
+                "Discord", 
+                "Link your GuildWars 2 account with the Discord server", 
+                "Connect to the Discord server and read the instructions",
                 false,
                 false,
                 true,
                 true
             );
         
-        SettingsPersistencyHelper::$visibleSettings["Teamspeak Settings"] = array(
-            SettingsPersistencyHelper::TEAMSPEAK_BOT_ADDRESS,
-            SettingsPersistencyHelper::TEAMSPEAK_LINKED_WORLD_TEMP_GROUP_PRIMARY,
-            SettingsPersistencyHelper::TEAMSPEAK_LINKED_WORLD_TEMP_GROUP_SECONDARY
+        SettingsPersistencyHelper::$visibleSettings["Discord Settings"] = array(
+            SettingsPersistencyHelper::DISCORD_BOT_ADDRESS,
+            SettingsPersistencyHelper::DISCORD_LINKED_WORLD_TEMP_GROUP_PRIMARY,
+            SettingsPersistencyHelper::DISCORD_LINKED_WORLD_TEMP_GROUP_SECONDARY
         );
     }
     
@@ -73,6 +73,7 @@ class Teamspeak extends LinkedService{
      */
     public function getLinkSetupHTML($successJSFunction) {
         return null;
+        return "<h5>Login to Discord</h5>";
     }
     
     public function hasUserGroupId($serviceUserId, $groupId) {
@@ -80,9 +81,9 @@ class Teamspeak extends LinkedService{
     }
     
     public function getConfigPageHTML(){
-        return '<h5>Soft Restart Teamspeak Bot</h5>
-                <p>Soft restart the teamspeak bot, this means the actual Java VM is not restarted, only the internal components</p>
-                <form action="../LinkedServices/Teamspeak/ManagementController.php" method="POST" name="soft-restart-ts" class="default-admin-form">
+        return '<h5>Soft Restart Discord Bot</h5>
+                <p>Soft restart the discord bot, this means the actual Java VM is not restarted, only the internal components</p>
+                <form action="../LinkedServices/Discord/ManagementController.php" method="POST" name="soft-restart-discord" class="default-admin-form">
                     <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner">
                         Soft Restart
                     </button> 
@@ -99,7 +100,7 @@ class Teamspeak extends LinkedService{
      * @param array $params
      */
     public static function sendRESTCommand($params){
-        $teamspeakAddress = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::TEAMSPEAK_BOT_ADDRESS);
+        $restAddress = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::DISCORD_BOT_ADDRESS);
         
         $paramsString = "";
         foreach($params AS $key => $value){
@@ -114,7 +115,7 @@ class Teamspeak extends LinkedService{
         }
         
         
-        $teamspeakLinkServerAddress = "$teamspeakAddress/teamspeak?$paramsString";
+        $teamspeakLinkServerAddress = "$restAddress/teamspeak?$paramsString";
         
         try{
             // create a new cURL resource

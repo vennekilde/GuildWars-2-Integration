@@ -1,7 +1,12 @@
+<?php
+
+use GW2Integration\LinkedServices\Discord\Discord;
+use function GuzzleHttp\json_encode;
+
 /* 
  * The MIT License
  *
- * Copyright 2017 Jeppe Boysen Vennekilde.
+ * Copyright 2016 Jeppe Boysen Vennekilde.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,23 +26,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-/**
- * Author:  Jeppe Boysen Vennekilde
- * Created: Mar 8, 2017
- */
 
+require_once __DIR__ . "/../../Admin/RestrictAdminPanel.php";
 
-ALTER TABLE `gw2integration_characters` CHANGE `name` `name` VARCHAR(128) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL DEFAULT '';
+$form = filter_input(INPUT_POST, 'form');
+$formData = array();
+$result = array();
+foreach($_POST AS $key => $value){
+    $formData[$key] = filter_input(INPUT_POST, $key);
+}
+switch($form){
+    case "soft-restart-ts":
+        try{
+            Discord::sendRESTCommand(array("srs" => null));
+            $result["status"] = "Sent soft restart command to teamspeak server";
+        } catch(Exception $e){
+            $result["status"] = $e->getMessage();
+        }
+        break;
+      
+        
+    default:
+        $result = $_POST;
+        break;
+}
 
-CREATE TABLE `gw2integration_account_data_ext` ( 
-    `link_id` INT(11) NOT NULL , 
-    `deaths` INT NOT NULL , 
-    `playtime` INT NOT NULL,
-	PRIMARY KEY (link_id)
-)ALTER TABLE `gw2_integration_live`.`gw2integration_statistics` ADD UNIQUE (`rid`, `type`);
-
-ALTER TABLE `gw2_integration_live`.`gw2integration_accounts` 
-CHANGE COLUMN `a_access` `a_access` VARCHAR(32) NOT NULL DEFAULT '-1' ;
-
-ALTER TABLE `gw2_integration_live`.`gw2integration_linked_user_sessions` 
-CHANGE COLUMN `service_user_id` `service_user_id` VARCHAR(64) NOT NULL ;
+echo json_encode(array(
+    "data" => $result
+));

@@ -44,6 +44,7 @@ class SettingsPersistencyHelper {
     const DEBUG_API_KEY = "debug_api_key";
     const IS_API_DOWN = "is_api_down";
     const TEAMSPEAK_BOT_ADDRESS = "teamspeak_bot_address";
+    const DISCORD_BOT_ADDRESS = "discord_bot_address";
     const TEMPORARY_ACCESS_EXPIRATION = "temporary_access_expiration";
     const STRICT_API_KEY_NAME = "strict_api_key_name";
     const API_KEY_NAME_PREFIX = "api_key_name_prefix";
@@ -54,6 +55,8 @@ class SettingsPersistencyHelper {
     const SMF_LINKED_WORLD_TEMP_GROUP_PRIMARY = "smf_linked_world_temp_group_primary";
     const TEAMSPEAK_LINKED_WORLD_TEMP_GROUP_PRIMARY = "teamspeak_linked_world_temp_group_primary";
     const TEAMSPEAK_LINKED_WORLD_TEMP_GROUP_SECONDARY = "teamspeak_linked_world_temp_group_secondary";
+    const DISCORD_LINKED_WORLD_TEMP_GROUP_PRIMARY = "discord_linked_world_temp_group_primary";
+    const DISCORD_LINKED_WORLD_TEMP_GROUP_SECONDARY = "discord_linked_world_temp_group_secondary";
     const API_KEYS_BATCH_MAX_PROCESS_TIME = "api_keys_batch_max_process_time";
     
     

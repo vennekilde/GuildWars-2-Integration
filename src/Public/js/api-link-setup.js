@@ -167,13 +167,13 @@ function fetchLinkSetupRequired() {
         success: function (e) {
             console.log(e);
             var json = JSON.parse(e);
-            if (json.length > 0) {
+            if (!jQuery.isEmptyObject(json)) {
                 var content = "";
-                for (var x in json) {
+                $.each(json, function(serviceId, serviceSetupHTML){
                     content += "<div class='link-service-setup'>";
-                    content += decodeEntities(json[x]);
+                    content += decodeEntities(serviceSetupHTML);
                     content += "</div>";
-                }
+                });
                 $("#link-setup-content").html(content);
                 //Refresh MDL Components
                 componentHandler.upgradeDom();

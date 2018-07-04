@@ -1,6 +1,7 @@
 <?php
 
 use GW2Integration\Exceptions\ModuleNotConfiguredException;
+use GW2Integration\LinkedServices\Discord\Discord;
 use GW2Integration\LinkedServices\SMF\SimpleMachinesForum;
 use GW2Integration\LinkedServices\Teamspeak\Teamspeak;
 use GW2Integration\Logger\EventLogger;
@@ -90,6 +91,14 @@ try{
 try{
     $gw2i_ts = new Teamspeak();
     $gw2i_linkedServices[$gw2i_ts->getServiceId()] = $gw2i_ts;
+} catch(ModuleNotConfiguredException $e){
+    $logger->info($e->getMessage());
+}
+
+//Discord Module
+try{
+    $gw2i_discord = new Discord();
+    $gw2i_linkedServices[$gw2i_discord->getServiceId()] = $gw2i_discord;
 } catch(ModuleNotConfiguredException $e){
     $logger->info($e->getMessage());
 }

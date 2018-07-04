@@ -48,28 +48,27 @@ if(isset($servicesToLinkStr)){
     
     //Establish which links are already known
     $linkedUser = RESTHelper::getLinkedUserFromParams();
-    
-    if($linkedUser != null){
-        global $gw2i_linkedServices;
-        foreach($servicesToLink AS $serviceToLink){
-            //Retrieve service object
-            $linkedService = $gw2i_linkedServices[$serviceToLink];
-            //Check if the service link can be determined during setup
-            if($linkedService->canDetermineLinkDuringSetup()){
-                //Check if any check for existing primary id's can be done
-                $primaryUserServiceLinks = $linkedUser->getPrimaryUserServiceLinks();
-                if(!empty($primaryUserServiceLinks)){
-                    //Check if the link is already known
-                    if(!array_key_exists($serviceToLink, $primaryUserServiceLinks)){
-                        //Add setup html
-                        $result[$serviceToLink] = $linkedService->getLinkSetupHTML($successJSFunction);
-                    }
-                } else{
+
+    global $gw2i_linkedServices;
+    foreach($servicesToLink AS $serviceToLink){
+        //Retrieve service object
+        $linkedService = $gw2i_linkedServices[$serviceToLink];
+        //Check if the service link can be determined during setup
+        if($linkedService->canDetermineLinkDuringSetup()){
+            //Check if any check for existing primary id's can be done
+            $primaryUserServiceLinks = $linkedUser == null ? false : $linkedUser->getPrimaryUserServiceLinks();
+            if(!empty($primaryUserServiceLinks)){
+                //Check if the link is already known
+                if(!array_key_exists($serviceToLink, $primaryUserServiceLinks)){
                     //Add setup html
-                    $result[$serviceToLink] = htmlentities($linkedService->getLinkSetupHTML($successJSFunction));
+                    $result[$serviceToLink] = $linkedService->getLinkSetupHTML($successJSFunction);
                 }
+            } else{
+                //Add setup html
+                $result[$serviceToLink] = htmlentities($linkedService->getLinkSetupHTML($successJSFunction));
             }
         }
+
     }
 }
-echo json_encode($result);
+echo json_encode($result, JSON_FORCE_OBJECT);

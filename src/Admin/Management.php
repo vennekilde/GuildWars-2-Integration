@@ -525,7 +525,7 @@ require_once __DIR__ . "/RestrictAdminPanel.php";
                                 </tbody>
                             </table>
 
-                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select" style="width: inherit;">
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select" style="width: inherit;display: none;">
                                 <input class="mdl-textfield__input" value="Belarus" type="text" id="country" readonly tabIndex="-1" data-val="BLR"/>
                                 <label class="mdl-textfield__label" for="country">Country</label>
                                 <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu" for="country">

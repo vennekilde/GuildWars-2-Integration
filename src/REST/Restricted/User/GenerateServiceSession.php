@@ -44,7 +44,10 @@ if(isset($sessionUserId) && isset($sessionId) && isset($sessionUserIp)){
             $sessionUserIp, 
             isset($sessionUserDisplayName) ? $sessionUserDisplayName : null, 
             isset($isPrimary) ? (($isPrimary == "false" ||  $isPrimary == "0") ? false : true) : true );
-    $response = array("session" => $sessionHash);
+    global $session_expiration_periode;
+    $response = array(
+        "session" => $sessionHash,
+        "valid-to" => time() + $session_expiration_periode);
 } else {
     $response = array("error" => "Missing params");
 }

@@ -297,9 +297,54 @@ switch($form){
         
         $result["chart"] = $skimmedGraphData;
         
-        $result["options"] = array(
-            "vAxis" => array("logScale" => true)
-        );
+        $result["options"] = [
+            //"vAxis" => array("logScale" => true)
+
+            "yAxis" => [
+                [
+                    "type" => "logarithmic",
+                    "minorTickInterval" => 0.1,
+                    "title" => [
+                        "text" => "API Verified Users Per World"
+                    ],
+                    "height" => 800,
+                    "lineWidth" => 2
+                ], [
+                    "title" => [
+                        "text" => 'Temporary Users Per World'
+                    ],
+                    "top" => 750,
+                    "height" => 200,
+                    "offset" => 0,
+                    "lineWidth" => 2
+                ]
+            ],
+            "xAxis" => [
+                "ordinal" => false
+            ]
+        ];
+        break;
+        
+        
+    case "get-statistics-service-users":
+        global $statistics, $gw2i_linkedServices;
+        $graphData = $statistics->getCombinedChartData(
+                array(StatisticsPersistence::SERVICE_USER_NUMBERS)
+            );
+        
+        if(isset($graphData[0])){
+            foreach($graphData[0] AS $key => $columnName){
+                if($key > 0){
+                    $split = explode(":", $columnName);
+                    $graphData[0][$key] = $gw2i_linkedServices[$split[1]]->getName();
+                } else {
+                    $graphData[0][$key] = array("type" => "date", "label" => "Date");
+                }
+            }
+        }
+        
+        $result["chart"] = $graphData;
+        
         break;
         
     
@@ -311,6 +356,7 @@ switch($form){
                 null,
                 604800, //1 week in seconds
                 2); 
+        
          
         $series = array();
         $typeToIndex = array();
@@ -392,6 +438,17 @@ switch($form){
             $graphData = $skimmedGraphData;
         }
         $result["options"] = array(
+            "yAxis" => [
+                [
+                    "title" => [
+                        "text" => "Time (ms)"
+                    ]
+                ], [
+                    "title" => [
+                        "text" => 'Count'
+                    ]
+                ]
+            ],
             "series" => $series,
             "axes" => array(
                 "y" => array(

@@ -209,6 +209,7 @@ $(document).ready(function () {
         //Retrieve charts
         if (!fetchedOnceTab6) {
             $("#update-world-dist-btn").click();
+            $("#update-service-users-stats-btn").click();
             $("#update-api-stats-btn").click();
             fetchedOnceTab6 = true;
         }
@@ -301,37 +302,8 @@ function fetchStatisticsChart(form, data) {
                     });
                 });
                 console.log(series);
-                Highcharts.stockChart(form.find(".chart_div").get(0), {
-                    yAxis: [{
-                            type: 'logarithmic',
-                            minorTickInterval: 0.1,
-                            title: {
-                                text: 'API Verified Users Per World'
-                            },
-                            labels: {
-                                formatter: function () {
-                                    return "";
-                                }
-                            },
-                            height: 800,
-                            lineWidth: 2
-                        }, {
-                            title: {
-                                text: 'Temporary Users Per World'
-                            },
-                            labels: {
-                                formatter: function () {
-                                    return "";
-                                }
-                            },
-                            top: 750,
-                            height: 200,
-                            offset: 0,
-                            lineWidth: 2
-                        }],
-                    xAsis: {
-                        ordinal: false
-                    },
+                
+                var options = {
                     tooltip: {
                         crosshairs: true,
                         borderWidth: 0,
@@ -344,7 +316,12 @@ function fetchStatisticsChart(form, data) {
                     },
 
                     series: series
-                });
+                };
+                if(json["data"]["options"] !== undefined){
+                    options = mergeObjects(options, json["data"]["options"]);
+                }
+                console.log(options);
+                Highcharts.stockChart(form.find(".chart_div").get(0), options);
                 stopSpinner(form);
 
 //                var chart = json["data"]["chart"];

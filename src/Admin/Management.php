@@ -440,6 +440,18 @@ require_once __DIR__ . "/RestrictAdminPanel.php";
                         </form>
                     </div>
                     <div class='secondaryheading'>
+                        <h5>Users per Service</h5>
+                        <p>See how many users has access to each service</p>
+                        <form action='ManagementController.php' method="POST" name='get-statistics-service-users' class="statistics-admin-form">
+                            <div class="chart_div"></div>
+                            <button id='update-service-users-stats-btn' class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner">
+                                Update
+                            </button>
+                            <div class="mdl-spinner mdl-js-spinner is-active spinner-button"></div>
+                            <br /><br />
+                        </form>
+                    </div>
+                    <div class='primaryheading'>
                         <h5>API Statistics</h5>
                         <p>Errors are to be expected, due to people deleting their API key, however spikes in api errors usually indicate that there is a problem with the GW2 API<br />
                             Successes and errors should be seen in relation to each other, as the amount of keys processed very from time to time</p>
@@ -452,7 +464,7 @@ require_once __DIR__ . "/RestrictAdminPanel.php";
                             <br /><br />
                         </form>
                     </div>
-                    <div class='primaryheading'>
+                    <div class='secondaryheading'>
                         <h5>Collect Available Statistics</h5>
                         <p>Collect the currently available statistics that does not require certain events to be collected</p>
                         <form action='ManagementController.php' method="POST" name='collect-statistics' class="default-admin-form">

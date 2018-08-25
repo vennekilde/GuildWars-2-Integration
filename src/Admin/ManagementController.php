@@ -256,15 +256,11 @@ switch($form){
                 $timeToSwitchToDays
             );
         $otherRowId = 0;
-        $firstTempId = null;
         if(isset($graphData[0])){
             foreach($graphData[0] AS $key => $columnName){
                 if($key > 0){
                     $split = explode(":", $columnName);
                     if($split[0] == 6){
-                        if(!isset($firstTempId)){
-                            $firstTempId = $key;
-                        }
                         $newName = "[T] ";
                     } else {
                         $newName = "";
@@ -305,11 +301,9 @@ switch($form){
             
             // Group data from worlds with less than 10 users verified
             foreach($skimmedGraphData[$roundedIndex] AS $key => $value){
-                if($key < $firstTempId){
-                    if($value < 10){
-                        unset($skimmedGraphData[$roundedIndex][$key]);
-                        $skimmedGraphData[$roundedIndex][$otherRowId] += $value;
-                    }
+                if($value < 10){
+                    unset($skimmedGraphData[$roundedIndex][$key]);
+                    $skimmedGraphData[$roundedIndex][$otherRowId] += $value;
                 }
             }
             

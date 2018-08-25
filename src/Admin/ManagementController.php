@@ -255,12 +255,16 @@ switch($form){
                 $timeToSwitchToHours,
                 $timeToSwitchToDays
             );
-        
+        $otherRowId = 0;
+        $firstTempId = null;
         if(isset($graphData[0])){
             foreach($graphData[0] AS $key => $columnName){
                 if($key > 0){
                     $split = explode(":", $columnName);
                     if($split[0] == 6){
+                        if(!isset($firstTempId)){
+                            $firstTempId = $key;
+                        }
                         $newName = "[T] ";
                     } else {
                         $newName = "";
@@ -271,6 +275,8 @@ switch($form){
                     $graphData[0][$key] = array("type" => "date", "label" => "Date");
                 }
             }
+            $otherRowId = count($graphData[0]);
+            $graphData[0][$otherRowId] = "Other";
         }
         
         $skimmedGraphData = array($graphData[0]);
@@ -283,16 +289,30 @@ switch($form){
 
             if($time >= time() - $timeToSwitchToHours) {
                 $skimmedGraphData[] = $graphData[$i];
+                
                 $roundedIndex++;
             } else if($lastRowDate != $date){
                 $skimmedGraphData[] = array_merge(array($date), array_slice($graphData[$i], 1));
+               
                 $roundedIndex++;
+                
                 $lastRowDate = $date;
             } else {
                 for($k = 1; $k < count($skimmedGraphData[$roundedIndex]) - 1; $k++){
-                    $skimmedGraphData[$roundedIndex][$k] = $graphData[$i][$k];
+                    $skimmedGraphData[$roundedIndex][$k] = $graphData[$i][$k] ;
                 }
             }
+            
+            // Group data from worlds with less than 10 users verified
+            foreach($skimmedGraphData[$roundedIndex] AS $key => $value){
+                if($key < $firstTempId){
+                    if($value < 10){
+                        unset($skimmedGraphData[$roundedIndex][$key]);
+                        $skimmedGraphData[$roundedIndex][$otherRowId] += $value;
+                    }
+                }
+            }
+            
         }
         
         $result["chart"] = $skimmedGraphData;
@@ -303,17 +323,17 @@ switch($form){
             "yAxis" => [
                 [
                     "type" => "logarithmic",
-                    "minorTickInterval" => 0.1,
+                    "minorTickInterval" => "auto",
                     "title" => [
                         "text" => "API Verified Users Per World"
                     ],
-                    "height" => 800,
+                    "height" => 600,
                     "lineWidth" => 2
                 ], [
                     "title" => [
                         "text" => 'Temporary Users Per World'
                     ],
-                    "top" => 750,
+                    "top" => 675,
                     "height" => 200,
                     "offset" => 0,
                     "lineWidth" => 2

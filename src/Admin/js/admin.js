@@ -279,8 +279,11 @@ function fetchStatisticsChart(form, data) {
                 $.each(json["data"]["chart"], function (i1, value) {
                     var self = this;
                     $.each(value, function (i2, data) {
-                        if (i1 === 0) {
-                            if (i2 === 0) {
+                        if(data === "undefined"){
+                            return;
+                        }
+                        if (i1 == 0) {
+                            if (i2 == 0) {
                                 return;
                             }
                             series.push({
@@ -290,7 +293,7 @@ function fetchStatisticsChart(form, data) {
                                 yAxis: data.startsWith("[T]") ? 1 : 0
                             });
                         } else {
-                            if (i2 === 0) {
+                            if (i2 == 0) {
                                 self.date = new Date(data).getTime();
                             } else {
                                 series[i2 - 1]["data"].push([

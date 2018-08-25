@@ -47,6 +47,7 @@ class StatisticsPersistence {
     const TEMPORARY_ACCESS = 6;
     const TEMPORARY_ACCESS_EXPIRED = 7;
     const API_SUCCESS = 8;
+    const SERVICE_USER_NUMBERS = 9;
     
     /**
      * 
@@ -169,10 +170,23 @@ class StatisticsPersistence {
         return $preparedStatement->fetchAll(PDO::FETCH_ASSOC);
     }
     
+    public static function countServiceUsers(){
+        global $gw2i_db_prefix;
+        $preparedQueryString = 'SELECT l.service_id, COUNT(*) as count FROM '.$gw2i_db_prefix.'api_keys k INNER JOIN '.$gw2i_db_prefix.'accounts a ON k.link_id = a.link_id INNER JOIN '.$gw2i_db_prefix.'user_service_links l ON a.link_id = l.link_id WHERE last_success > last_attempted_fetch - INTERVAL ? SECOND AND l.is_primary = 1 GROUP BY l.service_id';
+        $queryParams = array(
+            SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_EXPIRATION_TIME)
+        );
+        
+        $apiKeys = Persistence::getDBEngine()->prepare($preparedQueryString);
+
+        $apiKeys->execute($queryParams);
+        
+        return $apiKeys->fetchAll(PDO::FETCH_ASSOC);
+    }
     
     public static function countExpiredAPIKeys(){
         global $gw2i_db_prefix;
-        $preparedQueryString = 'SELECT a_world, COUNT(*) as count FROM '.$gw2i_db_prefix.'api_keys k INNER JOIN gw2integration_accounts a ON k.link_id = a.link_id WHERE last_success <= last_attempted_fetch - INTERVAL ? SECOND AND api_key_permissions != "' . VerificationController::TEMPORARY_API_KEY_PERMISSIONS . '" GROUP BY a.a_world';
+        $preparedQueryString = 'SELECT a_world, COUNT(*) as count FROM '.$gw2i_db_prefix.'api_keys k INNER JOIN '.$gw2i_db_prefix.'accounts a ON k.link_id = a.link_id WHERE last_success <= last_attempted_fetch - INTERVAL ? SECOND AND api_key_permissions != "' . VerificationController::TEMPORARY_API_KEY_PERMISSIONS . '" GROUP BY a.a_world';
         $queryParams = array(
             SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::API_KEY_EXPIRATION_TIME)
         );

@@ -56,6 +56,7 @@ class StatisticsLogger implements EventListener{
         $expiredKeysPerWorld = StatisticsPersistence::countExpiredAPIKeys();
         $tempAccessPerWorld = StatisticsPersistence::countNotExpiredTemporaryAccess();
         $tempAccessExpriedPerWorld = StatisticsPersistence::countExpiredTemporaryAccess();
+        $usersPerService = StatisticsPersistence::countServiceUsers();
         
         $timestamp = time();
         foreach($notExpiredPerWorld AS $notExpired){
@@ -72,6 +73,10 @@ class StatisticsLogger implements EventListener{
         
         foreach($tempAccessExpriedPerWorld AS $tempAccessExpried){
             StatisticsPersistence::persistStatistic($tempAccessExpried["count"], StatisticsPersistence::TEMPORARY_ACCESS_EXPIRED, $timestamp, $tempAccessExpried["a_world"]);
+        }
+        
+        foreach($usersPerService AS $serviceUserCount){
+            StatisticsPersistence::persistStatistic($serviceUserCount["count"], StatisticsPersistence::SERVICE_USER_NUMBERS, $timestamp, $serviceUserCount["service_id"]);
         }
     }
     

@@ -171,6 +171,27 @@ switch($form){
         break;
         
         
+    case "set-user-service-link":
+        if(isset($formData["link-id"]) && isset($formData["service-user-id"]) && !empty($formData["set-user-service"])) {
+            $linkId = $formData["link-id"];
+            $serviceUserId = $formData["service-user-id"];
+            $serviceId = $formData["set-user-service"];
+            $isMusicBot = $formData["is-music-bot"];
+            $serviceLink = new UserServiceLink($serviceId, $serviceUserId, !$isMusicBot);
+            $serviceLink->setLinkedId($linkId);
+            
+            try {                
+                LinkingPersistencyHelper::persistUserServiceLink($serviceLink);
+                $result["result"] = "success";
+            } catch(Exception $e){
+                $result["error"] = "Exception: ".$e->getMessage()."\n".$e->getTraceAsString();
+            }
+        } else {
+            $result["error"] = "Missing Input";
+        }
+        break;
+        
+        
     case "get-api-key-name":
         if(isset($formData["user-id"]) && isset($formData["get-key-name-service"])) {
             $linkedUser = new LinkedUser();

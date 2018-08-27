@@ -237,8 +237,48 @@ require_once __DIR__ . "/RestrictAdminPanel.php";
                             <br /><br />
                         </form>
                     </div>
-
+                    
                     <div class='secondaryheading'>
+                        <h5>Set User Service Link</h5>
+                        <p>Link a user from a service to a user's verification id (link-id)</p>
+                        <form action='ManagementController.php' method="POST" name='set-user-service-link' class="default-admin-form">
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                <input class="mdl-textfield__input" type="text" name="link-id" id="user-id">
+                                <label class="mdl-textfield__label" for="link-id">Link Id</label>
+                            </div>
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                <input class="mdl-textfield__input" type="text" name="service-user-id" id="service-user-id">
+                                <label class="mdl-textfield__label" for="service-user-id">User Identification</label>
+                            </div>
+                            <br />
+
+                            <?php
+                            foreach ($gw2i_linkedServices AS $linkedService) {
+                                echo'   <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" style="width: initial; padding-right: 10px" for="set-user-service-' . $linkedService->getServiceId() . '">
+                                                <input type="radio" id="set-user-service-' . $linkedService->getServiceId() . '" class="mdl-radio__button" name="set-user-service" value="' . $linkedService->getServiceId() . '">
+                                                <span class="mdl-radio__label">' . $linkedService->getName() . '</span>
+                                            </label>';
+                            }
+                            ?>
+                            <br />
+
+                            <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="is-music-bot">
+                                <input type="checkbox" name="is-music-bot" id="is-music-bot" class="mdl-checkbox__input">
+                                <span class="mdl-checkbox__label">Is Music Bot</span>
+                            </label>
+                            <br /><br />
+
+                            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button-spinner">
+                                Add/Set User Service Link
+                            </button> 
+                            <div class="mdl-spinner mdl-js-spinner is-active spinner-button"></div>
+
+                            <div class="response-div response-div-style"></div>
+                            <br /><br />
+                        </form>
+                    </div>
+
+                    <div class='primaryheading'>
                         <h5>Generate Unique API Key Name</h5>
                         <p>Generate a Unique API Key name for a specific user given the service they attempt to verify themselves with</p>
 

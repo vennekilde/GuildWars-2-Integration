@@ -71,11 +71,13 @@ class APIKeyManager {
      * @param LinkedUser $linkedUser
      * @param string $apiKey
      * @param boolean $ignoreAPIKeyFormat
+     * @param boolean $ignoreAPIKeyName
      * @param boolean $ignoreAPIKeyPermissions
+     * @param boolean $ignoreCharacterLevelRequirement
      * @throws InvalidAPIKeyFormatException
      * @throws MissingRequiredAPIKeyPermissions
      */
-    public static function addAPIKeyForUser($linkedUser, $apiKey, $ignoreAPIKeyFormat = false, $ignoreAPIKeyName = false, $ignoreAPIKeyPermissions = false){
+    public static function addAPIKeyForUser($linkedUser, $apiKey, $ignoreAPIKeyFormat = false, $ignoreAPIKeyName = false, $ignoreAPIKeyPermissions = false, $ignoreCharacterLevelRequirement = false){
         global $logger;
         $timeStarted = microtime(true) * 1000; 
         //Throws exceptions if not valid'
@@ -88,12 +90,14 @@ class APIKeyManager {
             }
         }
         
-        //Check level requirement
-        $level_restriction = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::ACCOUNT_LEVEL_REQUIREMENT);
-        $charactersData = null;
-        if($level_restriction > 0 && $hasRequiredPermissions === true){
-            $charactersData = (array)static::$api->characters($apiKey)->all();
-            static::hasCharacterInRequiredLevel($charactersData);
+        if(!$ignoreCharacterLevelRequirement){
+            //Check level requirement
+            $level_restriction = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::ACCOUNT_LEVEL_REQUIREMENT);
+            $charactersData = null;
+            if($level_restriction > 0 && $hasRequiredPermissions === true){
+                $charactersData = (array)static::$api->characters($apiKey)->all();
+                static::hasCharacterInRequiredLevel($charactersData);
+            }
         }
         //Get data from Account endpoint
         $accountData = (array)static::$api->account($apiKey)->get();

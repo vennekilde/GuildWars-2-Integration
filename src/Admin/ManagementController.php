@@ -157,7 +157,7 @@ switch($form){
             try {                
                 if(!empty($ignoreRestrictions)){
                     $keyNames = APIKeyManager::addAPIKeyForUser($linkedUser, $apiKey, 
-                            $ignoreRestrictions, $ignoreRestrictions, $ignoreRestrictions);
+                            $ignoreRestrictions, $ignoreRestrictions, $ignoreRestrictions, $ignoreRestrictions);
                 } else {
                     $keyNames = APIKeyManager::addAPIKeyForUser($linkedUser, $apiKey);
                 }

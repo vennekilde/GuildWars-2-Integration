@@ -223,7 +223,7 @@ require_once __DIR__ . "/RestrictAdminPanel.php";
                             <br />
 
                             <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="ignore-api-key-restrictions">
-                                <input type="checkbox" name="ignore-api-key-restrictions" id="ignore-api-key-restrictions" class="mdl-checkbox__input" disabled>
+                                <input type="checkbox" name="ignore-api-key-restrictions" id="ignore-api-key-restrictions" class="mdl-checkbox__input">
                                 <span class="mdl-checkbox__label">Ignore API Key Restrictions</span>
                             </label>
                             <br /><br />

@@ -151,10 +151,16 @@ switch($form){
             $userId = $formData["user-id"];
             $apiKey = $formData["api-key"];
             $serviceId = $formData["set-key-service"];
+            $ignoreRestrictions = $formData["ignore-api-key-restrictions"];
             $linkedUser->addUserServiceLink(new UserServiceLink($serviceId, $userId, true));
             
             try {                
-                $keyNames = APIKeyManager::addAPIKeyForUser($linkedUser, $apiKey);
+                if(!empty($ignoreRestrictions)){
+                    $keyNames = APIKeyManager::addAPIKeyForUser($linkedUser, $apiKey, 
+                            $ignoreRestrictions, $ignoreRestrictions, $ignoreRestrictions);
+                } else {
+                    $keyNames = APIKeyManager::addAPIKeyForUser($linkedUser, $apiKey);
+                }
                 $result["result"] = "success";
             } catch(Exception $e){
                 $result["error"] = "Exception: ".$e->getMessage()."\n".$e->getTraceAsString();

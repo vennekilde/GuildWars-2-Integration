@@ -115,7 +115,7 @@ class Discord extends LinkedService{
         }
         
         
-        $teamspeakLinkServerAddress = "$restAddress/teamspeak?$paramsString";
+        $teamspeakLinkServerAddress = "$restAddress/discord?$paramsString";
         
         try{
             // create a new cURL resource

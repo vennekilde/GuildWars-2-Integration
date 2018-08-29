@@ -36,7 +36,7 @@ foreach($_POST AS $key => $value){
     $formData[$key] = filter_input(INPUT_POST, $key);
 }
 switch($form){
-    case "soft-restart-ts":
+    case "soft-restart-discord":
         try{
             Discord::sendRESTCommand(array("srs" => null));
             $result["status"] = "Sent soft restart command to teamspeak server";

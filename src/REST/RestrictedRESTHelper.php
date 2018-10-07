@@ -35,7 +35,7 @@ require_once __DIR__."/RESTHelper.php";
 
 class RestrictedRESTHelper extends RESTHelper{
     public static function init(){
-        if(!$_SERVER['HTTP_HOST'] == "localhost"){
+        if($_SERVER['HTTP_HOST'] !== "localhost"){
             global $RESTAllowedIPs;
             if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
                 $ip = $_SERVER['HTTP_CLIENT_IP'];

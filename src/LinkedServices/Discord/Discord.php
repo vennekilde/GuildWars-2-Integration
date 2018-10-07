@@ -53,6 +53,7 @@ class Discord extends LinkedService{
         
         SettingsPersistencyHelper::$visibleSettings["Discord Settings"] = array(
             SettingsPersistencyHelper::DISCORD_BOT_ADDRESS,
+            SettingsPersistencyHelper::DISCORD_ACCESS_TOKEN,
             SettingsPersistencyHelper::DISCORD_LINKED_WORLD_TEMP_GROUP_PRIMARY,
             SettingsPersistencyHelper::DISCORD_LINKED_WORLD_TEMP_GROUP_SECONDARY
         );
@@ -101,6 +102,8 @@ class Discord extends LinkedService{
      */
     public static function sendRESTCommand($params){
         $restAddress = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::DISCORD_BOT_ADDRESS);
+        $accessToken = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::DISCORD_ACCESS_TOKEN);
+        $params["access-token"] = $accessToken;
         
         $paramsString = "";
         foreach($params AS $key => $value){

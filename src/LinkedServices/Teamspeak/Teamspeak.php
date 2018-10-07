@@ -53,6 +53,7 @@ class Teamspeak extends LinkedService{
         
         SettingsPersistencyHelper::$visibleSettings["Teamspeak Settings"] = array(
             SettingsPersistencyHelper::TEAMSPEAK_BOT_ADDRESS,
+            SettingsPersistencyHelper::TEAMSPEAK_ACCESS_TOKEN,
             SettingsPersistencyHelper::TEAMSPEAK_LINKED_WORLD_TEMP_GROUP_PRIMARY,
             SettingsPersistencyHelper::TEAMSPEAK_LINKED_WORLD_TEMP_GROUP_SECONDARY
         );
@@ -100,6 +101,8 @@ class Teamspeak extends LinkedService{
      */
     public static function sendRESTCommand($params){
         $teamspeakAddress = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::TEAMSPEAK_BOT_ADDRESS);
+        $accessToken = SettingsPersistencyHelper::getSetting(SettingsPersistencyHelper::TEAMSPEAK_ACCESS_TOKEN);
+        $params["access-token"] = $accessToken;
         
         $paramsString = "";
         foreach($params AS $key => $value){

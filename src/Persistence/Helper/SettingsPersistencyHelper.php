@@ -58,6 +58,8 @@ class SettingsPersistencyHelper {
     const DISCORD_LINKED_WORLD_TEMP_GROUP_PRIMARY = "discord_linked_world_temp_group_primary";
     const DISCORD_LINKED_WORLD_TEMP_GROUP_SECONDARY = "discord_linked_world_temp_group_secondary";
     const API_KEYS_BATCH_MAX_PROCESS_TIME = "api_keys_batch_max_process_time";
+    const DISCORD_ACCESS_TOKEN = "discord_access_token";
+    const TEAMSPEAK_ACCESS_TOKEN = "teamspeak_access_token";
     
     
     public static $visibleSettings = array(

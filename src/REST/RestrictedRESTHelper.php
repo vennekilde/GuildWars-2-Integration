@@ -35,8 +35,10 @@ require_once __DIR__."/RESTHelper.php";
 
 class RestrictedRESTHelper extends RESTHelper{
     public static function init(){
-        if($_SERVER['HTTP_HOST'] !== "localhost"){
-            global $RESTAllowedIPs;
+        global $RESTAccessToken;
+        $accessToken = filter_input(INPUT_GET, 'access-token', FILTER_SANITIZE_URL);
+        if($accessToken !== $RESTAccessToken){
+            global $logger;
             if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
                 $ip = $_SERVER['HTTP_CLIENT_IP'];
             } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
@@ -44,13 +46,27 @@ class RestrictedRESTHelper extends RESTHelper{
             } else {
                 $ip = $_SERVER['REMOTE_ADDR'];
             }
-            if(!in_array($ip, $RESTAllowedIPs)){
-                global $logger;
-                $logger->warning("$ip tried to connect to restricted REST endpoint " . $_SERVER['REQUEST_URI']);
-                http_response_code(403);
-                exit(0);
-            }
+            $logger->warning("$ip tried to connect to restricted REST endpoint " . $_SERVER['REQUEST_URI']);
+            http_response_code(403);
+            exit(0);
         }
+        
+//        if($_SERVER['HTTP_HOST'] !== "localhost"){
+//            global $RESTAllowedIPs;
+//            if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+//                $ip = $_SERVER['HTTP_CLIENT_IP'];
+//            } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+//                $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+//            } else {
+//                $ip = $_SERVER['REMOTE_ADDR'];
+//            }
+//            if(!in_array($ip, $RESTAllowedIPs)){
+//                global $logger;
+//                $logger->warning("$ip tried to connect to restricted REST endpoint " . $_SERVER['REQUEST_URI']);
+//                http_response_code(403);
+//                exit(0);
+//            }
+//        }
     }
 }
 RestrictedRESTHelper::init();

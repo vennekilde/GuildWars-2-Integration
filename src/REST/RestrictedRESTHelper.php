@@ -45,6 +45,8 @@ class RestrictedRESTHelper extends RESTHelper{
                 $ip = $_SERVER['REMOTE_ADDR'];
             }
             if(!in_array($ip, $RESTAllowedIPs)){
+                global $logger;
+                $logger->warning("$ip tried to connect to restricted REST endpoint " . $_SERVER['REQUEST_URI']);
                 http_response_code(403);
                 exit(0);
             }

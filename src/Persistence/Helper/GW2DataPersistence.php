@@ -165,7 +165,7 @@ class GW2DataPersistence {
             ':a_world' => $accountData["world"],
             ':a_created' => $created,
             ':a_access' => $accountData["access"],
-            ':a_commander' => $accountData["commander"] == "1",
+            ':a_commander' => $accountData["commander"],
         );
 
         //If true, that means the progression permission is given, so no need to check if the others is set

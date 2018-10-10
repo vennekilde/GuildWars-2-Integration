@@ -159,13 +159,14 @@ class GW2DataPersistence {
         }
 
         $created = date('Y-m-d h:i:s', strtotime($accountData["created"]));
+        $commander = $accountData["commander"] == "1" | $accountData["commander"] == true ? 1 : 0;
         $values = array(
             ':a_uuid' => $accountData["id"],
             ':a_username' => $accountData["name"],
             ':a_world' => $accountData["world"],
             ':a_created' => $created,
             ':a_access' => $accountData["access"],
-            ':a_commander' => (int) $accountData["commander"] == "1",
+            ':a_commander' => $commander,
         );
 
         //If true, that means the progression permission is given, so no need to check if the others is set

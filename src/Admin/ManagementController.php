@@ -175,7 +175,7 @@ switch ($form) {
             $serviceLink->setLinkedId($linkId);
 
             try {
-                LinkingPersistencyHelper::persistUserServiceLink($serviceLink);
+                LinkingPersistencyHelper::persistUserServiceLink($serviceLink, true);
                 $result["result"] = "success";
             } catch (Exception $e) {
                 $result["error"] = "Exception: " . $e->getMessage() . "\n" . $e->getTraceAsString();
